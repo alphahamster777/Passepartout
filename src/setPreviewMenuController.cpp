@@ -1,8 +1,13 @@
 #include "setPreviewMenuController.h"
 
-SetPreviewMenuController::SetPreviewMenuController(RecSetManager* manager, QObject* parent)
-    : QObject(parent), m_recSetManager(manager) {
+SetPreviewMenuController::SetPreviewMenuController(QObject* parent)
+    : QObject(parent), m_recSetManager(nullptr) {
     // Populate the expression list from RecSetManager
+
+}
+
+void SetPreviewMenuController::initialize(RecSetManager *manager) {
+    m_recSetManager = manager;
     auto recSets = m_recSetManager->getAllRecSets();
     for (const auto& recSet : recSets) {
         for (const auto& word : recSet) {
@@ -15,13 +20,14 @@ SetPreviewMenuController::SetPreviewMenuController(RecSetManager* manager, QObje
         }
     }
     emit expressionListChanged();
+    // Additional initialization as needed.
 }
 
 QList<QVariant> SetPreviewMenuController::getExpressionList() const {
     return m_expressionList;
 }
 
-void SetPreviewMenuController::startTests() {
-    // Logic to initialize tests can go here
-    emit navigateToTest(); // Trigger navigation signal
-}
+// void SetPreviewMenuController::startTests() {
+//     // Logic to initialize tests can go here
+//     emit navigateToTest(); // Trigger navigation signal
+// }

@@ -1,14 +1,14 @@
 #pragma once
 #include <QObject>
 #include <QString>
-// #include <QtQml/qqml.h>
+#include <QtQml/qqml.h>
 // #include <memory>
 
 #include "recSetManager.h"
 
 class SpellingTestController : public QObject {
     Q_OBJECT
-    // QML_ELEMENT
+    QML_ELEMENT
     Q_PROPERTY(int totalQuestions READ totalQuestions  WRITE setTotalQuestions NOTIFY totalQuestionsChanged)
     Q_PROPERTY(int correctAnswers READ correctAnswers  WRITE setCorrectAnswers NOTIFY correctAnswersChanged)
     Q_PROPERTY(QString currentWord READ currentWord  WRITE setCurrentWord NOTIFY currentWordChanged)
@@ -18,7 +18,8 @@ class SpellingTestController : public QObject {
 
     // Q_PROPERTY(QList<> audioUrl READ audioUrl  WRITE setAudioUrl NOTIFY audioUrlChanged)
 public:
-    explicit SpellingTestController(RecSetManager* manager, QObject* parent = nullptr);
+    explicit SpellingTestController(QObject* parent = nullptr);
+    Q_INVOKABLE void initialize(RecSetManager* manager);
 
     Q_INVOKABLE void nextQuestion();
     int totalQuestions() const { return m_totalQuestions; }

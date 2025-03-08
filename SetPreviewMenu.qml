@@ -67,7 +67,7 @@ Page {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
-            setPreviewController.startTests()
+            setPreviewController.navigateToTest()
         }
     }
 }

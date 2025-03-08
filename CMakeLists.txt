@@ -47,24 +47,56 @@ find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
-qt_add_library(SpellingTestController
+
+qt_add_qml_module(SpellingTestController
+    URI SpellingTestController
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
     ${CMAKE_SOURCE_DIR}/include/spellingTestController.h
     ${CMAKE_SOURCE_DIR}/src/spellingTestController.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/SpellingTestController"
 )
-target_include_directories(SpellingTestController
-    PUBLIC ${CMAKE_SOURCE_DIR}/include
-)
+
 target_link_libraries(SpellingTestController PRIVATE Qt6::Core RecSetManager)
 
 
-qt_add_library(SetPreviewMenuController
+qt_add_qml_module(SetPreviewMenuController
+    URI SetPreviewMenuController
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
     ${CMAKE_SOURCE_DIR}/include/setPreviewMenuController.h
     ${CMAKE_SOURCE_DIR}/src/setPreviewMenuController.cpp
-)
-target_include_directories(SetPreviewMenuController
-    PUBLIC ${CMAKE_SOURCE_DIR}/include
+    OUTPUT_DIRECTORY
+    "${CMAKE_BINARY_DIR}/SetPreviewMenuController"
 )
 target_link_libraries(SetPreviewMenuController PRIVATE Qt6::Core Qt6::Qml RecSetManager)
+
+
+qt_add_qml_module(AppController
+    URI AppController
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/appController.h
+    ${CMAKE_SOURCE_DIR}/src/appController.cpp
+    OUTPUT_DIRECTORY
+    "${CMAKE_BINARY_DIR}/AppController"
+)
+target_link_libraries(AppController PRIVATE Qt6::Core Qt6::Qml RecSetManager)
+
+
+
+# qt_add_library(AppController
+#     ${CMAKE_SOURCE_DIR}/include/appController.h
+#     ${CMAKE_SOURCE_DIR}/src/appController.cpp
+# )
+# target_include_directories(AppController
+#     PUBLIC ${CMAKE_SOURCE_DIR}/include
+# )
+
 
 qt_add_executable(appPassepartout
     ${CMAKE_SOURCE_DIR}/src/main.cpp
@@ -98,7 +130,7 @@ set_target_properties(appPassepartout PROPERTIES
 )
 
 target_link_libraries(appPassepartout
-    PRIVATE Qt6::Multimedia Qt6::QuickControls2 SpellingTestController SetPreviewMenuController
+    PRIVATE Qt6::Multimedia Qt6::QuickControls2 #SpellingTestController SetPreviewMenuController
 )
 
 include(GNUInstallDirs)

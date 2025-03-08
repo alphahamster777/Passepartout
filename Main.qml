@@ -1,5 +1,8 @@
 import QtQuick
 import QtQuick.Controls
+import AppController
+import SetPreviewMenuController
+import SpellingTestController
 
 ApplicationWindow {
     id: mainWindow
@@ -8,7 +11,19 @@ ApplicationWindow {
     height: 640
     title: "Passepartout"
 
-    // color: "red"
+    AppController{
+        id:appController
+    }
+
+    SpellingTestController {
+        id: spellingTestController
+        Component.onCompleted: initialize(appController.recSetManager)
+    }
+
+    SetPreviewMenuController {
+        id: setPreviewController
+        Component.onCompleted: initialize(appController.recSetManager)
+    }
 
     StackView {
         id: stackView
@@ -16,7 +31,6 @@ ApplicationWindow {
         initialItem: setPreviewMenu
 
         visible: true
-
     }
 
     Component {

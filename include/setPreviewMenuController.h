@@ -2,20 +2,22 @@
 
 #include <QObject>
 #include <QQmlListProperty>
-#include <QQmlListProperty>
+#include <QtQml/qqml.h>
 #include "recSetManager.h"
 
 class SetPreviewMenuController : public QObject {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(QList<QVariant> expressionList READ getExpressionList NOTIFY expressionListChanged)
 
 public:
-    explicit SetPreviewMenuController(RecSetManager* manager, QObject* parent = nullptr);
+    explicit SetPreviewMenuController(QObject* parent = nullptr);
+    Q_INVOKABLE void initialize(RecSetManager* manager);
 
     QList<QVariant> getExpressionList() const;
 
 public slots:
-    void startTests();
+    // void startTests();
 
 signals:
     void expressionListChanged();

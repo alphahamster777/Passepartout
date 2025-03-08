@@ -2,11 +2,17 @@
 #include "dictRec.h"
 #include <iostream>
 
-SpellingTestController::SpellingTestController(RecSetManager* manager, QObject* parent) : QObject(parent), m_recSetManager(manager) {
+SpellingTestController::SpellingTestController(QObject* parent) : QObject(parent), m_recSetManager(nullptr) {
     // m_recSetManager.createRecSet("Default Set");
     // m_recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "der Fahrrad", "bicycle", "audio.mp3", "qrc:/images/bicycle.jpg"));
     // m_recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
     // m_recSetManager.addRecToRecSet("Default Set", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
+
+}
+
+void SpellingTestController::initialize(RecSetManager *manager) {
+    m_recSetManager = manager;
+    // Additional initialization as needed.
     currentRecSetNum = 0;
     currentDictRecNum = 0;
     try {
