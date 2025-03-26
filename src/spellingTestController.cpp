@@ -10,26 +10,29 @@ SpellingTestController::SpellingTestController(QObject* parent) : QObject(parent
 
 }
 
-void SpellingTestController::initialize(RecSetManager *manager) {
+void SpellingTestController::initialize(RecSetManager *manager, int idx) {
     m_recSetManager = manager;
     // Additional initialization as needed.
-    currentRecSetNum = 0;
     currentDictRecNum = 0;
     try {
-        auto element = m_recSetManager->getAllRecSets().at(currentRecSetNum).getWordAt(currentDictRecNum++);
-
+        currentRecSetNum = idx;
+        currentDictRecNum = 0;
+        auto element = m_recSetManager->getAllRecSets().at(idx).getWordAt(currentDictRecNum++);
+        m_totalQuestions = m_recSetManager->getAllRecSets().at(idx).getWordCount();
+        m_correctAnswers = 0;
         m_currentWord = QString::fromStdString(element.getExpression());
         m_currentHint = QString::fromStdString(element.getHint());
         m_audioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
         m_imageUrl = QString::fromStdString(element.getImagePath().value_or(""));
+        // emit currentAnswersChanged();
         emit currentWordChanged();
         emit currentHintChanged();
         emit audioUrlChanged();
         emit imageUrlChanged();
+        emit totalQuestionsChanged();
     } catch (const std::out_of_range& e) {
         std::cout << "Out of Range error. " << e.what();
     }
-    m_totalQuestions = m_recSetManager->getAllRecSets().at(0).getWordCount();
 }
 
 void SpellingTestController::nextQuestion() {

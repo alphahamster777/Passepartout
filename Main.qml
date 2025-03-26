@@ -17,26 +17,30 @@ ApplicationWindow {
 
     SpellingTestController {
         id: spellingTestController
-        Component.onCompleted: initialize(appController.recSetManager)
+        // Component.onCompleted: initialize(appController.recSetManager)
     }
 
     SetPreviewMenuController {
         id: setPreviewController
-        Component.onCompleted: initialize(appController.recSetManager)
+        // Component.onCompleted: initialize(appController.recSetManager)
     }
 
     StackView {
         id: stackView
         anchors.fill: parent
-        initialItem: setPreviewMenu
-
+        initialItem: setDirMenu
         visible: true
+    }
+
+    Component {
+        id: setDirMenu
+        SetDirMenu{
+        }
     }
 
     Component {
         id: setPreviewMenu
         SetPreviewMenu{
-
         }
     }
 
@@ -71,7 +75,17 @@ ApplicationWindow {
         target:  stackView.currentItem
         function onResultsNextPressed (){
             stackView.pop()
-            // tackView.push(setPreviewPage)////kher
+            stackView.pop()//more beautiful solution should be realized
+        }
+    }
+
+    Connections {
+        target:  stackView.currentItem
+        function onRecSetSelected(num: int){
+            stackView.pop()
+            setPreviewController.initialize(appController.recSetManager, num)
+            spellingTestController.initialize(appController.recSetManager, num)
+            stackView.push(setPreviewMenu)
         }
     }
 }

@@ -12,7 +12,7 @@ class SetPreviewMenuController : public QObject {
 
 public:
     explicit SetPreviewMenuController(QObject* parent = nullptr);
-    Q_INVOKABLE void initialize(RecSetManager* manager);
+    Q_INVOKABLE void initialize(RecSetManager* manager, int idx);
 
     QList<QVariant> getExpressionList() const;
 

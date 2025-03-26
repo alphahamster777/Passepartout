@@ -105,8 +105,7 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES SpellingTest.qml SetPreviewMenu.qml Results.qml
-    QML_FILES Main.qml
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml
 )
 
 # Include the resource file

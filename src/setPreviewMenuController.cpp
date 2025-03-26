@@ -6,21 +6,19 @@ SetPreviewMenuController::SetPreviewMenuController(QObject* parent)
 
 }
 
-void SetPreviewMenuController::initialize(RecSetManager *manager) {
+void SetPreviewMenuController::initialize(RecSetManager *manager, int idx) {
+    m_expressionList.clear();
     m_recSetManager = manager;
-    auto recSets = m_recSetManager->getAllRecSets();
-    for (const auto& recSet : recSets) {
-        for (const auto& word : recSet) {
-            QVariantMap expressionData;
-            expressionData["expression"] = QString::fromStdString(word.getExpression());
-            expressionData["hint"] = QString::fromStdString(word.getHint());
-            expressionData["imagePath"] = QString::fromStdString(word.getImagePath().value_or(""));
-            expressionData["audioPath"] = QString::fromStdString(word.getAudioPath().value_or(""));
-            m_expressionList.append(expressionData);
-        }
+    auto recSet = m_recSetManager->getAllRecSets().at(idx);
+    for (const auto& word : recSet) {
+        QVariantMap expressionData;
+        expressionData["expression"] = QString::fromStdString(word.getExpression());
+        expressionData["hint"] = QString::fromStdString(word.getHint());
+        expressionData["imagePath"] = QString::fromStdString(word.getImagePath().value_or(""));
+        expressionData["audioPath"] = QString::fromStdString(word.getAudioPath().value_or(""));
+        m_expressionList.append(expressionData);
     }
     emit expressionListChanged();
-    // Additional initialization as needed.
 }
 
 QList<QVariant> SetPreviewMenuController::getExpressionList() const {

@@ -1,11 +1,11 @@
 #ifndef APPCONTROLLER_H
 #define APPCONTROLLER_H
 
+#include <QList>
+#include <QString>
 #include <QObject>
 #include "recSetManager.h"
 #include <QtQml/qqml.h>
-// #include "spellingTestController.h"
-// #include "setPreviewMenuController.h"
 
 class AppController: public QObject
 {
@@ -13,6 +13,7 @@ class AppController: public QObject
     QML_ELEMENT
     // QML_SINGLETON
     Q_PROPERTY(RecSetManager* recSetManager READ recSetManager)
+    Q_PROPERTY(QList<QString> recSetNameList READ getRecSetNameList NOTIFY recSetNameListChanged)
 
 public:
     AppController(QObject* parent = nullptr) {
@@ -20,12 +21,25 @@ public:
         m_recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "der Fahrrad", "bicycle", "audio.mp3", "qrc:/images/bicycle.jpg"));
         m_recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
         m_recSetManager.addRecToRecSet("Default Set", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
+
+        m_recSetManager.createRecSet("Default Set 2");
+        // m_recSetManager.addRecToRecSet("Default Set 2", DictRec(2, 1, "der Fahrrad", "bicycle", "audio.mp3", "qrc:/images/bicycle.jpg"));
+        m_recSetManager.addRecToRecSet("Default Set 2", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
+        m_recSetManager.addRecToRecSet("Default Set 2", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
     }
     RecSetManager* recSetManager() { return &m_recSetManager; }
+
+    QList<QString> getRecSetNameList() const {
+        QList<QString> ret;
+        for (auto& recSet : m_recSetManager.getAllRecSets()) {
+            ret.append(QString::fromStdString(recSet.getSetName()));
+        }
+        return ret;
+    }
+signals:
+    void recSetNameListChanged();
 private:
     RecSetManager m_recSetManager;
-    // SpellingTestController m_spellingTestController;
-    // SetPreviewMenuController m_setPreviewController;
 };
 
 #endif // APPCONTROLLER_H
