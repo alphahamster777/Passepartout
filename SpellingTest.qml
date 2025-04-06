@@ -5,7 +5,6 @@ import QtQuick.Controls
 Page {
     id:root
 
-    anchors.fill: parent
     signal getResults()
     property int nextCounter: 0
 
@@ -18,6 +17,7 @@ Page {
         horizontalAlignment: Text.AlignHCenter
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
     Column {
         anchors.fill: parent
         anchors.topMargin: 16
@@ -33,7 +33,7 @@ Page {
             Image {
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: spellingTestController.imageUrl
+                source: spellingTestController.currentImageUrl
             }
         }
 
@@ -60,8 +60,6 @@ Page {
 
                 nextButton.focus = true;
                 nextButton.highlighted = true;
-
-                // console.log("User entered:", text)
             }
         }
 
@@ -84,13 +82,14 @@ Page {
             nextCounter++
             if(nextCounter >= spellingTestController.totalQuestions){
                 getResults()
+                // nextCounter = 0;
                 return
             }
             guessInputField.color = "gray"
             guessInputField.text = ""
             isExpressionEntered = false
             highlighted = false;
-            guessInputField.focus =true
+            guessInputField.focus = true
 
             spellingTestController.nextQuestion()
         }

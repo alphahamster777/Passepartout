@@ -3,7 +3,6 @@ import QtQuick.Controls
 // import QtMultimedia
 
 Page {
-    anchors.fill: parent
     anchors.topMargin: 16
     anchors.leftMargin: 16
     anchors.rightMargin: 16
@@ -27,11 +26,13 @@ Page {
 
     footer: Button {
         text: "More exercises"
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: parent.horizontalCenter        
         onClicked: {
-            resultsNextPressed()
-
+            highlighted = false
+            resultsNextPressed()            
         }
-
+        onPressed:{//potential bug with releasing should be tested on smartphones
+            highlighted = true
+        }
     }
 }

@@ -13,8 +13,8 @@ class SpellingTestController : public QObject {
     Q_PROPERTY(int correctAnswers READ correctAnswers  WRITE setCorrectAnswers NOTIFY correctAnswersChanged)
     Q_PROPERTY(QString currentWord READ currentWord  WRITE setCurrentWord NOTIFY currentWordChanged)
     Q_PROPERTY(QString currentHint READ currentHint  WRITE setCurrentHint NOTIFY currentHintChanged)
-    Q_PROPERTY(QString imageUrl READ imageUrl  WRITE setImageUrl NOTIFY imageUrlChanged) //todo rename to currentImageUrl
-    Q_PROPERTY(QString audioUrl READ audioUrl  WRITE setAudioUrl NOTIFY audioUrlChanged) //todo rename to currentAudioUrl
+    Q_PROPERTY(QString currentImageUrl READ currentImageUrl  WRITE setCurrentImageUrl NOTIFY currentImageUrlChanged) //todo rename to currentImageUrl
+    Q_PROPERTY(QString currentAudioUrl READ currentAudioUrl  WRITE setCurrentAudioUrl NOTIFY currentAudioUrlChanged) //todo rename to currentAudioUrl
 
     // Q_PROPERTY(QList<> audioUrl READ audioUrl  WRITE setAudioUrl NOTIFY audioUrlChanged)
 public:
@@ -26,8 +26,8 @@ public:
     int correctAnswers() const { return m_correctAnswers; }
     QString currentWord() const { return m_currentWord; }
     QString currentHint() const { return m_currentHint; }
-    QString imageUrl() const { return m_imageUrl; }
-    QString audioUrl() const { return m_audioUrl; }
+    QString currentImageUrl() const { return m_currentImageUrl; }
+    QString currentAudioUrl() const { return m_currentAudioUrl; }
 
 // Setters
     void setTotalQuestions(int totalQuestions) {
@@ -58,17 +58,17 @@ public:
         }
     }
 
-    void setImageUrl(const QString &imageUrl) {
-        if (m_imageUrl != imageUrl) {
-            m_imageUrl = imageUrl;
-            emit imageUrlChanged();
+    void setCurrentImageUrl(const QString &imageUrl) {
+        if (m_currentImageUrl != imageUrl) {
+            m_currentImageUrl = imageUrl;
+            emit currentImageUrlChanged();
         }
     }
 
-    void setAudioUrl(const QString &audioUrl) {
-        if (m_audioUrl != audioUrl) {
-            m_audioUrl = audioUrl;
-            emit audioUrlChanged();
+    void setCurrentAudioUrl(const QString &audioUrl) {
+        if (m_currentAudioUrl != audioUrl) {
+            m_currentAudioUrl = audioUrl;
+            emit currentAudioUrlChanged();
         }
     }
 signals:
@@ -76,8 +76,8 @@ signals:
     void correctAnswersChanged();
     void currentWordChanged();
     void currentHintChanged();
-    void imageUrlChanged();
-    void audioUrlChanged();
+    void currentImageUrlChanged();
+    void currentAudioUrlChanged();
 
 private:
     ///tmp{
@@ -89,6 +89,6 @@ private:
     int m_correctAnswers = 0;
     QString m_currentWord;
     QString m_currentHint;
-    QString m_imageUrl;
-    QString m_audioUrl;
+    QString m_currentImageUrl;
+    QString m_currentAudioUrl;
 };

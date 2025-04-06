@@ -22,13 +22,13 @@ void SpellingTestController::initialize(RecSetManager *manager, int idx) {
         m_correctAnswers = 0;
         m_currentWord = QString::fromStdString(element.getExpression());
         m_currentHint = QString::fromStdString(element.getHint());
-        m_audioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
-        m_imageUrl = QString::fromStdString(element.getImagePath().value_or(""));
+        m_currentAudioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
+        m_currentImageUrl = QString::fromStdString(element.getImagePath().value_or(""));
         // emit currentAnswersChanged();
         emit currentWordChanged();
         emit currentHintChanged();
-        emit audioUrlChanged();
-        emit imageUrlChanged();
+        emit currentAudioUrlChanged();
+        emit currentImageUrlChanged();
         emit totalQuestionsChanged();
     } catch (const std::out_of_range& e) {
         std::cout << "Out of Range error. " << e.what();
@@ -41,12 +41,12 @@ void SpellingTestController::nextQuestion() {
 
         m_currentWord = QString::fromStdString(element.getExpression());
         m_currentHint = QString::fromStdString(element.getHint());
-        m_audioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
-        m_imageUrl = QString::fromStdString(element.getImagePath().value_or(""));
+        m_currentAudioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
+        m_currentImageUrl = QString::fromStdString(element.getImagePath().value_or(""));
         emit currentWordChanged();
         emit currentHintChanged();
-        emit audioUrlChanged();
-        emit imageUrlChanged();
+        emit currentAudioUrlChanged();
+        emit currentImageUrlChanged();
     } catch (const std::out_of_range& e) {
         std::cout << "Out of Range error. " << e.what();
 

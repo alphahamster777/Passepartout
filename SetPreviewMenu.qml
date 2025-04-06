@@ -2,11 +2,12 @@ import QtQuick
 import QtQuick.Controls
 
 Page {
-    anchors.fill: parent
     anchors.topMargin: 16
     anchors.leftMargin: 16
     anchors.rightMargin: 16
     anchors.bottomMargin: 16
+
+    signal navigateToTest()
 
     header: Label {
         text: "Revise expressions"
@@ -67,7 +68,11 @@ Page {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
-            setPreviewController.navigateToTest()
+            navigateToTest()
+            highlighted = false
+        }
+        onPressed:{//potential bug with releasing should be tested on smartphones
+            highlighted = true
         }
     }
 }

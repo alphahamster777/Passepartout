@@ -21,7 +21,6 @@ public slots:
 
 signals:
     void expressionListChanged();
-    void navigateToTest(); // Signal to navigate to the test page
 
 private:
     RecSetManager* m_recSetManager;
