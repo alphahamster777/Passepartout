@@ -13,12 +13,39 @@ endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2)
+
+qt_standard_project_setup(REQUIRES 6.5)
+
+qt_add_qml_module(LanguageHelper
+    URI LanguageHelper
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/languageHelper.h
+    ${CMAKE_SOURCE_DIR}/src/languageHelper.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/LanguageHelper"
+)
+
+target_include_directories(LanguageHelper
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(LanguageHelper
+    PRIVATE Qt6::Core
+)
+
 add_library(DictRec
     ${CMAKE_SOURCE_DIR}/include/dictRec.h
     ${CMAKE_SOURCE_DIR}/src/dictRec.cpp
 )
 target_include_directories(DictRec
     PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(DictRec
+    PRIVATE Qt6::Core
 )
 
 add_library(RecSet
@@ -29,24 +56,27 @@ target_include_directories(RecSet
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 target_link_libraries(RecSet
-    PRIVATE DictRec
+    PRIVATE DictRec Qt6::Core
 )
 
-add_library(RecSetManager
+qt_add_qml_module(RecSetManager
+    URI RecSetManager
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
     ${CMAKE_SOURCE_DIR}/include/recSetManager.h
     ${CMAKE_SOURCE_DIR}/src/recSetManager.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/recSetManager"
 )
+
 target_include_directories(RecSetManager
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
+
 target_link_libraries(RecSetManager
-    PRIVATE DictRec RecSet
+    PRIVATE DictRec RecSet Qt6::Core
 )
-
-find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2)
-
-qt_standard_project_setup(REQUIRES 6.5)
-
 
 qt_add_qml_module(SpellingTestController
     URI SpellingTestController
@@ -61,7 +91,6 @@ qt_add_qml_module(SpellingTestController
 
 target_link_libraries(SpellingTestController PRIVATE Qt6::Core RecSetManager)
 
-
 qt_add_qml_module(SetPreviewMenuController
     URI SetPreviewMenuController
     VERSION 1.0
@@ -72,8 +101,8 @@ qt_add_qml_module(SetPreviewMenuController
     OUTPUT_DIRECTORY
     "${CMAKE_BINARY_DIR}/SetPreviewMenuController"
 )
-target_link_libraries(SetPreviewMenuController PRIVATE Qt6::Core Qt6::Qml RecSetManager)
 
+target_link_libraries(SetPreviewMenuController PRIVATE Qt6::Core Qt6::Qml RecSetManager)
 
 qt_add_qml_module(AppController
     URI AppController
@@ -85,18 +114,8 @@ qt_add_qml_module(AppController
     OUTPUT_DIRECTORY
     "${CMAKE_BINARY_DIR}/AppController"
 )
+
 target_link_libraries(AppController PRIVATE Qt6::Core Qt6::Qml RecSetManager)
-
-
-
-# qt_add_library(AppController
-#     ${CMAKE_SOURCE_DIR}/include/appController.h
-#     ${CMAKE_SOURCE_DIR}/src/appController.cpp
-# )
-# target_include_directories(AppController
-#     PUBLIC ${CMAKE_SOURCE_DIR}/include
-# )
-
 
 qt_add_executable(appPassepartout
     ${CMAKE_SOURCE_DIR}/src/main.cpp
@@ -105,7 +124,7 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml
 )
 
 # Include the resource file
@@ -129,7 +148,7 @@ set_target_properties(appPassepartout PROPERTIES
 )
 
 target_link_libraries(appPassepartout
-    PRIVATE Qt6::Multimedia Qt6::QuickControls2 #SpellingTestController SetPreviewMenuController
+    PRIVATE Qt6::Multimedia Qt6::QuickControls2
 )
 
 include(GNUInstallDirs)

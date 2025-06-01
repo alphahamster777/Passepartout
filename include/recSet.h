@@ -1,16 +1,39 @@
 #pragma once
-#include <string>
+
+// #include <string>
 // #include <optional>
 // #include <vector>
 #include <set>
 #include <stdexcept>
 
 #include "dictRec.h"
-
-class RecSet {
+#include <QObject>
+#include <QVariant>
+#include <QString>
+class RecSet : public QObject {
+    Q_OBJECT
 public:
     // Constructors
-    RecSet(const std::string& setName) : m_setName(setName) {}
+    RecSet(const QString& setName) : m_setName(setName) {}
+
+    RecSet(const RecSet& other){
+        m_setName = other.m_setName;
+        m_words = other.m_words;
+    }
+    RecSet(RecSet&& other) {
+        m_setName = std::move(other.m_setName);
+        m_words = std::move(other.m_words);
+    }
+    RecSet& operator=(const RecSet& other) {
+        m_setName = other.m_setName;
+        m_words = other.m_words;
+        return *this;
+    }
+    RecSet& operator=(RecSet&& other) {
+        m_setName = std::move(other.m_setName);
+        m_words = std::move(other.m_words);
+        return *this;
+    }
 
     // Methods to manage word set
     void addWord(const DictRec& word) { m_words.insert(word); }
@@ -41,9 +64,9 @@ public:
     }
 
     // Getters
-    std::string getSetName() const { return m_setName; }
+    QString getSetName() const { return m_setName; }
     size_t getWordCount() const { return m_words.size(); }
 private:
-    std::string m_setName;               // Name of the word set.
+    QString m_setName;               // Name of the word set.
     std::set<DictRec> m_words;        // Collection of words in the set.
 };

@@ -21,7 +21,6 @@ Page {
         anchors.centerIn: parent
         width: parent.width
         height: parent.height/2
-        // anchors.fill: parent
 
         Repeater {
             model: setPreviewController.expressionList

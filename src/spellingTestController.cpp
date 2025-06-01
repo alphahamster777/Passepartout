@@ -10,8 +10,15 @@ SpellingTestController::SpellingTestController(QObject* parent) : QObject(parent
 
 }
 
-void SpellingTestController::initialize(RecSetManager *manager, int idx) {
-    m_recSetManager = manager;
+void SpellingTestController::initialize(QObject *manager, int idx) {
+
+    auto m = qobject_cast<RecSetManager*>(manager);
+    if (!m) {
+        qWarning() << "initialize(): not a RecSetManager*";
+        return;
+    }
+    m_recSetManager = m;
+
     // Additional initialization as needed.
     currentDictRecNum = 0;
     try {

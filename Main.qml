@@ -3,6 +3,7 @@ import QtQuick.Controls
 import AppController
 import SetPreviewMenuController
 import SpellingTestController
+import RecSetManager
 
 ApplicationWindow {
     id: mainWindow
@@ -10,10 +11,6 @@ ApplicationWindow {
     width: 360
     height: 640
     title: "Passepartout"
-
-    AppController{
-        id:appController
-    }
 
     SpellingTestController {
         id: spellingTestController
@@ -39,6 +36,12 @@ ApplicationWindow {
     }
 
     Component {
+        id: creatingRecSetMenu
+        CreatingRecSet{
+        }
+    }
+
+    Component {
         id: setPreviewMenu
         SetPreviewMenu{
         }
@@ -47,33 +50,34 @@ ApplicationWindow {
     Component {
         id: spellingTestPage
         SpellingTest {
-            // Pass any required properties to SpellingTest here, if needed
         }
     }
 
     Component {
         id: resultsPage
         Results {
-            // Pass any required properties to SpellingTest here, if needed
         }
     }
 
 ///////////////////////////////connections/////////////////////////////////////////
     Loader {
-        id: setDirConnectionLoader
-        active: stackView.currentItem && typeof stackView.currentItem.recSetSelected === "function"
-        sourceComponent: setDirConnectionComponent
+        id: setDirMenuConnectionLoader
+        active: stackView.currentItem && typeof stackView.currentItem.recSetSelected === "function" && typeof stackView.currentItem.addRecSet === "function"
+        sourceComponent: setDirMenuConnectionComponent
     }
 
     Component {
-        id: setDirConnectionComponent
+        id: setDirMenuConnectionComponent
         Connections {
             target: stackView.currentItem
             function onRecSetSelected(num: int){
                 stackView.pop()
-                setPreviewController.initialize(appController.recSetManager, num)
-                spellingTestController.initialize(appController.recSetManager, num)
+                setPreviewController.initialize(AppController.recSetManager, num)
+                spellingTestController.initialize(AppController.recSetManager, num)
                 stackView.push(setPreviewMenu)
+            }
+            function onAddRecSet() {
+                stackView.push(creatingRecSetMenu)
             }
         }
     }
@@ -112,18 +116,70 @@ ApplicationWindow {
     }
 
     Loader {
-        id: resultConnectionLoader
+        id: resultsConnectionLoader
         active: stackView.currentItem && typeof stackView.currentItem.resultsNextPressed === "function"
-        sourceComponent: resultConnectionComponent
+        sourceComponent: resultsConnectionComponent
     }
 
     Component {
-        id: resultConnectionComponent
+        id: resultsConnectionComponent
         Connections {
             target: stackView.currentItem
             function onResultsNextPressed() {
                 stackView.pop(stackView.get(stackView.depth - 3))
             }
+        }
+    }
+
+    Loader {
+        id: creatingRecSetConnectionLoader
+        active: stackView.currentItem && typeof stackView.currentItem.creatingRecSetCancel === "function" || typeof stackView.currentItem.creatingRecSetCancel === "function"
+        sourceComponent: creatingRecSetConnectionComponent
+    }
+
+    Component {
+        id: creatingRecSetConnectionComponent
+        Connections {
+            target: stackView.currentItem
+            function onCreatingRecSetCancel(){
+                stackView.pop();
+            }
+
+            function onCreatingRecSetSave() {                
+                var recSetName =  stackView.currentItem.recSetName.text
+
+                if(recSetName === "") {
+                    return;
+                }
+
+                var recSetModelRef = stackView.currentItem.recSetModelRef
+
+                var recSetManagerRef = AppController.recSetManager
+
+                for (var i = 0; i < recSetModelRef.count; ++i) {
+                    var rec = recSetModelRef.get(i)
+                    if(rec.expression === null || rec.expression.trim() === "" ){
+                        continue
+                    }
+
+                    var hintPreset = rec.hint != null && rec.hint.trim() != ""
+                    var audioPreset = rec.audioPath != null && rec.audioPath.trim() != ""
+                    var imagePreset = rec.imagePath != null && rec.imagePath.trim() != ""
+
+
+                    if(!hintPreset && !audioPreset && !imagePreset){
+                        continue
+                    }
+
+                    // console.log("hintPreset = ", hintPreset, "audioPreset = ", audioPreset, "imagePreset = ", imagePreset)
+
+                    recSetManagerRef.addRecToRecSet(recSetName, rec)
+                }
+                AppController.recSetNameListChanged()
+                stackView.pop();
+            }
+
+
         }
     }
 }

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QObject>
 #include <QQmlListProperty>
+#include <QObject>
 #include <QtQml/qqml.h>
+
 #include "recSetManager.h"
 
 class SetPreviewMenuController : public QObject {
@@ -12,7 +13,7 @@ class SetPreviewMenuController : public QObject {
 
 public:
     explicit SetPreviewMenuController(QObject* parent = nullptr);
-    Q_INVOKABLE void initialize(RecSetManager* manager, int idx);
+    Q_INVOKABLE void initialize(QObject* manager, int idx);
 
     QList<QVariant> getExpressionList() const;
 

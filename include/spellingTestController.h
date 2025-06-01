@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QObject>
 #include <QString>
 #include <QtQml/qqml.h>
@@ -19,7 +20,7 @@ class SpellingTestController : public QObject {
     // Q_PROPERTY(QList<> audioUrl READ audioUrl  WRITE setAudioUrl NOTIFY audioUrlChanged)
 public:
     explicit SpellingTestController(QObject* parent = nullptr);
-    Q_INVOKABLE void initialize(RecSetManager* manager, int idx);
+    Q_INVOKABLE void initialize(QObject* manager, int idx);
 
     Q_INVOKABLE void nextQuestion();
     int totalQuestions() const { return m_totalQuestions; }

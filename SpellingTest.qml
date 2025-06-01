@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-// import QtMultimedia
 
 Page {
     id:root
@@ -77,7 +76,6 @@ Page {
         id: nextButton
         text: "Next"
         anchors.horizontalCenter:parent.horizontalCenter
-        // focusPolicy: Qt.StrongFocus
         onClicked: {
             nextCounter++
             if(nextCounter >= spellingTestController.totalQuestions){

@@ -1,14 +1,56 @@
 #pragma once
+
 #include <optional>
 #include <string>
 
-class DictRec {
+#include <QObject>
+#include <QVariant>
+
+#include "languageHelper.h"
+
+class DictRec : public QObject {
+    Q_OBJECT
 public:
     // Constructors
     DictRec(size_t exprlangID, size_t  hintLangID, const std::string& expression, const std::string& hint,
                const std::optional<std::string>& audioPath = std::nullopt, const std::optional<std::string>& imagePath = std::nullopt)
         : m_exprLangID(exprlangID), m_hintLangID(hintLangID), m_expression(expression), m_hint(hint),
         m_audioPath(audioPath), m_imagePath(imagePath) {}
+
+    DictRec(const DictRec& other){
+        m_exprLangID = other.m_exprLangID;
+        m_hintLangID = other.m_exprLangID;
+        m_expression = other.m_expression;
+        m_hint = other.m_hint;
+        m_audioPath = other.m_audioPath;
+        m_imagePath = other.m_imagePath;
+    }
+    DictRec(DictRec&& other) {
+        m_exprLangID = std::move(other.m_exprLangID);
+        m_hintLangID = std::move(other.m_exprLangID);
+        m_expression = std::move(other.m_expression);
+        m_hint = std::move(other.m_hint);
+        m_audioPath = std::move(other.m_audioPath);
+        m_imagePath = std::move(other.m_imagePath);
+    }
+    DictRec& operator=(const DictRec& other) {
+        m_exprLangID = other.m_exprLangID;
+        m_hintLangID = other.m_exprLangID;
+        m_expression = other.m_expression;
+        m_hint = other.m_hint;
+        m_audioPath = other.m_audioPath;
+        m_imagePath = other.m_imagePath;
+        return *this;
+    }
+    DictRec& operator=(DictRec&& other) {
+        m_exprLangID = std::move(other.m_exprLangID);
+        m_hintLangID = std::move(other.m_exprLangID);
+        m_expression = std::move(other.m_expression);
+        m_hint = std::move(other.m_hint);
+        m_audioPath = std::move(other.m_audioPath);
+        m_imagePath = std::move(other.m_imagePath);
+        return *this;
+    }
 
     // Getters
     int getExprLanguageID() const { return m_exprLangID; }
@@ -35,7 +77,29 @@ public:
         return m_audioPath.value_or("") <=> other.m_audioPath.value_or("");
     }
 
-    bool operator==(const DictRec& other) const = default;
+    bool operator==(const DictRec& other) const {
+        if(m_exprLangID != other.m_exprLangID){
+            return false;
+        }
+        if(m_hintLangID != other.m_exprLangID){
+            return false;
+        }
+        if(m_expression != other.m_expression){
+            return false;
+        }
+        if(m_hint != other.m_hint){
+            return false;
+        }
+        if(m_audioPath != other.m_audioPath){
+            return false;
+        }
+        if(m_imagePath != other.m_imagePath){
+            return false;
+        }
+
+        return true;
+    };
+
 
 private:
     int m_exprLangID;               // ID representing the language of the word to learn.

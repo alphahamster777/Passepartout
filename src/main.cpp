@@ -2,10 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickStyle>//to set "Material" style
-// #include "spellingTestController.h"
-// #include "setPreviewMenuController.h"
 
-// import word_set_manager;
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);

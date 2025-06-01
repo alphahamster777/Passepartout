@@ -6,9 +6,15 @@ SetPreviewMenuController::SetPreviewMenuController(QObject* parent)
 
 }
 
-void SetPreviewMenuController::initialize(RecSetManager *manager, int idx) {
+void SetPreviewMenuController::initialize(QObject *manager, int idx) {
+    auto m = qobject_cast<RecSetManager*>(manager);
+    if (!m) {
+        qWarning() << "initialize(): not a RecSetManager*";
+        return;
+    }
+    // m_recSetManager = m;
     m_expressionList.clear();
-    m_recSetManager = manager;
+    m_recSetManager = m;
     auto recSet = m_recSetManager->getAllRecSets().at(idx);
     for (const auto& word : recSet) {
         QVariantMap expressionData;

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import AppController
 
 Page {
     anchors.topMargin: 16
@@ -8,6 +9,7 @@ Page {
     anchors.bottomMargin: 16
 
     signal recSetSelected(idx: int)
+    signal addRecSet()
 
     Rectangle{
         anchors.fill: parent
@@ -17,33 +19,36 @@ Page {
     ListView {
         id: listView
         anchors.centerIn: parent
-        // width: parent.width
-        // height: parent.height/2
+
         anchors.fill: parent
         spacing: 10
-        model: appController.recSetNameList
+        model: AppController.recSetNameList
 
         delegate: Button {
             width: listView.width
             height: listView.height/5
-            // color: "blue"
-            // border.color: "black"
-            // border.width: 5
-            // radius: 10
 
             text: modelData
-            //     font.pixelSize: 18
-            //     horizontalAlignment: Text.AlignHCenter
-            //     // verticalAlignment:
-            //     anchors.centerIn: parent
-            //     anchors.horizontalCenter: parent.horizontalCenter
-            // }
+
             onClicked:{
                 highlighted = false
                 recSetSelected(index)
             }
             onPressed:{//potential bug with releasing should be tested on smartphones
                 highlighted = true
+            }
+        }
+    }
+    footer: Row {
+        spacing: 20
+        padding: 10
+        // Center the row horizontally within the footer area
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        Button {
+            text: "add new"
+            onClicked: {
+                addRecSet()
             }
         }
     }
