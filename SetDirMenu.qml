@@ -30,15 +30,56 @@ Page {
 
             text: modelData
 
-            onClicked:{
-                highlighted = false
-                recSetSelected(index)
+            Menu {
+                id: myContextMenu
+
+                MenuItem {
+                    text: "delete this record set"
+                    onTriggered: {
+                        var recSetManagerRef = AppController.recSetManager
+                        recSetManagerRef.deleteRecSet(modelData)
+                        AppController.recSetNameListChanged()
+                    }
+                }
+
+                // MenuItem {
+                //     text: "Action 2"
+                //     onTriggered: {
+                //         console.log("Action 2 selected")
+                //     }
+                // }
+
+                // MenuSeparator { }
+
+                // MenuItem {
+                //     text: "Exit"
+                //     onTriggered: {
+                //         Qt.quit()
+                //     }
+                // }
             }
-            onPressed:{//potential bug with releasing should be tested on smartphones
-                highlighted = true
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton
+
+                //The 'mouse' parameter is now declared.
+                onPressAndHold: function(mouse) {
+                    // Position and open the context menu
+                    myContextMenu.x = mouse.x
+                    myContextMenu.y = mouse.y
+                    myContextMenu.open()
+                }
+                onClicked:{
+                    parent.highlighted = false
+                    recSetSelected(index)
+                }
+                onPressed:{//potential bug with releasing should be tested on smartphones
+                    parent.highlighted = true
+                }
             }
         }
     }
+
     footer: Row {
         spacing: 20
         padding: 10
