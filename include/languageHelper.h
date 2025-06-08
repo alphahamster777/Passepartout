@@ -26,8 +26,8 @@ public:
     Q_ENUM(Language)
 
     explicit LanguageHelper(QObject *parent = nullptr);
+
     // Return a QStringList of all enum‐names (exactly matching the Q_ENUM keys).
-    // You can use these strings directly in ComboBox.model.
     Q_INVOKABLE static QStringList languageNames() {
         // Note: The order here must match the enum declaration order.
         return {
@@ -62,8 +62,7 @@ public:
         return mapping.value(name, NotSelected);
     }
 
-    // If you want a user-friendly display string instead of the raw enum key,
-    // you could also add a mapping function. For example:
+    // mapping function for user-friendly display string:
     Q_INVOKABLE static QString displayName(Language lang) {
         switch (lang) {
         case English:          return QStringLiteral("English");

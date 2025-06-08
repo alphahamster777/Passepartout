@@ -1,6 +1,5 @@
 #pragma once
 
-// #include <iostream>
 #include <QList>
 #include <QString>
 #include <QObject>
@@ -24,11 +23,8 @@ public:
         m_recSetManager.addRecToRecSet("Default Set", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
 
         m_recSetManager.createRecSet("Default Set 2");
-        // m_recSetManager.addRecToRecSet("Default Set 2", DictRec(2, 1, "der Fahrrad", "bicycle", "audio.mp3", "qrc:/images/bicycle.jpg"));
         m_recSetManager.addRecToRecSet("Default Set 2", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
         m_recSetManager.addRecToRecSet("Default Set 2", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
-
-        // std::cout << "hey hey lalaley" <<std::endl;
     }
 
     Q_INVOKABLE RecSetManager* recSetManager() {
@@ -45,7 +41,6 @@ public:
 
     // This static method is required by QML_SINGLETON
     static QObject* qmlInstance(QQmlEngine*, QJSEngine*) {
-        // Always return a *new* instance (Qt manages its lifetime as a singleton)
         return new AppController();
     }
 

@@ -73,10 +73,10 @@ public:
         DictRec dr {
             static_cast<size_t>(rec.value("languageFrom" ).toInt()),
             static_cast<size_t>(rec.value("languageTo" ).toInt()),
-            rec.value("expression" ).toString().toStdString(),
-            rec.value("hint"       ).toString().toStdString(),
-            rec.value("audioPath"  ).toString().toStdString(),
-            rec.value("imagePath"  ).toString().toStdString()
+            rec.value("expression" ).toString(),
+            rec.value("hint"       ).toString(),
+            rec.value("audioPath"  ).toString(),
+            rec.value("imagePath"  ).toString()
         };
         return addRecToRecSet(setName, dr);
     }

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <optional>
-#include <string>
 
 #include <QObject>
+#include <QString>
 #include <QVariant>
 
 #include "languageHelper.h"
@@ -12,8 +12,8 @@ class DictRec : public QObject {
     Q_OBJECT
 public:
     // Constructors
-    DictRec(size_t exprlangID, size_t  hintLangID, const std::string& expression, const std::string& hint,
-               const std::optional<std::string>& audioPath = std::nullopt, const std::optional<std::string>& imagePath = std::nullopt)
+    DictRec(size_t exprlangID, size_t  hintLangID, const QString& expression, const QString& hint,
+               const std::optional<QString>& audioPath = std::nullopt, const std::optional<QString>& imagePath = std::nullopt)
         : m_exprLangID(exprlangID), m_hintLangID(hintLangID), m_expression(expression), m_hint(hint),
         m_audioPath(audioPath), m_imagePath(imagePath) {}
 
@@ -55,18 +55,18 @@ public:
     // Getters
     int getExprLanguageID() const { return m_exprLangID; }
     int getHintLanguageID() const { return m_hintLangID; }
-    std::string getExpression() const { return m_expression; }
-    std::string getHint() const { return m_hint; }
-    std::optional<std::string> getAudioPath() const { return m_audioPath; }
-    std::optional<std::string> getImagePath() const { return m_imagePath; }
+    QString getExpression() const { return m_expression; }
+    QString getHint() const { return m_hint; }
+    std::optional<QString> getAudioPath() const { return m_audioPath; }
+    std::optional<QString> getImagePath() const { return m_imagePath; }
 
     // Setters
     void setExprLangID(int languageID) { m_exprLangID = languageID; }
     void setHintLangID(int languageID) { m_hintLangID = languageID; }
-    void setExpression(const std::string& expression) { m_expression = expression; }
-    void setMeaning(const std::string& hint) { m_hint = hint; }
-    void setAudioPath(const std::optional<std::string>& audioPath) { m_audioPath = audioPath; }
-    void setImagePath(const std::optional<std::string>& imagePath) { m_imagePath = imagePath; }
+    void setExpression(const QString& expression) { m_expression = expression; }
+    void setMeaning(const QString& hint) { m_hint = hint; }
+    void setAudioPath(const std::optional<QString>& audioPath) { m_audioPath = audioPath; }
+    void setImagePath(const std::optional<QString>& imagePath) { m_imagePath = imagePath; }
 
     // Spaceship operator for comparisons
     auto operator<=>(const DictRec& other) const {
@@ -98,14 +98,13 @@ public:
         }
 
         return true;
-    };
-
+    }
 
 private:
     int m_exprLangID;               // ID representing the language of the word to learn.
     int m_hintLangID = 0;           // ID representing the language of the hint if ste to zero that means only that it could use any language.
-    std::string m_expression;        // The word or expression to memorize.
-    std::string m_hint;       // The translation of the expression.
-    std::optional<std::string> m_audioPath; // File path or URL for the audio pronunciation.
-    std::optional<std::string> m_imagePath; // File path or URL for the corresponding image.
+    QString m_expression;        // The word or expression to memorize.
+    QString m_hint;       // The translation of the expression.
+    std::optional<QString> m_audioPath; // File path or URL for the audio pronunciation.
+    std::optional<QString> m_imagePath; // File path or URL for the corresponding image.
 };

@@ -3,13 +3,15 @@
 // #include <string>
 // #include <optional>
 // #include <vector>
-#include <set>
+// #include <set>
 #include <stdexcept>
 
 #include "dictRec.h"
 #include <QObject>
 #include <QVariant>
+#include <QVector>
 #include <QString>
+
 class RecSet : public QObject {
     Q_OBJECT
 public:
@@ -36,7 +38,7 @@ public:
     }
 
     // Methods to manage word set
-    void addWord(const DictRec& word) { m_words.insert(word); }
+    void addWord(const DictRec& word) { m_words.push_back(word); }
     bool removeWord(const DictRec& expression) {
         for (auto it = m_words.begin(); it != m_words.end(); ++it) {
             if (*it == expression) {
@@ -68,5 +70,5 @@ public:
     size_t getWordCount() const { return m_words.size(); }
 private:
     QString m_setName;               // Name of the word set.
-    std::set<DictRec> m_words;        // Collection of words in the set.
+    QVector<DictRec> m_words;        // Collection of words in the set.
 };

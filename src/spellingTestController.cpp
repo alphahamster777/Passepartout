@@ -27,10 +27,10 @@ void SpellingTestController::initialize(QObject *manager, int idx) {
         auto element = m_recSetManager->getAllRecSets().at(idx).getWordAt(currentDictRecNum++);
         m_totalQuestions = m_recSetManager->getAllRecSets().at(idx).getWordCount();
         m_correctAnswers = 0;
-        m_currentWord = QString::fromStdString(element.getExpression());
-        m_currentHint = QString::fromStdString(element.getHint());
-        m_currentAudioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
-        m_currentImageUrl = QString::fromStdString(element.getImagePath().value_or(""));
+        m_currentWord = element.getExpression();
+        m_currentHint = element.getHint();
+        m_currentAudioUrl = element.getAudioPath().value_or("");
+        m_currentImageUrl = element.getImagePath().value_or("");
         // emit currentAnswersChanged();
         emit currentWordChanged();
         emit currentHintChanged();
@@ -46,10 +46,10 @@ void SpellingTestController::nextQuestion() {
     try {
         auto element = m_recSetManager->getAllRecSets().at(currentRecSetNum).getWordAt(currentDictRecNum++);
 
-        m_currentWord = QString::fromStdString(element.getExpression());
-        m_currentHint = QString::fromStdString(element.getHint());
-        m_currentAudioUrl = QString::fromStdString(element.getAudioPath().value_or(""));
-        m_currentImageUrl = QString::fromStdString(element.getImagePath().value_or(""));
+        m_currentWord = element.getExpression();
+        m_currentHint = element.getHint();
+        m_currentAudioUrl = element.getAudioPath().value_or("");
+        m_currentImageUrl = element.getImagePath().value_or("");
         emit currentWordChanged();
         emit currentHintChanged();
         emit currentAudioUrlChanged();
