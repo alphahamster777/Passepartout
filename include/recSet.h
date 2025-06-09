@@ -16,38 +16,16 @@ class RecSet : public QObject {
     Q_OBJECT
 public:
     // Constructors
-    RecSet(const QString& setName) : m_setName(setName) {}
+    RecSet(const QString& setName);
 
-    RecSet(const RecSet& other){
-        m_setName = other.m_setName;
-        m_words = other.m_words;
-    }
-    RecSet(RecSet&& other) {
-        m_setName = std::move(other.m_setName);
-        m_words = std::move(other.m_words);
-    }
-    RecSet& operator=(const RecSet& other) {
-        m_setName = other.m_setName;
-        m_words = other.m_words;
-        return *this;
-    }
-    RecSet& operator=(RecSet&& other) {
-        m_setName = std::move(other.m_setName);
-        m_words = std::move(other.m_words);
-        return *this;
-    }
+    RecSet(const RecSet& other);
+    RecSet(RecSet&& other);
+    RecSet& operator=(const RecSet& other);
+    RecSet& operator=(RecSet&& other);
 
     // Methods to manage word set
     void addWord(const DictRec& word) { m_words.push_back(word); }
-    bool removeWord(const DictRec& expression) {
-        for (auto it = m_words.begin(); it != m_words.end(); ++it) {
-            if (*it == expression) {
-                m_words.erase(it);
-                return true;
-            }
-        }
-        return false; // Word not found
-    }
+    bool removeWord(const DictRec& expression);
 
     // std::set<SetElement> getAllWords() const { return m_words; }
     auto begin() const { return m_words.begin(); }
@@ -56,14 +34,7 @@ public:
     auto end() { return m_words.end(); }
 
     // Random access
-    const DictRec& getWordAt(size_t index) const {
-        if (index >= m_words.size()) {
-            throw std::out_of_range("Index out of range");
-        }
-        auto it = m_words.begin();
-        std::advance(it, index); // Move iterator to the specified index
-        return *it;
-    }
+    const DictRec& getWordAt(size_t index) const;
 
     // Getters
     QString getSetName() const { return m_setName; }

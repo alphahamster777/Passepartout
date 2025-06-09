@@ -13,44 +13,12 @@ class DictRec : public QObject {
 public:
     // Constructors
     DictRec(size_t exprlangID, size_t  hintLangID, const QString& expression, const QString& hint,
-               const std::optional<QString>& audioPath = std::nullopt, const std::optional<QString>& imagePath = std::nullopt)
-        : m_exprLangID(exprlangID), m_hintLangID(hintLangID), m_expression(expression), m_hint(hint),
-        m_audioPath(audioPath), m_imagePath(imagePath) {}
+            const std::optional<QString>& audioPath = std::nullopt, const std::optional<QString>& imagePath = std::nullopt);
 
-    DictRec(const DictRec& other){
-        m_exprLangID = other.m_exprLangID;
-        m_hintLangID = other.m_exprLangID;
-        m_expression = other.m_expression;
-        m_hint = other.m_hint;
-        m_audioPath = other.m_audioPath;
-        m_imagePath = other.m_imagePath;
-    }
-    DictRec(DictRec&& other) {
-        m_exprLangID = std::move(other.m_exprLangID);
-        m_hintLangID = std::move(other.m_exprLangID);
-        m_expression = std::move(other.m_expression);
-        m_hint = std::move(other.m_hint);
-        m_audioPath = std::move(other.m_audioPath);
-        m_imagePath = std::move(other.m_imagePath);
-    }
-    DictRec& operator=(const DictRec& other) {
-        m_exprLangID = other.m_exprLangID;
-        m_hintLangID = other.m_exprLangID;
-        m_expression = other.m_expression;
-        m_hint = other.m_hint;
-        m_audioPath = other.m_audioPath;
-        m_imagePath = other.m_imagePath;
-        return *this;
-    }
-    DictRec& operator=(DictRec&& other) {
-        m_exprLangID = std::move(other.m_exprLangID);
-        m_hintLangID = std::move(other.m_exprLangID);
-        m_expression = std::move(other.m_expression);
-        m_hint = std::move(other.m_hint);
-        m_audioPath = std::move(other.m_audioPath);
-        m_imagePath = std::move(other.m_imagePath);
-        return *this;
-    }
+    DictRec(const DictRec& other);
+    DictRec(DictRec&& other);
+    DictRec& operator=(const DictRec& other);
+    DictRec& operator=(DictRec&& other);
 
     // Getters
     int getExprLanguageID() const { return m_exprLangID; }
@@ -69,36 +37,9 @@ public:
     void setImagePath(const std::optional<QString>& imagePath) { m_imagePath = imagePath; }
 
     // Spaceship operator for comparisons
-    auto operator<=>(const DictRec& other) const {
-        if (auto cmp = m_expression <=> other.m_expression; cmp != 0) return cmp;
-        if (auto cmp = m_hint <=> other.m_hint; cmp != 0) return cmp;
-        if (auto cmp = m_exprLangID <=> other.m_exprLangID; cmp != 0) return cmp;
-        if (auto cmp = m_hintLangID <=> other.m_hintLangID; cmp != 0) return cmp;
-        return m_audioPath.value_or("") <=> other.m_audioPath.value_or("");
-    }
+    auto operator<=>(const DictRec& other) const;
 
-    bool operator==(const DictRec& other) const {
-        if(m_exprLangID != other.m_exprLangID){
-            return false;
-        }
-        if(m_hintLangID != other.m_exprLangID){
-            return false;
-        }
-        if(m_expression != other.m_expression){
-            return false;
-        }
-        if(m_hint != other.m_hint){
-            return false;
-        }
-        if(m_audioPath != other.m_audioPath){
-            return false;
-        }
-        if(m_imagePath != other.m_imagePath){
-            return false;
-        }
-
-        return true;
-    }
+    bool operator==(const DictRec& other) const;
 
 private:
     int m_exprLangID;               // ID representing the language of the word to learn.
