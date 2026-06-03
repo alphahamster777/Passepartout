@@ -2,9 +2,11 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickStyle>//to set "Material" style
+#include <QLoggingCategory>
 
 int main(int argc, char *argv[])
 {
+    QLoggingCategory::setFilterRules(QStringLiteral("qt.qml.debug=true"));
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     QQuickStyle::setStyle("Material");

@@ -84,7 +84,10 @@ ApplicationWindow {
         ///////////////////////////////connections/////////////////////////////////////////
         Loader {
             id: setDirMenuConnectionLoader
-            active: stackView.currentItem && typeof stackView.currentItem.recSetSelected === "function" && typeof stackView.currentItem.addRecSet === "function"
+            active: stackView.currentItem &&
+                    typeof stackView.currentItem.recSetSelected === "function" &&
+                    typeof stackView.currentItem.addRecSet === "function" &&
+                    typeof stackView.currentItem.editRecSet === "function"
             sourceComponent: setDirMenuConnectionComponent
         }
 
@@ -100,6 +103,27 @@ ApplicationWindow {
                 }
                 function onAddRecSet() {
                     stackView.push(creatingRecSetMenu)
+                }
+                function onEditRecSet(num: int){
+                    stackView.push(creatingRecSetMenu)
+                    var recSetManagerRef = AppController.recSetManager
+                    var recSetInfo = recSetManagerRef.getRecSetInfoQML(num)
+                    stackView.currentItem.recSetName = recSetInfo.name
+                    stackView.currentItem.recSetIdx = num
+                    var recSetModelRef = stackView.currentItem.recSetModelRef
+                    recSetModelRef.clear()
+                    for (var i = 0; i < recSetInfo.wordCount; ++i) {
+                        var rec = recSetManagerRef.getWordFromRecSetQML(num, i)
+                        recSetModelRef.append({
+                            languageFrom: rec.exprLangID,
+                            languageTo:   rec.hintLangID,
+                            expression:   rec.expression,
+                            hint:         rec.hint,
+                            context:      rec.context,
+                            audioPath:    rec.audioPath,
+                            imagePath:    rec.imagePath
+                        })
+                    }
                 }
             }
         }
@@ -168,37 +192,38 @@ ApplicationWindow {
                 }
 
                 function onCreatingRecSetSave() {
-                    var recSetName =  stackView.currentItem.recSetName.text
-
-                    if(recSetName === "") {
-                        return;
-                    }
-
+                    var recSetName = stackView.currentItem.recSetName
+                    var recSetIdx  = stackView.currentItem.recSetIdx
                     var recSetModelRef = stackView.currentItem.recSetModelRef
-
                     var recSetManagerRef = AppController.recSetManager
+
+                    if (recSetName === "")
+                        return
+
+                    if (recSetIdx === -1) {
+                        // Creating a new set
+                        recSetManagerRef.createRecSet(recSetName)
+                    } else {
+                        // Editing existing set: clear old words, then rename
+                        var oldInfo = recSetManagerRef.getRecSetInfoQML(recSetIdx)
+                        recSetManagerRef.clearRecordsFromRecSet(oldInfo.name)
+                        recSetManagerRef.renameRecSet(recSetIdx, recSetName)
+                    }
 
                     for (var i = 0; i < recSetModelRef.count; ++i) {
                         var rec = recSetModelRef.get(i)
-                        if(rec.expression === null || rec.expression.trim() === "" ){
+                        if (rec.expression === null || rec.expression.trim() === "")
                             continue
-                        }
-
-                        var hintPreset = rec.hint != null && rec.hint.trim() != ""
-                        var audioPreset = rec.audioPath != null && rec.audioPath.trim() != ""
-                        var imagePreset = rec.imagePath != null && rec.imagePath.trim() != ""
-
-
-                        if(!hintPreset && !audioPreset && !imagePreset){
+                        var hintPreset  = rec.hint      != null && rec.hint.trim()      !== ""
+                        var audioPreset = rec.audioPath != null && rec.audioPath.trim() !== ""
+                        var imagePreset = rec.imagePath != null && rec.imagePath.trim() !== ""
+                        if (!hintPreset && !audioPreset && !imagePreset)
                             continue
-                        }
-
-                        // console.log("hintPreset = ", hintPreset, "audioPreset = ", audioPreset, "imagePreset = ", imagePreset)
-
                         recSetManagerRef.addRecToRecSet(recSetName, rec)
                     }
+
                     AppController.recSetNameListChanged()
-                    stackView.pop();
+                    stackView.pop()
                 }
 
 

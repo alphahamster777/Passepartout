@@ -19,9 +19,10 @@ void SetPreviewMenuController::initialize(QObject *manager, int idx) {
     for (const auto& word : recSet) {
         QVariantMap expressionData;
         expressionData["expression"] = word.getExpression();
-        expressionData["hint"] = word.getHint();
-        expressionData["imagePath"] = word.getImagePath().value_or("");
-        expressionData["audioPath"] = word.getAudioPath().value_or("");
+        expressionData["hint"]       = word.getHint();
+        expressionData["context"]    = word.getContext();
+        expressionData["imagePath"]  = word.getImagePath();
+        expressionData["audioPath"]  = word.getAudioPath();
         m_expressionList.append(expressionData);
     }
     emit expressionListChanged();

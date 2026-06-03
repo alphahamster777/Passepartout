@@ -10,6 +10,7 @@ Page {
 
     signal recSetSelected(idx: int)
     signal addRecSet()
+    signal editRecSet(idx: int)
 
     Rectangle{
         anchors.fill: parent
@@ -34,7 +35,7 @@ Page {
                 id: myContextMenu
 
                 MenuItem {
-                    text: "delete this record set"
+                    text: "delete"
                     onTriggered: {
                         var recSetManagerRef = AppController.recSetManager
                         recSetManagerRef.deleteRecSet(modelData)
@@ -42,12 +43,13 @@ Page {
                     }
                 }
 
-                // MenuItem {
-                //     text: "Action 2"
-                //     onTriggered: {
-                //         console.log("Action 2 selected")
-                //     }
-                // }
+                MenuItem {
+                    text: "edit"
+                    onTriggered: {
+                        editRecSet(index)
+                        // console.log("Action 2 selected")
+                    }
+                }
 
                 // MenuSeparator { }
 

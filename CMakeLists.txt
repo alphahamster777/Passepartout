@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.28)
 
 project(Passepartout VERSION 0.1 LANGUAGES CXX)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+add_definitions(-DQT_QML_DEBUG)
+
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message(FATAL_ERROR "Error: This project requires Clang. Please switch to Clang.")
 else()

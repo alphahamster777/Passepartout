@@ -29,8 +29,8 @@ void SpellingTestController::initialize(QObject *manager, int idx) {
         m_correctAnswers = 0;
         m_currentWord = element.getExpression();
         m_currentHint = element.getHint();
-        m_currentAudioUrl = element.getAudioPath().value_or("");
-        m_currentImageUrl = element.getImagePath().value_or("");
+        m_currentAudioUrl = element.getAudioPath();
+        m_currentImageUrl = element.getImagePath();
         // emit currentAnswersChanged();
         emit currentWordChanged();
         emit currentHintChanged();
@@ -48,8 +48,8 @@ void SpellingTestController::nextQuestion() {
 
         m_currentWord = element.getExpression();
         m_currentHint = element.getHint();
-        m_currentAudioUrl = element.getAudioPath().value_or("");
-        m_currentImageUrl = element.getImagePath().value_or("");
+        m_currentAudioUrl = element.getAudioPath();
+        m_currentImageUrl = element.getImagePath();
         emit currentWordChanged();
         emit currentHintChanged();
         emit currentAudioUrlChanged();

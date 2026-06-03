@@ -57,6 +57,17 @@ Page {
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
+
+                    Label {
+                        text: modelData.context
+                        font.pixelSize: 12
+                        color: "#666"
+                        wrapMode: Text.WordWrap
+                        width: swipeView.width * 0.85
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: modelData.context !== ""
+                    }
                 }
             }
         }

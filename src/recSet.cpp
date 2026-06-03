@@ -1,4 +1,5 @@
 #include "recSet.h"
+#include <QVariantMap>
 
 RecSet::RecSet(const QString &setName) : m_setName(setName) {}
 
@@ -35,6 +36,21 @@ const DictRec &RecSet::getWordAt(size_t index) const {
     auto it = m_words.begin();
     std::advance(it, index); // Move iterator to the specified index
     return *it;
+}
+
+QVariantMap RecSet::getWordAtQML(size_t index) const {
+    if (index >= static_cast<size_t>(m_words.size()))
+        return {};
+    const auto& word = m_words.at(index);
+    QVariantMap map;
+    map["exprLangID"]  = word.getExprLanguageID();
+    map["hintLangID"]  = word.getHintLanguageID();
+    map["expression"]  = word.getExpression();
+    map["hint"]        = word.getHint();
+    map["context"]     = word.getContext();
+    map["audioPath"]   = word.getAudioPath();
+    map["imagePath"]   = word.getImagePath();
+    return map;
 }
 
 RecSet &RecSet::operator=(const RecSet &other) {

@@ -14,6 +14,7 @@
 
 class RecSet : public QObject {
     Q_OBJECT
+    QML_ELEMENT
 public:
     // Constructors
     RecSet(const QString& setName);
@@ -26,6 +27,7 @@ public:
     // Methods to manage word set
     void addWord(const DictRec& word) { m_words.push_back(word); }
     bool removeWord(const DictRec& expression);
+    void clearWords() { m_words.clear(); }
 
     // std::set<SetElement> getAllWords() const { return m_words; }
     auto begin() const { return m_words.begin(); }
@@ -34,11 +36,15 @@ public:
     auto end() { return m_words.end(); }
 
     // Random access
-    const DictRec& getWordAt(size_t index) const;
+    Q_INVOKABLE const DictRec& getWordAt(size_t index) const;
+
+    Q_INVOKABLE void setRecSetName(QString newName) {m_setName = newName;};
+
+    Q_INVOKABLE QVariantMap getWordAtQML(size_t index) const;
 
     // Getters
-    QString getSetName() const { return m_setName; }
-    size_t getWordCount() const { return m_words.size(); }
+    Q_INVOKABLE QString getSetName() const { return m_setName; }
+    Q_INVOKABLE int getWordCount() const { return m_words.size(); }
 private:
     QString m_setName;               // Name of the word set.
     QVector<DictRec> m_words;        // Collection of words in the set.
