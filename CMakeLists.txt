@@ -16,7 +16,7 @@ endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2 QuickDialogs2)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -151,7 +151,7 @@ set_target_properties(appPassepartout PROPERTIES
 )
 
 target_link_libraries(appPassepartout
-    PRIVATE Qt6::Multimedia Qt6::QuickControls2
+    PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
 )
 
 include(GNUInstallDirs)

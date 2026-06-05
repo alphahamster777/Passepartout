@@ -1,96 +1,167 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 Page {
-    id:root
-
+    id: root
     signal getResults()
+
     property int nextCounter: 0
-
     property bool isExpressionEntered: false
+    property bool isCorrect: false
 
-    header: Label {
-        id: expressionExplanationText
-        text: spellingTestController.currentHint
-        font.pixelSize: 20
-        horizontalAlignment: Text.AlignHCenter
-        anchors.horizontalCenter: parent.horizontalCenter
+    background: Rectangle { color: "#f0f4f8" }
+
+    header: Rectangle {
+        height: 56
+        color: "#2c3e50"
+
+        RowLayout {
+            anchors { fill: parent; leftMargin: 16; rightMargin: 16 }
+
+            Label {
+                text: spellingTestController.currentHint
+                font.pixelSize: 20
+                font.bold: true
+                color: "white"
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+            }
+
+            Label {
+                text: spellingTestController.correctAnswers + "/" + spellingTestController.totalQuestions
+                font.pixelSize: 14
+                color: "#3498db"
+            }
+        }
     }
 
-    Column {
+    ColumnLayout {
         anchors.fill: parent
-        anchors.topMargin: 16
-        anchors.leftMargin: 16
-        anchors.rightMargin: 16
-        anchors.bottomMargin: 16
+        anchors.margins: 16
         spacing: 16
 
+        // ── Image ─────────────────────────────────────────────────────────────
         Rectangle {
-            width: parent.width
+            Layout.fillWidth: true
             height: 200
-            color: "lightblue"
+            radius: 12
+            color: spellingTestController.currentImageUrl !== "" ? "transparent" : "#eaf4fb"
+            clip: true
+            border.color: "#dce1e7"
+
             Image {
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
                 source: spellingTestController.currentImageUrl
+                visible: spellingTestController.currentImageUrl !== ""
+            }
+
+            Label {
+                anchors.centerIn: parent
+                text: "🖼"
+                font.pixelSize: 64
+                opacity: 0.2
+                visible: spellingTestController.currentImageUrl === ""
             }
         }
 
+        // ── Input ─────────────────────────────────────────────────────────────
         TextField {
             id: guessInputField
-            placeholderText: qsTr("Type here...")
-            text: ""
-            color: "gray"
+            Layout.fillWidth: true
+            placeholderText: qsTr("Type the expression…")
             font.pixelSize: 18
-            width: parent.width * 0.8
-            // height: 200
-            anchors.horizontalCenter:parent.horizontalCenter
+            color: isExpressionEntered ? (isCorrect ? "#27ae60" : "#e74c3c") : "#2c3e50"
+            background: Rectangle {
+                radius: 10
+                color: "white"
+                border.color: {
+                    if (!isExpressionEntered) return guessInputField.activeFocus ? "#3498db" : "#dce1e7"
+                    return isCorrect ? "#27ae60" : "#e74c3c"
+                }
+                border.width: isExpressionEntered ? 2 : (guessInputField.activeFocus ? 2 : 1)
+            }
+            leftPadding: 14
             onEditingFinished: {
-                if(isExpressionEntered)
-                    return
+                if (isExpressionEntered) return
                 isExpressionEntered = true
 
-                if(spellingTestController.currentWord === guessInputField.text){
+                if (spellingTestController.currentWord === guessInputField.text) {
+                    isCorrect = true
                     spellingTestController.correctAnswers++
                 } else {
-                    color = "red"
+                    isCorrect = false
                     text = spellingTestController.currentWord
                 }
-
-                nextButton.focus = true;
-                nextButton.highlighted = true;
+                nextButton.forceActiveFocus()
             }
         }
 
-        ProgressBar {
-            id: progressBar
-            from: 0
-            to: spellingTestController.totalQuestions
-            value: spellingTestController.correctAnswers
-            width: parent.width * 0.8
-            anchors.horizontalCenter:parent.horizontalCenter
+        // ── Progress bar ──────────────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 4
+            Label {
+                text: qsTr("Correct: %1 / %2").arg(spellingTestController.correctAnswers).arg(spellingTestController.totalQuestions)
+                font.pixelSize: 13
+                color: "#7f8c8d"
+            }
+            ProgressBar {
+                Layout.fillWidth: true
+                from: 0
+                to: spellingTestController.totalQuestions
+                value: spellingTestController.correctAnswers
+                background: Rectangle { radius: 4; color: "#dce1e7"; implicitHeight: 10 }
+                contentItem: Rectangle {
+                    width: parent.visualPosition * parent.width
+                    height: parent.height
+                    radius: 4
+                    color: "#27ae60"
+                }
+            }
         }
+
+        Item { Layout.fillHeight: true }
     }
 
-    footer: Button {
-        id: nextButton
-        text: "Next"
-        anchors.horizontalCenter:parent.horizontalCenter
-        onClicked: {
-            nextCounter++
-            if(nextCounter >= spellingTestController.totalQuestions){
-                getResults()
-                // nextCounter = 0;
-                return
+    footer: Rectangle {
+        height: 64
+        color: "#2c3e50"
+
+        Button {
+            id: nextButton
+            anchors.centerIn: parent
+            width: parent.width * 0.7
+            height: 44
+            text: nextCounter + 1 >= spellingTestController.totalQuestions ? qsTr("See Results") : qsTr("Next →")
+            background: Rectangle {
+                radius: 22
+                color: parent.pressed ? "#2980b9" : "#3498db"
             }
-            guessInputField.color = "gray"
-            guessInputField.text = ""
-            isExpressionEntered = false
-            highlighted = false;
-            guessInputField.focus = true
-
-            spellingTestController.nextQuestion()
+            contentItem: Text {
+                text: parent.text
+                color: "white"
+                font.pixelSize: 17
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+            onClicked: {
+                nextCounter++
+                if (nextCounter >= spellingTestController.totalQuestions) {
+                    getResults()
+                    return
+                }
+                guessInputField.text = ""
+                guessInputField.color = "#2c3e50"
+                isExpressionEntered = false
+                isCorrect = false
+                guessInputField.forceActiveFocus()
+                spellingTestController.nextQuestion()
+            }
         }
-
     }
 }

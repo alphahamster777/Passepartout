@@ -3,6 +3,8 @@
 #include <QList>
 #include <QString>
 #include <QObject>
+#include <QDir>
+#include <QStandardPaths>
 #include <QtQml/qqml.h>
 
 #include "recSetManager.h"
@@ -24,6 +26,9 @@ public:
 
     QList<QString> getRecSetNameList() const;
 
+    Q_INVOKABLE void saveData();
+    Q_INVOKABLE bool loadData();
+
     // This static method is required by QML_SINGLETON
     static QObject* qmlInstance(QQmlEngine*, QJSEngine*) {
         return new AppController();
@@ -31,6 +36,8 @@ public:
 
 signals:
     void recSetNameListChanged();
+
 private:
     RecSetManager m_recSetManager;
+    QString dataFilePath() const;
 };

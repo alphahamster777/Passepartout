@@ -14,74 +14,44 @@ ApplicationWindow {
     height: 640
     title: "Passepartout"
 
-    // Make the window’s content a FocusScope:
     FocusScope {
         id: rootScope
         anchors.fill: parent
         focus: true
 
-        Keys.onReleased: function(event){
-            if (event.key === Qt.Key_Back
-                    || event.key === Qt.Key_Backspace) {
+        Keys.onReleased: function(event) {
+            if (event.key === Qt.Key_Back || event.key === Qt.Key_Backspace) {
                 if (stackView.depth > 1) {
                     stackView.pop()
                 } else {
-                    // no more pages to pop → default behavior
                     Qt.quit()
                 }
-
                 event.accepted = true
             }
         }
 
         SpellingTestController {
             id: spellingTestController
-            // Component.onCompleted: initialize(appController.recSetManager)
         }
 
         SetPreviewMenuController {
             id: setPreviewController
-            // Component.onCompleted: initialize(appController.recSetManager)
         }
 
         StackView {
             id: stackView
             anchors.fill: parent
             initialItem: setDirMenu
-            visible: true
         }
 
-        Component {
-            id: setDirMenu
-            SetDirMenu{
-            }
-        }
-
-        Component {
-            id: creatingRecSetMenu
-            CreatingRecSet{
-            }
-        }
-
-        Component {
-            id: setPreviewMenu
-            SetPreviewMenu{
-            }
-        }
-
-        Component {
-            id: spellingTestPage
-            SpellingTest {
-            }
-        }
-
-        Component {
-            id: resultsPage
-            Results {
-            }
-        }
+        Component { id: setDirMenu;         SetDirMenu {}       }
+        Component { id: creatingRecSetMenu; CreatingRecSet {}   }
+        Component { id: setPreviewMenu;     SetPreviewMenu {}   }
+        Component { id: spellingTestPage;   SpellingTest {}     }
+        Component { id: resultsPage;        Results {}          }
 
         ///////////////////////////////connections/////////////////////////////////////////
+
         Loader {
             id: setDirMenuConnectionLoader
             active: stackView.currentItem &&
@@ -95,7 +65,7 @@ ApplicationWindow {
             id: setDirMenuConnectionComponent
             Connections {
                 target: stackView.currentItem
-                function onRecSetSelected(num: int){
+                function onRecSetSelected(num: int) {
                     stackView.pop()
                     setPreviewController.initialize(AppController.recSetManager, num)
                     spellingTestController.initialize(AppController.recSetManager, num)
@@ -104,17 +74,17 @@ ApplicationWindow {
                 function onAddRecSet() {
                     stackView.push(creatingRecSetMenu)
                 }
-                function onEditRecSet(num: int){
+                function onEditRecSet(num: int) {
                     stackView.push(creatingRecSetMenu)
-                    var recSetManagerRef = AppController.recSetManager
-                    var recSetInfo = recSetManagerRef.getRecSetInfoQML(num)
-                    stackView.currentItem.recSetName = recSetInfo.name
-                    stackView.currentItem.recSetIdx = num
-                    var recSetModelRef = stackView.currentItem.recSetModelRef
-                    recSetModelRef.clear()
-                    for (var i = 0; i < recSetInfo.wordCount; ++i) {
-                        var rec = recSetManagerRef.getWordFromRecSetQML(num, i)
-                        recSetModelRef.append({
+                    var mgr = AppController.recSetManager
+                    var info = mgr.getRecSetInfoQML(num)
+                    stackView.currentItem.recSetName = info.name
+                    stackView.currentItem.recSetIdx  = num
+                    var modelRef = stackView.currentItem.recSetModelRef
+                    modelRef.clear()
+                    for (var i = 0; i < info.wordCount; ++i) {
+                        var rec = mgr.getWordFromRecSetQML(num, i)
+                        modelRef.append({
                             languageFrom: rec.exprLangID,
                             languageTo:   rec.hintLangID,
                             expression:   rec.expression,
@@ -155,8 +125,8 @@ ApplicationWindow {
             Connections {
                 target: stackView.currentItem
                 function onGetResults() {
-                    stackView.pop();
-                    stackView.push(resultsPage);
+                    stackView.pop()
+                    stackView.push(resultsPage)
                 }
             }
         }
@@ -179,7 +149,8 @@ ApplicationWindow {
 
         Loader {
             id: creatingRecSetConnectionLoader
-            active: stackView.currentItem && typeof stackView.currentItem.creatingRecSetCancel === "function" || typeof stackView.currentItem.creatingRecSetCancel === "function"
+            active: stackView.currentItem &&
+                    typeof stackView.currentItem.creatingRecSetCancel === "function"
             sourceComponent: creatingRecSetConnectionComponent
         }
 
@@ -187,48 +158,42 @@ ApplicationWindow {
             id: creatingRecSetConnectionComponent
             Connections {
                 target: stackView.currentItem
-                function onCreatingRecSetCancel(){
-                    stackView.pop();
-                }
 
-                function onCreatingRecSetSave() {
-                    var recSetName = stackView.currentItem.recSetName
-                    var recSetIdx  = stackView.currentItem.recSetIdx
-                    var recSetModelRef = stackView.currentItem.recSetModelRef
-                    var recSetManagerRef = AppController.recSetManager
-
-                    if (recSetName === "")
-                        return
-
-                    if (recSetIdx === -1) {
-                        // Creating a new set
-                        recSetManagerRef.createRecSet(recSetName)
-                    } else {
-                        // Editing existing set: clear old words, then rename
-                        var oldInfo = recSetManagerRef.getRecSetInfoQML(recSetIdx)
-                        recSetManagerRef.clearRecordsFromRecSet(oldInfo.name)
-                        recSetManagerRef.renameRecSet(recSetIdx, recSetName)
-                    }
-
-                    for (var i = 0; i < recSetModelRef.count; ++i) {
-                        var rec = recSetModelRef.get(i)
-                        if (rec.expression === null || rec.expression.trim() === "")
-                            continue
-                        var hintPreset  = rec.hint      != null && rec.hint.trim()      !== ""
-                        var audioPreset = rec.audioPath != null && rec.audioPath.trim() !== ""
-                        var imagePreset = rec.imagePath != null && rec.imagePath.trim() !== ""
-                        if (!hintPreset && !audioPreset && !imagePreset)
-                            continue
-                        recSetManagerRef.addRecToRecSet(recSetName, rec)
-                    }
-
-                    AppController.recSetNameListChanged()
+                function onCreatingRecSetCancel() {
                     stackView.pop()
                 }
 
+                function onCreatingRecSetSave() {
+                    var recSetName   = stackView.currentItem.recSetName
+                    var recSetIdx    = stackView.currentItem.recSetIdx
+                    var modelRef     = stackView.currentItem.recSetModelRef
+                    var mgr          = AppController.recSetManager
 
+                    if (recSetName === "") return
+
+                    if (recSetIdx === -1) {
+                        mgr.createRecSet(recSetName)
+                    } else {
+                        var oldInfo = mgr.getRecSetInfoQML(recSetIdx)
+                        mgr.clearRecordsFromRecSet(oldInfo.name)
+                        mgr.renameRecSet(recSetIdx, recSetName)
+                    }
+
+                    for (var i = 0; i < modelRef.count; ++i) {
+                        var rec = modelRef.get(i)
+                        if (rec.expression === null || rec.expression.trim() === "") continue
+                        var hintSet  = rec.hint      != null && rec.hint.trim()      !== ""
+                        var audioSet = rec.audioPath != null && rec.audioPath.trim() !== ""
+                        var imageSet = rec.imagePath != null && rec.imagePath.trim() !== ""
+                        if (!hintSet && !audioSet && !imageSet) continue
+                        mgr.addRecToRecSet(recSetName, rec)
+                    }
+
+                    AppController.saveData()
+                    AppController.recSetNameListChanged()
+                    stackView.pop()
+                }
             }
         }
     }
 }
-

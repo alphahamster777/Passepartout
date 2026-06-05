@@ -104,3 +104,210 @@ QVariantMap RecSetManager::getWordFromRecSetQML(int setIdx, int wordIdx) {
         return {};
     return m_recSetVec.at(setIdx).getWordAtQML(static_cast<size_t>(wordIdx));
 }
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+QString RecSetManager::localPath(const QString& urlOrPath) {
+    QUrl url(urlOrPath);
+    return url.isLocalFile() ? url.toLocalFile() : urlOrPath;
+}
+
+static QJsonObject wordToJson(const DictRec& w) {
+    QJsonObject o;
+    o["exprLangID"] = w.getExprLanguageID();
+    o["hintLangID"] = w.getHintLanguageID();
+    o["expression"] = w.getExpression();
+    o["hint"]       = w.getHint();
+    o["context"]    = w.getContext();
+    o["audioPath"]  = w.getAudioPath();
+    o["imagePath"]  = w.getImagePath();
+    return o;
+}
+
+static DictRec wordFromJson(const QJsonObject& o) {
+    return DictRec{
+        static_cast<size_t>(o["exprLangID"].toInt()),
+        static_cast<size_t>(o["hintLangID"].toInt()),
+        o["expression"].toString(),
+        o["hint"].toString(),
+        o["audioPath"].toString(),
+        o["imagePath"].toString(),
+        o["context"].toString()
+    };
+}
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+
+bool RecSetManager::saveAllToJson(const QString& filePath) {
+    QJsonArray setsArr;
+    for (const auto& rs : m_recSetVec) {
+        QJsonObject setObj;
+        setObj["name"] = rs.getSetName();
+        QJsonArray wordsArr;
+        for (int i = 0; i < rs.getWordCount(); ++i)
+            wordsArr.append(wordToJson(rs.getWordAt(static_cast<size_t>(i))));
+        setObj["words"] = wordsArr;
+        setsArr.append(setObj);
+    }
+    QFile file(localPath(filePath));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+    file.write(QJsonDocument(setsArr).toJson());
+    return true;
+}
+
+bool RecSetManager::loadFromJson(const QString& filePath) {
+    QFile file(localPath(filePath));
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    if (!doc.isArray())
+        return false;
+    m_recSetVec.clear();
+    for (const auto& setVal : doc.array()) {
+        QJsonObject setObj = setVal.toObject();
+        RecSet rs(setObj["name"].toString());
+        for (const auto& wv : setObj["words"].toArray())
+            rs.addWord(wordFromJson(wv.toObject()));
+        m_recSetVec.push_back(std::move(rs));
+    }
+    return true;
+}
+
+// ── Export ────────────────────────────────────────────────────────────────────
+
+static const quint32 k_binaryMagic   = 0x50505354; // "PPST"
+static const quint16 k_binaryVersion = 1;
+
+bool RecSetManager::exportSetToBinary(int idx, const QString& filePath) {
+    if (idx < 0 || idx >= m_recSetVec.size())
+        return false;
+    QFile file(localPath(filePath));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_6_5);
+    out << k_binaryMagic << k_binaryVersion;
+    const auto& rs = m_recSetVec.at(idx);
+    out << rs.getSetName() << qint32(rs.getWordCount());
+    for (int i = 0; i < rs.getWordCount(); ++i) {
+        const auto& w = rs.getWordAt(static_cast<size_t>(i));
+        out << qint32(w.getExprLanguageID())
+            << qint32(w.getHintLanguageID())
+            << w.getExpression()
+            << w.getHint()
+            << w.getContext()
+            << w.getAudioPath()
+            << w.getImagePath();
+    }
+    return true;
+}
+
+QVariantMap RecSetManager::readSetFromBinary(const QString& filePath) {
+    QFile file(localPath(filePath));
+    if (!file.open(QIODevice::ReadOnly))
+        return {};
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_6_5);
+    quint32 magic; quint16 version;
+    in >> magic >> version;
+    if (magic != k_binaryMagic)
+        return {};
+    QString setName;
+    qint32 wordCount;
+    in >> setName >> wordCount;
+    QVariantList words;
+    for (int i = 0; i < wordCount; ++i) {
+        qint32 exprLangID, hintLangID;
+        QString expression, hint, context, audioPath, imagePath;
+        in >> exprLangID >> hintLangID >> expression >> hint >> context >> audioPath >> imagePath;
+        QVariantMap w;
+        w["languageFrom"] = (int)exprLangID;
+        w["languageTo"]   = (int)hintLangID;
+        w["expression"]   = expression;
+        w["hint"]         = hint;
+        w["context"]      = context;
+        w["audioPath"]    = audioPath;
+        w["imagePath"]    = imagePath;
+        words.append(w);
+    }
+    QVariantMap result;
+    result["name"]  = setName;
+    result["words"] = words;
+    return result;
+}
+
+QVariantMap RecSetManager::readSetFromXml(const QString& filePath) {
+    QFile file(localPath(filePath));
+    if (!file.open(QIODevice::ReadOnly))
+        return {};
+    QXmlStreamReader xml(&file);
+    QString setName;
+    QVariantList words;
+    while (!xml.atEnd() && !xml.hasError()) {
+        xml.readNext();
+        if (!xml.isStartElement()) continue;
+        if (xml.name() == QLatin1String("RecSet")) {
+            setName = xml.attributes().value("name").toString();
+        } else if (xml.name() == QLatin1String("Word")) {
+            QVariantMap w;
+            w["languageFrom"] = 10;
+            w["languageTo"]   = 10;
+            w["expression"]   = QString{};
+            w["hint"]         = QString{};
+            w["context"]      = QString{};
+            w["audioPath"]    = QString{};
+            w["imagePath"]    = QString{};
+            while (!xml.atEnd() && !xml.hasError()) {
+                xml.readNext();
+                if (xml.isEndElement() && xml.name() == QLatin1String("Word")) break;
+                if (!xml.isStartElement()) continue;
+                const QString tag = xml.name().toString();
+                const QString val = xml.readElementText();
+                if      (tag == "ExprLangID") w["languageFrom"] = val.toInt();
+                else if (tag == "HintLangID") w["languageTo"]   = val.toInt();
+                else if (tag == "Expression") w["expression"]   = val;
+                else if (tag == "Hint")       w["hint"]         = val;
+                else if (tag == "Context")    w["context"]      = val;
+                else if (tag == "AudioPath")  w["audioPath"]    = val;
+                else if (tag == "ImagePath")  w["imagePath"]    = val;
+            }
+            words.append(w);
+        }
+    }
+    if (xml.hasError())
+        return {};
+    QVariantMap result;
+    result["name"]  = setName;
+    result["words"] = words;
+    return result;
+}
+
+bool RecSetManager::exportSetToXml(int idx, const QString& filePath) {
+    if (idx < 0 || idx >= m_recSetVec.size())
+        return false;
+    QFile file(localPath(filePath));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+    QXmlStreamWriter xml(&file);
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
+    const auto& rs = m_recSetVec.at(idx);
+    xml.writeStartElement("RecSet");
+    xml.writeAttribute("name", rs.getSetName());
+    for (int i = 0; i < rs.getWordCount(); ++i) {
+        const auto& w = rs.getWordAt(static_cast<size_t>(i));
+        xml.writeStartElement("Word");
+        xml.writeTextElement("ExprLangID", QString::number(w.getExprLanguageID()));
+        xml.writeTextElement("HintLangID", QString::number(w.getHintLanguageID()));
+        xml.writeTextElement("Expression", w.getExpression());
+        xml.writeTextElement("Hint",       w.getHint());
+        xml.writeTextElement("Context",    w.getContext());
+        xml.writeTextElement("AudioPath",  w.getAudioPath());
+        xml.writeTextElement("ImagePath",  w.getImagePath());
+        xml.writeEndElement();
+    }
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    return true;
+}
