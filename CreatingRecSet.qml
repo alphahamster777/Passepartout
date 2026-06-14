@@ -220,6 +220,7 @@ Page {
                                     implicitWidth: 138
                                     implicitHeight: 30
                                     model: LanguageHelper.languageNames()
+                                    currentIndex: languageFrom
                                     font.pixelSize: 11
                                     onCurrentIndexChanged: recSetModel.set(index, { languageFrom: currentIndex })
                                     Component.onCompleted: currentIndex = languageFrom
@@ -256,6 +257,7 @@ Page {
                                     implicitWidth: 138
                                     implicitHeight: 30
                                     model: LanguageHelper.languageNames()
+                                    currentIndex: languageTo
                                     font.pixelSize: 11
                                     onCurrentIndexChanged: recSetModel.set(index, { languageTo: currentIndex })
                                     Component.onCompleted: currentIndex = languageTo
@@ -447,8 +449,8 @@ Page {
 
             Component.onCompleted: {
                 recSetModel.append({
-                    languageFrom: LanguageHelper.NotSelected,
-                    languageTo:   LanguageHelper.NotSelected,
+                    languageFrom: LanguageHelper.English,
+                    languageTo:   LanguageHelper.English,
                     expression: "", hint: "", audioPath: "", imagePath: ""
                 })
                 page.selectedCardIndex = 0
@@ -468,7 +470,7 @@ Page {
                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
-                    var lastLangFrom = LanguageHelper.NotSelected
+                    var lastLangFrom = LanguageHelper.NotSelected //langFromCombo
                     var lastLangTo   = LanguageHelper.NotSelected
                     if (recSetModel.count > 0) {
                         var last = recSetModel.get(recSetModel.count - 1)
