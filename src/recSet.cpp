@@ -47,7 +47,6 @@ QVariantMap RecSet::getWordAtQML(size_t index) const {
     map["hintLangID"]  = word.getHintLanguageID();
     map["expression"]  = word.getExpression();
     map["hint"]        = word.getHint();
-    map["context"]     = word.getContext();
     map["audioPath"]   = word.getAudioPath();
     map["imagePath"]   = word.getImagePath();
     return map;

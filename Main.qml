@@ -89,11 +89,11 @@ ApplicationWindow {
                             languageTo:   rec.hintLangID,
                             expression:   rec.expression,
                             hint:         rec.hint,
-                            context:      rec.context,
                             audioPath:    rec.audioPath,
                             imagePath:    rec.imagePath
                         })
                     }
+                    stackView.currentItem.selectedCardIndex = info.wordCount > 0 ? info.wordCount - 1 : 0
                 }
             }
         }
@@ -186,7 +186,15 @@ ApplicationWindow {
                         var audioSet = rec.audioPath != null && rec.audioPath.trim() !== ""
                         var imageSet = rec.imagePath != null && rec.imagePath.trim() !== ""
                         if (!hintSet && !audioSet && !imageSet) continue
-                        mgr.addRecToRecSet(recSetName, rec)
+                        var wordData = {
+                            languageFrom: rec.languageFrom,
+                            languageTo:   rec.languageTo,
+                            expression:   rec.expression,
+                            hint:         rec.hint,
+                            audioPath:    rec.audioPath,
+                            imagePath:    rec.imagePath
+                        }
+                        mgr.addRecToRecSet(recSetName, wordData)
                     }
 
                     AppController.saveData()

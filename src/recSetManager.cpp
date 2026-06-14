@@ -65,8 +65,7 @@ void RecSetManager::addRecToRecSet(const QString &setName, const QVariantMap &re
         rec.value("expression").toString(),
         rec.value("hint"      ).toString(),
         rec.value("audioPath" ).toString(),
-        rec.value("imagePath" ).toString(),
-        rec.value("context"   ).toString()
+        rec.value("imagePath" ).toString()
     };
     addRecToRecSet(setName, dr);
 }
@@ -118,7 +117,6 @@ static QJsonObject wordToJson(const DictRec& w) {
     o["hintLangID"] = w.getHintLanguageID();
     o["expression"] = w.getExpression();
     o["hint"]       = w.getHint();
-    o["context"]    = w.getContext();
     o["audioPath"]  = w.getAudioPath();
     o["imagePath"]  = w.getImagePath();
     return o;
@@ -131,8 +129,7 @@ static DictRec wordFromJson(const QJsonObject& o) {
         o["expression"].toString(),
         o["hint"].toString(),
         o["audioPath"].toString(),
-        o["imagePath"].toString(),
-        o["context"].toString()
+        o["imagePath"].toString()
     };
 }
 
@@ -196,7 +193,6 @@ bool RecSetManager::exportSetToBinary(int idx, const QString& filePath) {
             << qint32(w.getHintLanguageID())
             << w.getExpression()
             << w.getHint()
-            << w.getContext()
             << w.getAudioPath()
             << w.getImagePath();
     }
@@ -219,14 +215,13 @@ QVariantMap RecSetManager::readSetFromBinary(const QString& filePath) {
     QVariantList words;
     for (int i = 0; i < wordCount; ++i) {
         qint32 exprLangID, hintLangID;
-        QString expression, hint, context, audioPath, imagePath;
-        in >> exprLangID >> hintLangID >> expression >> hint >> context >> audioPath >> imagePath;
+        QString expression, hint, audioPath, imagePath;
+        in >> exprLangID >> hintLangID >> expression >> hint >> audioPath >> imagePath;
         QVariantMap w;
         w["languageFrom"] = (int)exprLangID;
         w["languageTo"]   = (int)hintLangID;
         w["expression"]   = expression;
         w["hint"]         = hint;
-        w["context"]      = context;
         w["audioPath"]    = audioPath;
         w["imagePath"]    = imagePath;
         words.append(w);
@@ -255,7 +250,6 @@ QVariantMap RecSetManager::readSetFromXml(const QString& filePath) {
             w["languageTo"]   = 10;
             w["expression"]   = QString{};
             w["hint"]         = QString{};
-            w["context"]      = QString{};
             w["audioPath"]    = QString{};
             w["imagePath"]    = QString{};
             while (!xml.atEnd() && !xml.hasError()) {
@@ -268,7 +262,6 @@ QVariantMap RecSetManager::readSetFromXml(const QString& filePath) {
                 else if (tag == "HintLangID") w["languageTo"]   = val.toInt();
                 else if (tag == "Expression") w["expression"]   = val;
                 else if (tag == "Hint")       w["hint"]         = val;
-                else if (tag == "Context")    w["context"]      = val;
                 else if (tag == "AudioPath")  w["audioPath"]    = val;
                 else if (tag == "ImagePath")  w["imagePath"]    = val;
             }
@@ -280,6 +273,21 @@ QVariantMap RecSetManager::readSetFromXml(const QString& filePath) {
     QVariantMap result;
     result["name"]  = setName;
     result["words"] = words;
+    return result;
+}
+
+QString RecSetManager::exportSetToText(int idx) {
+    if (idx < 0 || idx >= m_recSetVec.size())
+        return {};
+    const auto& rs = m_recSetVec.at(idx);
+    QString result = rs.getSetName() + "\n\n";
+    for (int i = 0; i < rs.getWordCount(); ++i) {
+        const auto& w = rs.getWordAt(static_cast<size_t>(i));
+        result += QString::number(i + 1) + ". " + w.getExpression();
+        if (!w.getHint().isEmpty())
+            result += " — " + w.getHint();
+        result += "\n";
+    }
     return result;
 }
 
@@ -302,7 +310,6 @@ bool RecSetManager::exportSetToXml(int idx, const QString& filePath) {
         xml.writeTextElement("HintLangID", QString::number(w.getHintLanguageID()));
         xml.writeTextElement("Expression", w.getExpression());
         xml.writeTextElement("Hint",       w.getHint());
-        xml.writeTextElement("Context",    w.getContext());
         xml.writeTextElement("AudioPath",  w.getAudioPath());
         xml.writeTextElement("ImagePath",  w.getImagePath());
         xml.writeEndElement();

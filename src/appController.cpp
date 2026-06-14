@@ -1,17 +1,7 @@
 #include "appController.h"
 
 AppController::AppController(QObject *parent) {
-    if (!loadData()) {
-        // First run – seed with example data
-        m_recSetManager.createRecSet("Default Set");
-        m_recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "der Fahrrad", "bicycle", "audio.mp3", "qrc:/images/bicycle.jpg"));
-        m_recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
-        m_recSetManager.addRecToRecSet("Default Set", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
-
-        m_recSetManager.createRecSet("Default Set 2");
-        m_recSetManager.addRecToRecSet("Default Set 2", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
-        m_recSetManager.addRecToRecSet("Default Set 2", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
-    }
+    loadData();
 }
 
 QList<QString> AppController::getRecSetNameList() const {

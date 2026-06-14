@@ -14,10 +14,11 @@ Page {
     property alias recSetName: topTextField.text
     property int recSetIdx: -1
     property int activeCardIndex: -1
+    property int selectedCardIndex: 0
 
     background: Rectangle { color: "#f0f4f8" }
 
-    // ── Audio player (one shared instance) ────────────────────────────────────
+    // ── Audio player ──────────────────────────────────────────────────────────
     MediaPlayer {
         id: audioPlayer
         audioOutput: AudioOutput {}
@@ -69,6 +70,7 @@ Page {
             for (var i = 0; i < wordList.length; i++) {
                 recSetModel.append(wordList[i])
             }
+            page.selectedCardIndex = Math.max(0, recSetModel.count - 1)
         }
     }
 
@@ -81,7 +83,6 @@ Page {
             anchors { fill: parent; leftMargin: 8; rightMargin: 8 }
             spacing: 4
 
-            // placeholder so title stays centred
             Item { implicitWidth: 76 }
 
             Label {
@@ -143,6 +144,7 @@ Page {
             ColumnLayout {
                 id: rowsColumn
                 width: scrollView.width
+                height: implicitHeight
                 spacing: 10
 
                 ListModel { id: recSetModel }
@@ -150,13 +152,18 @@ Page {
                 Repeater {
                     model: recSetModel
                     delegate: Rectangle {
+                        id: cardRect
                         Layout.fillWidth: true
                         width: rowsColumn.width
-                        height: cardColumn.implicitHeight + 20
+                        Layout.preferredHeight: cardColumn.implicitHeight + 24
+                        implicitHeight: cardColumn.implicitHeight + 24
+
                         radius: 10
                         color: "white"
-                        border.color: "#dce1e7"
+                        border.color: page.selectedCardIndex === index ? "#3498db" : "#dce1e7"
+                        border.width: page.selectedCardIndex === index ? 2 : 1
 
+                        // Blue top accent bar
                         Rectangle {
                             width: parent.width; height: 3
                             radius: 10
@@ -166,14 +173,62 @@ Page {
 
                         ColumnLayout {
                             id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 10 }
-                            spacing: 8
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
+                            spacing: 10
 
-                            // ── Expression / Hint / Context ───────────────────
+                            // ── Card header: word number + tap-to-select ──────
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 24
+                                color: "transparent"
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Label {
+                                        text: qsTr("Word") + " " + (index + 1)
+                                        font.pixelSize: 11
+                                        color: "#95a5a6"
+                                        Layout.fillWidth: true
+                                    }
+                                    Label {
+                                        visible: page.selectedCardIndex === index
+                                        text: qsTr("selected")
+                                        font.pixelSize: 10
+                                        color: "#3498db"
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: page.selectedCardIndex = index
+                                }
+                            }
+
+                            // ── Word / Term ───────────────────────────────────
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 6
+                                Label {
+                                    text: qsTr("Word / Term")
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#2c3e50"
+                                    Layout.fillWidth: true
+                                }
+                                ComboBox {
+                                    id: langFromCombo
+                                    implicitWidth: 138
+                                    implicitHeight: 30
+                                    model: LanguageHelper.languageNames()
+                                    font.pixelSize: 11
+                                    onCurrentIndexChanged: recSetModel.set(index, { languageFrom: currentIndex })
+                                    Component.onCompleted: currentIndex = languageFrom
+                                }
+                            }
                             TextField {
                                 id: exprField
                                 Layout.fillWidth: true
-                                placeholderText: qsTr("Expression")
+                                placeholderText: qsTr("Enter word...")
                                 text: expression
                                 font.pixelSize: 15
                                 background: Rectangle {
@@ -181,13 +236,35 @@ Page {
                                     border.color: exprField.activeFocus ? "#3498db" : "#e0e6ed"
                                 }
                                 leftPadding: 10
+                                onActiveFocusChanged: if (activeFocus) page.selectedCardIndex = index
                                 onEditingFinished: recSetModel.set(index, { expression: exprField.text })
                             }
 
+                            // ── Hint / meaning ──────────────────────────
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 6
+                                Label {
+                                    text: qsTr("Hint / meaning")
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#2c3e50"
+                                    Layout.fillWidth: true
+                                }
+                                ComboBox {
+                                    id: langToCombo
+                                    implicitWidth: 138
+                                    implicitHeight: 30
+                                    model: LanguageHelper.languageNames()
+                                    font.pixelSize: 11
+                                    onCurrentIndexChanged: recSetModel.set(index, { languageTo: currentIndex })
+                                    Component.onCompleted: currentIndex = languageTo
+                                }
+                            }
                             TextField {
                                 id: hintField
                                 Layout.fillWidth: true
-                                placeholderText: qsTr("Hint / Translation")
+                                placeholderText: qsTr("Hint, definition...")
                                 text: hint
                                 font.pixelSize: 15
                                 background: Rectangle {
@@ -195,172 +272,172 @@ Page {
                                     border.color: hintField.activeFocus ? "#3498db" : "#e0e6ed"
                                 }
                                 leftPadding: 10
+                                onActiveFocusChanged: if (activeFocus) page.selectedCardIndex = index
                                 onEditingFinished: recSetModel.set(index, { hint: hintField.text })
                             }
 
-                            TextField {
-                                id: contextField
-                                Layout.fillWidth: true
-                                placeholderText: qsTr("Context sentence (optional)")
-                                text: context
-                                font.pixelSize: 13
-                                color: "#555"
-                                background: Rectangle {
-                                    radius: 6; color: "#f7f9fb"
-                                    border.color: contextField.activeFocus ? "#3498db" : "#e0e6ed"
-                                }
-                                leftPadding: 10
-                                onEditingFinished: recSetModel.set(index, { context: contextField.text })
-                            }
-
-                            // ── Image picker ──────────────────────────────────
+                            // ── Image preview — height adapts to aspect ratio ──
+                            // Layout.preferredHeight (not height:) is what ColumnLayout
+                            // actually uses; height: is ignored on layout-managed children.
                             Image {
+                                id: imagePreview
                                 visible: imagePath !== ""
                                 source: imagePath
                                 Layout.fillWidth: true
-                                height: 90
+                                Layout.preferredHeight: (sourceSize.width > 0 && cardColumn.width > 0)
+                                    ? Math.min(cardColumn.width * sourceSize.height / sourceSize.width, 260)
+                                    : 0
                                 fillMode: Image.PreserveAspectFit
-                                Layout.alignment: Qt.AlignHCenter
                             }
 
+                            // ── Image & Audio boxes ───────────────────────────
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: 6
+                                spacing: 8
 
-                                Button {
+                                // Image box
+                                Rectangle {
                                     Layout.fillWidth: true
-                                    text: imagePath !== "" ? qsTr("Change image") : qsTr("Add image")
-                                    font.pixelSize: 13
-                                    background: Rectangle {
-                                        radius: 6
-                                        color: parent.pressed ? "#2980b9" : (imagePath !== "" ? "#27ae60" : "#3498db")
-                                    }
-                                    contentItem: Text {
-                                        text: parent.text; color: "white"; font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                                    }
-                                    onClicked: { page.activeCardIndex = index; imagePickerDialog.open() }
-                                }
+                                    height: 72
+                                    radius: 8
+                                    color: "#f7f9fb"
+                                    border.color: "#c8d6e5"
+                                    border.width: 1
 
-                                Button {
-                                    visible: imagePath !== ""
-                                    text: qsTr("✕"); font.pixelSize: 13; implicitWidth: 36
-                                    background: Rectangle { radius: 6; color: "#e74c3c" }
-                                    contentItem: Text {
-                                        text: parent.text; color: "white"; font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                                    }
-                                    onClicked: recSetModel.set(index, { imagePath: "" })
-                                }
-                            }
-
-                            // ── Audio picker + preview ────────────────────────
-                            Label {
-                                visible: audioPath !== ""
-                                text: {
-                                    var p = audioPath
-                                    if (!p) return ""
-                                    var parts = p.split("/")
-                                    return "♪ " + parts[parts.length - 1]
-                                }
-                                font.pixelSize: 12
-                                color: "#27ae60"
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                            }
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 6
-
-                                Button {
-                                    Layout.fillWidth: true
-                                    text: audioPath !== "" ? qsTr("Change audio") : qsTr("Add audio")
-                                    font.pixelSize: 13
-                                    background: Rectangle {
-                                        radius: 6
-                                        color: parent.pressed ? "#7f8c8d" : (audioPath !== "" ? "#27ae60" : "#95a5a6")
-                                    }
-                                    contentItem: Text {
-                                        text: parent.text; color: "white"; font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                                    }
-                                    onClicked: { page.activeCardIndex = index; audioPickerDialog.open() }
-                                }
-
-                                // ── Play / Stop audio preview ─────────────────
-                                Button {
-                                    visible: audioPath !== ""
-                                    implicitWidth: 80; implicitHeight: 36
-
-                                    readonly property bool isPlaying:
-                                        audioPlayer.playbackState === MediaPlayer.PlayingState &&
-                                        page.currentPlayingPath === audioPath
-
-                                    text: isPlaying ? qsTr("■ Stop") : qsTr("▶ Play")
-                                    font.pixelSize: 13
-
-                                    background: Rectangle {
-                                        radius: 6
-                                        color: parent.isPlaying
-                                               ? (parent.pressed ? "#c0392b" : "#e74c3c")
-                                               : (parent.pressed ? "#1a6ca8" : "#3498db")
-                                    }
-                                    contentItem: Text {
-                                        text: parent.text; color: "white"; font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                                    // Picker tap target — declared FIRST so buttons above it in Z capture clicks first
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            page.selectedCardIndex = index
+                                            page.activeCardIndex   = index
+                                            imagePickerDialog.open()
+                                        }
                                     }
 
-                                    onClicked: {
-                                        if (isPlaying) {
-                                            audioPlayer.stop()
-                                            page.currentPlayingPath = ""
-                                        } else {
-                                            audioPlayer.stop()
-                                            page.currentPlayingPath = audioPath
-                                            audioPlayer.source = audioPath
-                                            audioPlayer.play()
+                                    ColumnLayout {
+                                        anchors.centerIn: parent
+                                        spacing: 3
+                                        Label {
+                                            text: imagePath !== "" ? qsTr("Change image") : qsTr("Add image")
+                                            font.pixelSize: 11
+                                            color: imagePath !== "" ? "#27ae60" : "#95a5a6"
+                                            Layout.alignment: Qt.AlignHCenter
+                                        }
+                                    }
+
+                                    // Remove image button — above picker MouseArea in Z
+                                    Rectangle {
+                                        visible: imagePath !== ""
+                                        width: 20; height: 20
+                                        radius: 10
+                                        color: "#e74c3c"
+                                        anchors { top: parent.top; right: parent.right; margins: 4 }
+                                        Label {
+                                            text: "x"; color: "white"; font.pixelSize: 12
+                                            anchors.centerIn: parent
+                                        }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: recSetModel.set(index, { imagePath: "" })
                                         }
                                     }
                                 }
 
-                                Button {
-                                    visible: audioPath !== ""
-                                    text: qsTr("✕"); font.pixelSize: 13; implicitWidth: 36
-                                    background: Rectangle { radius: 6; color: "#e74c3c" }
-                                    contentItem: Text {
-                                        text: parent.text; color: "white"; font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                                    }
-                                    onClicked: {
-                                        if (page.currentPlayingPath === audioPath)
-                                            audioPlayer.stop()
-                                        recSetModel.set(index, { audioPath: "" })
-                                    }
-                                }
-                            }
+                                // Audio box
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 72
+                                    radius: 8
+                                    color: "#f7f9fb"
+                                    border.color: "#c8d6e5"
+                                    border.width: 1
 
-                            // ── Language selectors ────────────────────────────
-                            RowLayout {
-                                Layout.fillWidth: true; spacing: 6
-                                Label { text: qsTr("From"); font.pixelSize: 12; color: "#7f8c8d" }
-                                ComboBox {
-                                    Layout.fillWidth: true
-                                    model: LanguageHelper.languageNames()
-                                    font.pixelSize: 13
-                                    onCurrentIndexChanged: recSetModel.set(index, { languageFrom: currentIndex })
-                                    Component.onCompleted: currentIndex = languageFrom
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillWidth: true; spacing: 6
-                                Label { text: qsTr("To"); font.pixelSize: 12; color: "#7f8c8d" }
-                                ComboBox {
-                                    Layout.fillWidth: true
-                                    model: LanguageHelper.languageNames()
-                                    font.pixelSize: 13
-                                    onCurrentIndexChanged: recSetModel.set(index, { languageTo: currentIndex })
-                                    Component.onCompleted: currentIndex = languageTo
+                                    // Picker tap target — FIRST (lowest Z); buttons above intercept their own clicks
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            page.selectedCardIndex = index
+                                            page.activeCardIndex   = index
+                                            audioPickerDialog.open()
+                                        }
+                                    }
+
+                                    // Filename label + centered play/stop button
+                                    ColumnLayout {
+                                        anchors.centerIn: parent
+                                        spacing: 4
+
+                                        Label {
+                                            text: {
+                                                if (audioPath === "") return qsTr("Add audio")
+                                                var parts = audioPath.split("/")
+                                                var name = parts[parts.length - 1]
+                                                return name.length > 16 ? name.substring(0, 14) + "…" : name
+                                            }
+                                            font.pixelSize: 11
+                                            color: audioPath !== "" ? "#27ae60" : "#95a5a6"
+                                            Layout.alignment: Qt.AlignHCenter
+                                            wrapMode: Text.NoWrap
+                                        }
+
+                                        // Play / Stop button — centered, only when audio is set
+                                        Button {
+                                            visible: audioPath !== ""
+                                            Layout.alignment: Qt.AlignHCenter
+                                            implicitWidth: 52; implicitHeight: 26
+
+                                            readonly property bool isPlaying:
+                                                audioPlayer.playbackState === MediaPlayer.PlayingState &&
+                                                page.currentPlayingPath === audioPath
+
+                                            text: isPlaying ? qsTr("■ Stop") : qsTr("▶ Play")
+                                            font.pixelSize: 10
+
+                                            background: Rectangle {
+                                                radius: 13
+                                                color: parent.isPlaying
+                                                    ? (parent.pressed ? "#c0392b" : "#e74c3c")
+                                                    : (parent.pressed ? "#1a6ca8" : "#3498db")
+                                            }
+                                            contentItem: Text {
+                                                text: parent.text; color: "white"; font: parent.font
+                                                horizontalAlignment: Text.AlignHCenter
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+                                            onClicked: {
+                                                if (isPlaying) {
+                                                    audioPlayer.stop()
+                                                    page.currentPlayingPath = ""
+                                                } else {
+                                                    audioPlayer.stop()
+                                                    page.currentPlayingPath = audioPath
+                                                    audioPlayer.source = audioPath
+                                                    audioPlayer.play()
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Remove audio — top-right corner, same style as image remove button
+                                    Rectangle {
+                                        visible: audioPath !== ""
+                                        width: 20; height: 20
+                                        radius: 10
+                                        color: "#e74c3c"
+                                        anchors { top: parent.top; right: parent.right; margins: 4 }
+                                        Label {
+                                            text: "x"; color: "white"; font.pixelSize: 12
+                                            anchors.centerIn: parent
+                                        }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (page.currentPlayingPath === audioPath)
+                                                    audioPlayer.stop()
+                                                recSetModel.set(index, { audioPath: "" })
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -372,8 +449,9 @@ Page {
                 recSetModel.append({
                     languageFrom: LanguageHelper.NotSelected,
                     languageTo:   LanguageHelper.NotSelected,
-                    expression: "", hint: "", context: "", audioPath: "", imagePath: ""
+                    expression: "", hint: "", audioPath: "", imagePath: ""
                 })
+                page.selectedCardIndex = 0
             }
         }
 
@@ -390,16 +468,25 @@ Page {
                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
+                    var lastLangFrom = LanguageHelper.NotSelected
+                    var lastLangTo   = LanguageHelper.NotSelected
+                    if (recSetModel.count > 0) {
+                        var last = recSetModel.get(recSetModel.count - 1)
+                        lastLangFrom = last.languageFrom
+                        lastLangTo   = last.languageTo
+                    }
                     recSetModel.append({
-                        languageFrom: LanguageHelper.NotSelected, languageTo: LanguageHelper.NotSelected,
-                        expression: "", hint: "", context: "", audioPath: "", imagePath: ""
+                        languageFrom: lastLangFrom,
+                        languageTo:   lastLangTo,
+                        expression: "", hint: "", audioPath: "", imagePath: ""
                     })
+                    page.selectedCardIndex = recSetModel.count - 1
                 }
             }
 
             Button {
-                text: qsTr("Remove last")
-                enabled: recSetModel.count > 1
+                text: qsTr("Remove")
+                enabled: recSetModel.count > 0
                 Layout.fillWidth: true
                 background: Rectangle {
                     radius: 8
@@ -409,7 +496,16 @@ Page {
                     text: parent.text; color: "white"; font: parent.font
                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                 }
-                onClicked: recSetModel.remove(recSetModel.count - 1)
+                onClicked: {
+                    var idx = page.selectedCardIndex
+                    if (idx >= 0 && idx < recSetModel.count) {
+                        if (page.currentPlayingPath !== "" &&
+                                recSetModel.get(idx).audioPath === page.currentPlayingPath)
+                            audioPlayer.stop()
+                        recSetModel.remove(idx)
+                        page.selectedCardIndex = Math.min(idx, recSetModel.count - 1)
+                    }
+                }
             }
         }
     }

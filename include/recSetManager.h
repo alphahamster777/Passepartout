@@ -53,9 +53,12 @@ public:
     Q_INVOKABLE bool exportSetToBinary(int idx, const QString& filePath);
     Q_INVOKABLE bool exportSetToXml(int idx, const QString& filePath);
 
-    // Import a set — returns {name, words:[{languageFrom,languageTo,expression,hint,context,audioPath,imagePath},...]}
+    // Import a set — returns {name, words:[{languageFrom,languageTo,expression,hint,audioPath,imagePath},...]}
     Q_INVOKABLE QVariantMap readSetFromBinary(const QString& filePath);
     Q_INVOKABLE QVariantMap readSetFromXml(const QString& filePath);
+
+    // Returns human-readable text for sharing
+    Q_INVOKABLE QString exportSetToText(int idx);
 
 private:
     QVector<RecSet> m_recSetVec;

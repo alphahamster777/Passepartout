@@ -18,17 +18,6 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
 
-    // qmlRegisterType<SpellingTestController>("Passepartout", 1, 0, "AppController");
-    // RecSetManager recSetManager; // Assume it's initialized properly
-    // recSetManager.createRecSet("Default Set");
-    // recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "der Fahrrad", "bicycle", "audio.mp3", "qrc:/images/bicycle.jpg"));
-    // recSetManager.addRecToRecSet("Default Set", DictRec(2, 1, "die Käse", "cheese", "audio.mp3", "qrc:/images/cheese.jpg"));
-    // recSetManager.addRecToRecSet("Default Set", DictRec(1, 2, "opportunity", "Möglichkeit", "audio.mp3", "qrc:/images/default_logo.jpg"));
-    // SpellingTestController spellingTestController(&recSetManager);
-    // engine.rootContext()->setContextProperty("spellingTestController", &spellingTestController);
-
-    // SetPreviewMenuController setPreviewController(&recSetManager);
-    // engine.rootContext()->setContextProperty("setPreviewController", &setPreviewController);
     engine.loadFromModule("Passepartout", "Main");
     return app.exec();
 }

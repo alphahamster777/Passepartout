@@ -20,7 +20,6 @@ void SetPreviewMenuController::initialize(QObject *manager, int idx) {
         QVariantMap expressionData;
         expressionData["expression"] = word.getExpression();
         expressionData["hint"]       = word.getHint();
-        expressionData["context"]    = word.getContext();
         expressionData["imagePath"]  = word.getImagePath();
         expressionData["audioPath"]  = word.getAudioPath();
         m_expressionList.append(expressionData);

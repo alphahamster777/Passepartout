@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import AppController
+import ShareHelper
 
 Page {
     id: page
@@ -120,6 +121,14 @@ Page {
                             AppController.recSetManager.deleteRecSet(modelData)
                             AppController.saveData()
                             AppController.recSetNameListChanged()
+                        }
+                    }
+                    MenuSeparator {}
+                    MenuItem {
+                        text: qsTr("Share via messenger")
+                        onTriggered: {
+                            var text = AppController.recSetManager.exportSetToText(index)
+                            ShareHelper.shareText(text, modelData)
                         }
                     }
                     MenuSeparator {}

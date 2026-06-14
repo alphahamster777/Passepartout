@@ -118,18 +118,6 @@ Page {
                                 wrapMode: Text.WordWrap
                             }
 
-                            // Context
-                            Label {
-                                Layout.fillWidth: true
-                                visible: modelData.context !== ""
-                                text: modelData.context
-                                font.pixelSize: 13
-                                font.italic: true
-                                color: "#7f8c8d"
-                                wrapMode: Text.WordWrap
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-
                             // ── Audio playback ────────────────────────────────
                             Button {
                                 Layout.alignment: Qt.AlignHCenter
@@ -192,10 +180,13 @@ Page {
             anchors.centerIn: parent
             width: parent.width * 0.7
             height: 44
-            text: qsTr("Start Test")
+            text: swipeView.count > 0 ? qsTr("Start Test") : qsTr("No words yet")
+            enabled: swipeView.count > 0
             background: Rectangle {
                 radius: 22
-                color: parent.pressed ? "#1e8449" : "#27ae60"
+                color: !parent.enabled ? "#95a5a6"
+                     : parent.pressed  ? "#1e8449"
+                     : "#27ae60"
             }
             contentItem: Text {
                 text: parent.text

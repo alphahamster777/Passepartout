@@ -10,7 +10,7 @@ class DictRec : public QObject {
     Q_OBJECT
 public:
     DictRec(size_t exprlangID, size_t hintLangID, const QString& expression, const QString& hint,
-            const QString& audioPath = {}, const QString& imagePath = {}, const QString& context = {});
+            const QString& audioPath = {}, const QString& imagePath = {});
 
     DictRec(const DictRec& other);
     DictRec(DictRec&& other);
@@ -22,7 +22,6 @@ public:
     Q_INVOKABLE int getHintLanguageID() const { return m_hintLangID; }
     Q_INVOKABLE QString getExpression() const { return m_expression; }
     Q_INVOKABLE QString getHint() const { return m_hint; }
-    Q_INVOKABLE QString getContext() const { return m_context; }
     Q_INVOKABLE QString getImagePath() const { return m_imagePath; }
     Q_INVOKABLE QString getAudioPath() const { return m_audioPath; }
 
@@ -31,7 +30,6 @@ public:
     void setHintLangID(int languageID) { m_hintLangID = languageID; }
     void setExpression(const QString& expression) { m_expression = expression; }
     void setMeaning(const QString& hint) { m_hint = hint; }
-    void setContext(const QString& context) { m_context = context; }
     void setAudioPath(QString& audioPath) { m_audioPath = audioPath; }
     void setImagePath(const QString& imagePath) { m_imagePath = imagePath; }
 
@@ -43,7 +41,6 @@ private:
     int m_hintLangID = 0;
     QString m_expression;
     QString m_hint;
-    QString m_context;
     QString m_audioPath;
     QString m_imagePath;
 };
