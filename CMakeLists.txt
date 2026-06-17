@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
 project(Passepartout VERSION 0.1 LANGUAGES CXX)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 add_definitions(-DQT_QML_DEBUG)
@@ -8,12 +9,12 @@ add_definitions(-DQT_QML_DEBUG)
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message(FATAL_ERROR "Error: This project requires Clang. Please switch to Clang.")
 else()
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.1.3)
-        message(FATAL_ERROR "Error: Clang version 14 or higher is required. Current version: ${CMAKE_CXX_COMPILER_VERSION}")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS  17.0.2)
+        message(FATAL_ERROR "Error: Clang version  17.0.2 or higher is required. Current version: ${CMAKE_CXX_COMPILER_VERSION}")
     endif()
 endif()
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2 QuickDialogs2)

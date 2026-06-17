@@ -33,8 +33,9 @@ public:
     void setAudioPath(QString& audioPath) { m_audioPath = audioPath; }
     void setImagePath(const QString& imagePath) { m_imagePath = imagePath; }
 
-    auto operator<=>(const DictRec& other) const;
+    // auto operator<=>(const DictRec& other) const;
     bool operator==(const DictRec& other) const;
+    // bool operator<(const DictRec& other) const;
 
 private:
     int m_exprLangID;

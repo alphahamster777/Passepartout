@@ -20,7 +20,13 @@ ApplicationWindow {
         focus: true
 
         Keys.onReleased: function(event) {
-            if (event.key === Qt.Key_Back || event.key === Qt.Key_Backspace) {
+            const androidBackPressed =
+                Qt.platform.os === "android" && event.key === Qt.Key_Back
+
+            const desktopLeftPressed =
+                Qt.platform.os !== "android" && event.key === Qt.Key_Left
+
+            if (androidBackPressed || desktopLeftPressed) {
                 if (stackView.depth > 1) {
                     stackView.pop()
                 } else {
