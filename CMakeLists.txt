@@ -4,7 +4,11 @@ project(Passepartout VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-add_definitions(-DQT_QML_DEBUG)
+# QT_QML_DEBUG only for Debug builds — globally defining it causes the app to
+# hang on Android when Qt Creator's QML debugger port-forward fails.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DQT_QML_DEBUG)
+endif()
 
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message(FATAL_ERROR "Error: This project requires Clang. Please switch to Clang.")
@@ -193,6 +197,21 @@ target_link_libraries(appPassepartout
 set_target_properties(appPassepartout PROPERTIES
     QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android"
 )
+
+# Bundle OpenSSL 3.x for Android so HTTPS (Wikipedia image fetch) works.
+# KDAB's android_openssl provides pre-built arm64-v8a libssl_3.so / libcrypto_3.so.
+if(ANDROID)
+    include(FetchContent)
+    FetchContent_Declare(
+        android_openssl
+        GIT_REPOSITORY https://github.com/KDAB/android_openssl.git
+        GIT_TAG        master
+        GIT_SHALLOW    TRUE
+    )
+    FetchContent_MakeAvailable(android_openssl)
+    include("${android_openssl_SOURCE_DIR}/android_openssl.cmake")
+    add_android_openssl_libraries(appPassepartout)
+endif()
 
 include(GNUInstallDirs)
 install(TARGETS appPassepartout
