@@ -10,6 +10,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QFile>
+#include <QDir>
+#include <QStandardPaths>
 #include <QDataStream>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
@@ -50,10 +52,12 @@ public:
     Q_INVOKABLE bool loadFromJson(const QString& filePath);
 
     // Export a single set
+    Q_INVOKABLE bool exportSetToZip(int idx, const QString& filePath);
     Q_INVOKABLE bool exportSetToBinary(int idx, const QString& filePath);
     Q_INVOKABLE bool exportSetToXml(int idx, const QString& filePath);
 
     // Import a set — returns {name, words:[{languageFrom,languageTo,expression,hint,audioPath,imagePath},...]}
+    Q_INVOKABLE QVariantMap readSetFromZip(const QString& filePath);
     Q_INVOKABLE QVariantMap readSetFromBinary(const QString& filePath);
     Q_INVOKABLE QVariantMap readSetFromXml(const QString& filePath);
 

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtMultimedia
+import MediaHelper
 
 Page {
     id: page
@@ -47,6 +48,7 @@ Page {
             // Stop playback when the user swipes to another card
             onCurrentIndexChanged: {
                 audioPlayer.stop()
+                MediaHelper.stopSpeaking()
                 page.currentPlayingPath = ""
             }
 
@@ -118,21 +120,31 @@ Page {
                                 wrapMode: Text.WordWrap
                             }
 
-                            // ── Audio playback ────────────────────────────────
+                            // ── Audio playback (file or TTS) ─────────────────
                             Button {
                                 Layout.alignment: Qt.AlignHCenter
-                                visible: modelData.audioPath !== ""
                                 implicitWidth: 140; implicitHeight: 38
 
-                                readonly property bool isPlaying:
+                                readonly property bool hasFile: modelData.audioPath !== ""
+                                readonly property string ttsKey: "tts://" + modelData.expression
+
+                                readonly property bool isPlayingFile:
+                                    hasFile &&
                                     audioPlayer.playbackState === MediaPlayer.PlayingState &&
                                     page.currentPlayingPath === modelData.audioPath
 
-                                text: isPlaying ? qsTr("■  Stop") : qsTr("▶  Listen")
+                                readonly property bool isSpeaking:
+                                    !hasFile &&
+                                    MediaHelper.speaking &&
+                                    page.currentPlayingPath === ttsKey
+
+                                readonly property bool isActive: isPlayingFile || isSpeaking
+
+                                text: isActive ? qsTr("■  Stop") : qsTr("▶  Listen")
 
                                 background: Rectangle {
                                     radius: 19
-                                    color: parent.isPlaying
+                                    color: parent.isActive
                                            ? (parent.pressed ? "#c0392b" : "#e74c3c")
                                            : (parent.pressed ? "#1a6ca8" : "#3498db")
                                 }
@@ -145,14 +157,21 @@ Page {
                                 }
 
                                 onClicked: {
-                                    if (isPlaying) {
+                                    if (isActive) {
                                         audioPlayer.stop()
+                                        MediaHelper.stopSpeaking()
                                         page.currentPlayingPath = ""
-                                    } else {
+                                    } else if (hasFile) {
                                         audioPlayer.stop()
+                                        MediaHelper.stopSpeaking()
                                         page.currentPlayingPath = modelData.audioPath
                                         audioPlayer.source = modelData.audioPath
                                         audioPlayer.play()
+                                    } else {
+                                        audioPlayer.stop()
+                                        MediaHelper.stopSpeaking()
+                                        page.currentPlayingPath = ttsKey
+                                        MediaHelper.speak(modelData.expression, modelData.exprLangID)
                                     }
                                 }
                             }

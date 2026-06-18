@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import AppController
 import ShareHelper
+import RecSetManager
 
 Page {
     id: page
@@ -17,13 +18,13 @@ Page {
 
     // ── Export dialogs ────────────────────────────────────────────────────────
     FileDialog {
-        id: binaryExportDialog
-        title: qsTr("Export as Binary")
+        id: zipExportDialog
+        title: qsTr("Export as .ppset")
         fileMode: FileDialog.SaveFile
         nameFilters: ["Passepartout Set (*.ppset)"]
         defaultSuffix: "ppset"
         onAccepted: {
-            AppController.recSetManager.exportSetToBinary(page.exportSetIdx, selectedFile.toString())
+            AppController.recSetManager.exportSetToZip(page.exportSetIdx, selectedFile.toString())
         }
     }
 
@@ -125,18 +126,26 @@ Page {
                     }
                     MenuSeparator {}
                     MenuItem {
-                        text: qsTr("Share via messenger")
+                        text: qsTr("Share as text")
                         onTriggered: {
                             var text = AppController.recSetManager.exportSetToText(index)
                             ShareHelper.shareText(text, modelData)
                         }
                     }
+                    MenuItem {
+                        text: qsTr("Share .ppset file")
+                        onTriggered: {
+                            var path = ShareHelper.shareableExportPath(modelData)
+                            AppController.recSetManager.exportSetToZip(index, path)
+                            ShareHelper.shareFile(path, modelData)
+                        }
+                    }
                     MenuSeparator {}
                     MenuItem {
-                        text: qsTr("Export binary (.ppset)")
+                        text: qsTr("Export .ppset (save to disk)")
                         onTriggered: {
                             page.exportSetIdx = index
-                            binaryExportDialog.open()
+                            zipExportDialog.open()
                         }
                     }
                     MenuItem {

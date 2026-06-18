@@ -1,5 +1,10 @@
 #include "recSetManager.h"
 
+#include <private/qzipreader_p.h>
+#include <private/qzipwriter_p.h>
+#include <QFileInfo>
+#include <QUuid>
+
 RecSetManager::RecSetManager(QObject *parent) : QObject(parent) {}
 
 RecSetManager::RecSetManager(const RecSetManager &other) {
@@ -171,7 +176,135 @@ bool RecSetManager::loadFromJson(const QString& filePath) {
     return true;
 }
 
-// ── Export ────────────────────────────────────────────────────────────────────
+// ── ZIP Export / Import ───────────────────────────────────────────────────────
+
+// manifest.json schema:
+// { "version":1, "name":"...", "words":[{ exprLangID, hintLangID, expression, hint,
+//   "imagePath":"media/img_0.jpg"|"https://..."|"", "audioPath":"media/aud_0.mp3"|""|... }] }
+// Paths starting with "http" are kept as-is; everything else is embedded in media/.
+
+static bool isUrl(const QString& s) {
+    return s.startsWith(QLatin1String("http://")) || s.startsWith(QLatin1String("https://"));
+}
+
+bool RecSetManager::exportSetToZip(int idx, const QString& filePath) {
+    if (idx < 0 || idx >= m_recSetVec.size())
+        return false;
+
+    const auto& rs = m_recSetVec.at(idx);
+    QZipWriter zip(localPath(filePath));
+    zip.setCompressionPolicy(QZipWriter::AutoCompress);
+
+    QJsonArray wordsArr;
+    int mediaIdx = 0;
+
+    for (int i = 0; i < rs.getWordCount(); ++i) {
+        const auto& w = rs.getWordAt(static_cast<size_t>(i));
+        QJsonObject obj;
+        obj[QStringLiteral("exprLangID")] = w.getExprLanguageID();
+        obj[QStringLiteral("hintLangID")] = w.getHintLanguageID();
+        obj[QStringLiteral("expression")] = w.getExpression();
+        obj[QStringLiteral("hint")]       = w.getHint();
+
+        // image
+        QString imgPath = w.getImagePath();
+        if (!imgPath.isEmpty() && !isUrl(imgPath)) {
+            QString local = localPath(imgPath);
+            QFile f(local);
+            if (f.open(QIODevice::ReadOnly)) {
+                QString ext  = QFileInfo(local).suffix();
+                QString name = QStringLiteral("media/img_%1.%2").arg(mediaIdx++).arg(ext);
+                zip.addFile(name, f.readAll());
+                imgPath = name;
+            }
+        }
+        obj[QStringLiteral("imagePath")] = imgPath;
+
+        // audio
+        QString audPath = w.getAudioPath();
+        if (!audPath.isEmpty() && !isUrl(audPath)) {
+            QString local = localPath(audPath);
+            QFile f(local);
+            if (f.open(QIODevice::ReadOnly)) {
+                QString ext  = QFileInfo(local).suffix();
+                QString name = QStringLiteral("media/aud_%1.%2").arg(mediaIdx++).arg(ext);
+                zip.addFile(name, f.readAll());
+                audPath = name;
+            }
+        }
+        obj[QStringLiteral("audioPath")] = audPath;
+
+        wordsArr.append(obj);
+    }
+
+    QJsonObject manifest;
+    manifest[QStringLiteral("version")] = 1;
+    manifest[QStringLiteral("name")]    = rs.getSetName();
+    manifest[QStringLiteral("words")]   = wordsArr;
+    zip.addFile(QStringLiteral("manifest.json"), QJsonDocument(manifest).toJson());
+    zip.close();
+    return zip.status() == QZipWriter::NoError;
+}
+
+QVariantMap RecSetManager::readSetFromZip(const QString& filePath) {
+    QZipReader zip(localPath(filePath));
+    QByteArray manifestData = zip.fileData(QStringLiteral("manifest.json"));
+    if (manifestData.isEmpty())
+        return {};
+
+    QJsonObject manifest = QJsonDocument::fromJson(manifestData).object();
+    QString setName = manifest[QStringLiteral("name")].toString();
+
+    // Extract media files into a unique cache directory under AppDataLocation
+    QString cacheBase = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                        + QStringLiteral("/import_cache/")
+                        + QUuid::createUuid().toString(QUuid::Id128).left(8)
+                        + QStringLiteral("/");
+    QDir().mkpath(cacheBase);
+
+    // Pre-extract all media/ entries
+    for (const auto& entry : zip.fileInfoList()) {
+        if (entry.filePath.startsWith(QLatin1String("media/"))) {
+            QByteArray data = zip.fileData(entry.filePath);
+            if (data.isEmpty()) continue;
+            QString dest = cacheBase + entry.filePath;
+            QDir().mkpath(QFileInfo(dest).absolutePath());
+            QFile out(dest);
+            if (out.open(QIODevice::WriteOnly))
+                out.write(data);
+        }
+    }
+    zip.close();
+
+    QVariantList words;
+    for (const auto& wv : manifest[QStringLiteral("words")].toArray()) {
+        QJsonObject wo = wv.toObject();
+        QString imgPath = wo[QStringLiteral("imagePath")].toString();
+        QString audPath = wo[QStringLiteral("audioPath")].toString();
+
+        // Resolve relative media paths to absolute cache paths
+        if (!imgPath.isEmpty() && !isUrl(imgPath))
+            imgPath = QUrl::fromLocalFile(cacheBase + imgPath).toString();
+        if (!audPath.isEmpty() && !isUrl(audPath))
+            audPath = QUrl::fromLocalFile(cacheBase + audPath).toString();
+
+        QVariantMap w;
+        w[QStringLiteral("languageFrom")] = wo[QStringLiteral("exprLangID")].toInt();
+        w[QStringLiteral("languageTo")]   = wo[QStringLiteral("hintLangID")].toInt();
+        w[QStringLiteral("expression")]   = wo[QStringLiteral("expression")].toString();
+        w[QStringLiteral("hint")]         = wo[QStringLiteral("hint")].toString();
+        w[QStringLiteral("audioPath")]    = audPath;
+        w[QStringLiteral("imagePath")]    = imgPath;
+        words.append(w);
+    }
+
+    QVariantMap result;
+    result[QStringLiteral("name")]  = setName;
+    result[QStringLiteral("words")] = words;
+    return result;
+}
+
+// ── Legacy Binary/XML Export ──────────────────────────────────────────────────
 
 static const quint32 k_binaryMagic   = 0x50505354; // "PPST"
 static const quint16 k_binaryVersion = 1;

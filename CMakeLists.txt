@@ -17,7 +17,7 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2 QuickDialogs2)
+find_package(Qt6 REQUIRED COMPONENTS Quick Core Multimedia QuickControls2 QuickDialogs2 Network TextToSpeech)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -79,7 +79,7 @@ target_include_directories(RecSetManager
 )
 
 target_link_libraries(RecSetManager
-    PRIVATE DictRec RecSet Qt6::Core
+    PRIVATE DictRec RecSet Qt6::Core Qt6::CorePrivate
 )
 
 qt_add_qml_module(SpellingTestController
@@ -125,6 +125,23 @@ target_include_directories(ShareHelper
 
 target_link_libraries(ShareHelper PRIVATE Qt6::Core)
 
+qt_add_qml_module(MediaHelper
+    URI MediaHelper
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/mediaHelper.h
+    ${CMAKE_SOURCE_DIR}/src/mediaHelper.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/MediaHelper"
+)
+
+target_include_directories(MediaHelper
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(MediaHelper PRIVATE Qt6::Core Qt6::Gui Qt6::Network Qt6::TextToSpeech)
+
 qt_add_qml_module(AppController
     URI AppController
     VERSION 1.0
@@ -145,7 +162,7 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml
 )
 
 # Include the resource file
@@ -170,6 +187,11 @@ set_target_properties(appPassepartout PROPERTIES
 
 target_link_libraries(appPassepartout
     PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
+            Qt6::Network Qt6::TextToSpeech
+)
+
+set_target_properties(appPassepartout PROPERTIES
+    QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android"
 )
 
 include(GNUInstallDirs)

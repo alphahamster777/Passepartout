@@ -6,6 +6,7 @@ import AppController
 import SetPreviewMenuController
 import SpellingTestController
 import RecSetManager
+import ShareHelper
 
 ApplicationWindow {
     id: mainWindow
@@ -50,11 +51,15 @@ ApplicationWindow {
             initialItem: setDirMenu
         }
 
+        // Saved reference to the CreatingRecSet page so the camera result can update it
+        property var creatingPageRef: null
+
         Component { id: setDirMenu;         SetDirMenu {}       }
         Component { id: creatingRecSetMenu; CreatingRecSet {}   }
         Component { id: setPreviewMenu;     SetPreviewMenu {}   }
         Component { id: spellingTestPage;   SpellingTest {}     }
         Component { id: resultsPage;        Results {}          }
+        Component { id: cameraCaptureMenu;  CameraCapture {}    }
 
         ///////////////////////////////connections/////////////////////////////////////////
 
@@ -143,6 +148,29 @@ ApplicationWindow {
             sourceComponent: resultsConnectionComponent
         }
 
+        Loader {
+            id: cameraConnectionLoader
+            active: stackView.currentItem && typeof stackView.currentItem.photoCaptured === "function"
+            sourceComponent: cameraConnectionComponent
+        }
+
+        Component {
+            id: cameraConnectionComponent
+            Connections {
+                target: stackView.currentItem
+                function onPhotoCaptured(cardIndex, imagePath) {
+                    stackView.pop()
+                    if (rootScope.creatingPageRef && cardIndex >= 0)
+                        rootScope.creatingPageRef.recSetModelRef.set(cardIndex, { imagePath: imagePath })
+                    rootScope.creatingPageRef = null
+                }
+                function onCancelCapture() {
+                    stackView.pop()
+                    rootScope.creatingPageRef = null
+                }
+            }
+        }
+
         Component {
             id: resultsConnectionComponent
             Connections {
@@ -166,7 +194,14 @@ ApplicationWindow {
                 target: stackView.currentItem
 
                 function onCreatingRecSetCancel() {
+                    rootScope.creatingPageRef = null
                     stackView.pop()
+                }
+
+                function onRequestCameraCapture(cardIndex) {
+                    rootScope.creatingPageRef = stackView.currentItem
+                    stackView.push(cameraCaptureMenu)
+                    stackView.currentItem.targetCardIndex = cardIndex
                 }
 
                 function onCreatingRecSetSave() {
@@ -208,6 +243,14 @@ ApplicationWindow {
                     stackView.pop()
                 }
             }
+        }
+
+        // If the app was opened by tapping a .ppset file, import it immediately.
+        Component.onCompleted: {
+            var incoming = ShareHelper.incomingFilePath()
+            if (incoming === "") return
+            var page = stackView.push(creatingRecSetMenu)
+            Qt.callLater(function() { page.importFromPath(incoming) })
         }
     }
 }

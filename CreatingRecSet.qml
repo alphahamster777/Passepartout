@@ -5,16 +5,23 @@ import QtQuick.Dialogs
 import QtMultimedia
 import LanguageHelper
 import AppController
+import MediaHelper
 
 Page {
     id: page
     signal creatingRecSetCancel()
     signal creatingRecSetSave()
+    signal requestCameraCapture(int cardIndex)
     property alias recSetModelRef: recSetModel
     property alias recSetName: topTextField.text
     property int recSetIdx: -1
     property int activeCardIndex: -1
     property int selectedCardIndex: 0
+    property bool autoMedia: false
+    property string currentPlayingPath: ""
+    property int recordingCardIndex: -1   // card currently being recorded into
+    property int pendingRecordCardIndex: -1  // waiting for mic permission
+    property int pendingCameraCardIndex: -1  // waiting for camera permission
 
     background: Rectangle { color: "#f0f4f8" }
 
@@ -27,7 +34,69 @@ Page {
                 page.currentPlayingPath = ""
         }
     }
-    property string currentPlayingPath: ""
+
+    // ── Audio recorder ────────────────────────────────────────────────────────
+    CaptureSession {
+        id: recSession
+        audioInput: AudioInput { id: recAudioInput }
+        recorder: MediaRecorder {
+            id: audioRecorder
+            onRecorderStateChanged: {
+                if (recorderState === MediaRecorder.StoppedState) {
+                    var path = audioRecorder.actualLocation.toString()
+                    if (path !== "" && page.recordingCardIndex >= 0) {
+                        if (!path.startsWith("file://"))
+                            path = "file://" + path
+                        recSetModel.set(page.recordingCardIndex, { audioPath: path })
+                        page.recordingCardIndex = -1
+                    }
+                }
+            }
+        }
+    }
+
+    function importFromPath(path) {
+        var result
+        if (path.endsWith(".xml"))
+            result = AppController.recSetManager.readSetFromXml(path)
+        else
+            result = AppController.recSetManager.readSetFromZip(path)
+        if (!result || !result.name) return
+        topTextField.text = result.name
+        recSetModel.clear()
+        var wordList = result.words
+        for (var i = 0; i < wordList.length; i++)
+            recSetModel.append(wordList[i])
+        page.selectedCardIndex = Math.max(0, recSetModel.count - 1)
+    }
+
+    function startRecording(cardIndex) {
+        page.recordingCardIndex = cardIndex
+        var dest = MediaHelper.newRecordingPath()
+        audioRecorder.outputLocation = "file://" + dest
+        audioRecorder.record()
+    }
+
+    // ── MediaHelper signal handlers ───────────────────────────────────────────
+    Connections {
+        target: MediaHelper
+        function onImageFetched(cardIndex, url) {
+            if (cardIndex >= 0 && cardIndex < recSetModel.count)
+                recSetModel.set(cardIndex, { imagePath: url })
+        }
+        function onMicrophonePermissionGranted() {
+            if (page.pendingRecordCardIndex >= 0) {
+                page.startRecording(page.pendingRecordCardIndex)
+                page.pendingRecordCardIndex = -1
+            }
+        }
+        function onCameraPermissionGranted() {
+            if (page.pendingCameraCardIndex >= 0) {
+                page.requestCameraCapture(page.pendingCameraCardIndex)
+                page.pendingCameraCardIndex = -1
+            }
+        }
+    }
 
     // ── File dialogs ──────────────────────────────────────────────────────────
     FileDialog {
@@ -57,10 +126,10 @@ Page {
         onAccepted: {
             var path = selectedFile.toString()
             var result
-            if (path.endsWith(".ppset"))
-                result = AppController.recSetManager.readSetFromBinary(path)
-            else
+            if (path.endsWith(".xml"))
                 result = AppController.recSetManager.readSetFromXml(path)
+            else
+                result = AppController.recSetManager.readSetFromZip(path)
 
             if (!result || !result.name) return
 
@@ -133,6 +202,33 @@ Page {
                 border.width: topTextField.activeFocus ? 2 : 1
             }
             leftPadding: 12
+        }
+
+        // ── Auto-fetch toggle ─────────────────────────────────────────────────
+        Rectangle {
+            Layout.fillWidth: true
+            height: 42
+            radius: 8
+            color: "white"
+            border.color: "#dce1e7"
+
+            RowLayout {
+                anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
+                spacing: 10
+
+                Label {
+                    text: qsTr("Auto-fetch image & pronunciation")
+                    font.pixelSize: 13
+                    color: "#2c3e50"
+                    Layout.fillWidth: true
+                }
+
+                Switch {
+                    id: autoMediaSwitch
+                    checked: page.autoMedia
+                    onCheckedChanged: page.autoMedia = checked
+                }
+            }
         }
 
         ScrollView {
@@ -238,7 +334,11 @@ Page {
                                 }
                                 leftPadding: 10
                                 onActiveFocusChanged: if (activeFocus) page.selectedCardIndex = index
-                                onEditingFinished: recSetModel.set(index, { expression: exprField.text })
+                                onEditingFinished: {
+                                    recSetModel.set(index, { expression: exprField.text })
+                                    if (page.autoMedia && exprField.text.trim() !== "" && imagePath === "")
+                                        MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index)
+                                }
                             }
 
                             // ── Hint / meaning ──────────────────────────
@@ -279,8 +379,6 @@ Page {
                             }
 
                             // ── Image preview — height adapts to aspect ratio ──
-                            // Layout.preferredHeight (not height:) is what ColumnLayout
-                            // actually uses; height: is ignored on layout-managed children.
                             Image {
                                 id: imagePreview
                                 visible: imagePath !== ""
@@ -306,7 +404,6 @@ Page {
                                     border.color: "#c8d6e5"
                                     border.width: 1
 
-                                    // Picker tap target — declared FIRST so buttons above it in Z capture clicks first
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
@@ -319,15 +416,67 @@ Page {
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         spacing: 3
+
                                         Label {
                                             text: imagePath !== "" ? qsTr("Change image") : qsTr("Add image")
                                             font.pixelSize: 11
                                             color: imagePath !== "" ? "#27ae60" : "#95a5a6"
                                             Layout.alignment: Qt.AlignHCenter
                                         }
+
+                                        RowLayout {
+                                            Layout.alignment: Qt.AlignHCenter
+                                            spacing: 4
+
+                                            // Auto-fetch button
+                                            Button {
+                                                visible: imagePath === "" && page.autoMedia && exprField.text.trim() !== ""
+                                                implicitWidth: 56; implicitHeight: 22
+                                                text: qsTr("Fetch")
+                                                font.pixelSize: 10
+                                                background: Rectangle {
+                                                    radius: 11
+                                                    color: parent.pressed ? "#2980b9" : "#3498db"
+                                                }
+                                                contentItem: Text {
+                                                    text: parent.text; color: "white"; font: parent.font
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    verticalAlignment: Text.AlignVCenter
+                                                }
+                                                onClicked: {
+                                                    page.activeCardIndex = index
+                                                    MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index)
+                                                }
+                                            }
+
+                                            // Camera button
+                                            Button {
+                                                implicitWidth: 56; implicitHeight: 22
+                                                text: qsTr("Camera")
+                                                font.pixelSize: 10
+                                                background: Rectangle {
+                                                    radius: 11
+                                                    color: parent.pressed ? "#7f5b00" : "#f39c12"
+                                                }
+                                                contentItem: Text {
+                                                    text: parent.text; color: "white"; font: parent.font
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    verticalAlignment: Text.AlignVCenter
+                                                }
+                                                onClicked: {
+                                                    page.activeCardIndex = index
+                                                    if (MediaHelper.hasCameraPermission()) {
+                                                        page.requestCameraCapture(index)
+                                                    } else {
+                                                        page.pendingCameraCardIndex = index
+                                                        MediaHelper.requestCameraPermission()
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
 
-                                    // Remove image button — above picker MouseArea in Z
+                                    // Remove image button
                                     Rectangle {
                                         visible: imagePath !== ""
                                         width: 20; height: 20
@@ -354,7 +503,6 @@ Page {
                                     border.color: "#c8d6e5"
                                     border.width: 1
 
-                                    // Picker tap target — FIRST (lowest Z); buttons above intercept their own clicks
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
@@ -364,7 +512,6 @@ Page {
                                         }
                                     }
 
-                                    // Filename label + centered play/stop button
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         spacing: 4
@@ -382,7 +529,7 @@ Page {
                                             wrapMode: Text.NoWrap
                                         }
 
-                                        // Play / Stop button — centered, only when audio is set
+                                        // Play / Stop button for file audio
                                         Button {
                                             visible: audioPath !== ""
                                             Layout.alignment: Qt.AlignHCenter
@@ -418,9 +565,92 @@ Page {
                                                 }
                                             }
                                         }
+
+                                        // Row: TTS preview + Record mic (when no audio file set)
+                                        RowLayout {
+                                            visible: audioPath === ""
+                                            Layout.alignment: Qt.AlignHCenter
+                                            spacing: 6
+
+                                            // TTS preview
+                                            Button {
+                                                visible: exprField.text.trim() !== ""
+                                                implicitWidth: 58; implicitHeight: 24
+
+                                                readonly property bool isSpeakingThis:
+                                                    MediaHelper.speaking &&
+                                                    page.currentPlayingPath === ("tts://" + expression)
+
+                                                text: isSpeakingThis ? qsTr("■") : qsTr("▶ TTS")
+                                                font.pixelSize: 10
+
+                                                background: Rectangle {
+                                                    radius: 12
+                                                    color: parent.isSpeakingThis
+                                                        ? (parent.pressed ? "#c0392b" : "#e74c3c")
+                                                        : (parent.pressed ? "#7f5b00" : "#f39c12")
+                                                }
+                                                contentItem: Text {
+                                                    text: parent.text; color: "white"; font: parent.font
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    verticalAlignment: Text.AlignVCenter
+                                                }
+                                                onClicked: {
+                                                    var key = "tts://" + expression
+                                                    if (isSpeakingThis) {
+                                                        MediaHelper.stopSpeaking()
+                                                        page.currentPlayingPath = ""
+                                                    } else {
+                                                        MediaHelper.stopSpeaking()
+                                                        audioPlayer.stop()
+                                                        page.currentPlayingPath = key
+                                                        MediaHelper.speak(exprField.text.trim(), languageFrom)
+                                                    }
+                                                }
+                                            }
+
+                                            // Microphone record button
+                                            Button {
+                                                implicitWidth: 58; implicitHeight: 24
+
+                                                readonly property bool isRecordingThis:
+                                                    audioRecorder.recorderState === MediaRecorder.RecordingState &&
+                                                    page.recordingCardIndex === index
+
+                                                text: isRecordingThis ? qsTr("⬛ Stop") : qsTr("● Rec")
+                                                font.pixelSize: 10
+
+                                                background: Rectangle {
+                                                    radius: 12
+                                                    color: parent.isRecordingThis
+                                                        ? (parent.pressed ? "#c0392b" : "#e74c3c")
+                                                        : (parent.pressed ? "#1a3a00" : "#27ae60")
+                                                }
+                                                contentItem: Text {
+                                                    text: parent.text; color: "white"; font: parent.font
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    verticalAlignment: Text.AlignVCenter
+                                                }
+                                                onClicked: {
+                                                    if (isRecordingThis) {
+                                                        audioRecorder.stop()
+                                                    } else {
+                                                        // Stop any other active recording first
+                                                        if (audioRecorder.recorderState === MediaRecorder.RecordingState)
+                                                            audioRecorder.stop()
+                                                        if (MediaHelper.hasMicrophonePermission()) {
+                                                            page.startRecording(index)
+                                                        } else {
+                                                            page.pendingRecordCardIndex = index
+                                                            MediaHelper.requestMicrophonePermission()
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
 
-                                    // Remove audio — top-right corner, same style as image remove button
+                                    // Remove audio
                                     Rectangle {
                                         visible: audioPath !== ""
                                         width: 20; height: 20
@@ -470,7 +700,7 @@ Page {
                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
-                    var lastLangFrom = LanguageHelper.NotSelected //langFromCombo
+                    var lastLangFrom = LanguageHelper.NotSelected
                     var lastLangTo   = LanguageHelper.NotSelected
                     if (recSetModel.count > 0) {
                         var last = recSetModel.get(recSetModel.count - 1)
