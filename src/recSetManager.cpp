@@ -309,28 +309,28 @@ QVariantMap RecSetManager::readSetFromZip(const QString& filePath) {
 static const quint32 k_binaryMagic   = 0x50505354; // "PPST"
 static const quint16 k_binaryVersion = 1;
 
-bool RecSetManager::exportSetToBinary(int idx, const QString& filePath) {
-    if (idx < 0 || idx >= m_recSetVec.size())
-        return false;
-    QFile file(localPath(filePath));
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        return false;
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_6_5);
-    out << k_binaryMagic << k_binaryVersion;
-    const auto& rs = m_recSetVec.at(idx);
-    out << rs.getSetName() << qint32(rs.getWordCount());
-    for (int i = 0; i < rs.getWordCount(); ++i) {
-        const auto& w = rs.getWordAt(static_cast<size_t>(i));
-        out << qint32(w.getExprLanguageID())
-            << qint32(w.getHintLanguageID())
-            << w.getExpression()
-            << w.getHint()
-            << w.getAudioPath()
-            << w.getImagePath();
-    }
-    return true;
-}
+// bool RecSetManager::exportSetToBinary(int idx, const QString& filePath) {
+//     if (idx < 0 || idx >= m_recSetVec.size())
+//         return false;
+//     QFile file(localPath(filePath));
+//     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//         return false;
+//     QDataStream out(&file);
+//     out.setVersion(QDataStream::Qt_6_5);
+//     out << k_binaryMagic << k_binaryVersion;
+//     const auto& rs = m_recSetVec.at(idx);
+//     out << rs.getSetName() << qint32(rs.getWordCount());
+//     for (int i = 0; i < rs.getWordCount(); ++i) {
+//         const auto& w = rs.getWordAt(static_cast<size_t>(i));
+//         out << qint32(w.getExprLanguageID())
+//             << qint32(w.getHintLanguageID())
+//             << w.getExpression()
+//             << w.getHint()
+//             << w.getAudioPath()
+//             << w.getImagePath();
+//     }
+//     return true;
+// }
 
 QVariantMap RecSetManager::readSetFromBinary(const QString& filePath) {
     QFile file(localPath(filePath));
@@ -409,45 +409,45 @@ QVariantMap RecSetManager::readSetFromXml(const QString& filePath) {
     return result;
 }
 
-QString RecSetManager::exportSetToText(int idx) {
-    if (idx < 0 || idx >= m_recSetVec.size())
-        return {};
-    const auto& rs = m_recSetVec.at(idx);
-    QString result = rs.getSetName() + "\n\n";
-    for (int i = 0; i < rs.getWordCount(); ++i) {
-        const auto& w = rs.getWordAt(static_cast<size_t>(i));
-        result += QString::number(i + 1) + ". " + w.getExpression();
-        if (!w.getHint().isEmpty())
-            result += " — " + w.getHint();
-        result += "\n";
-    }
-    return result;
-}
+// QString RecSetManager::exportSetToText(int idx) {
+//     if (idx < 0 || idx >= m_recSetVec.size())
+//         return {};
+//     const auto& rs = m_recSetVec.at(idx);
+//     QString result = rs.getSetName() + "\n\n";
+//     for (int i = 0; i < rs.getWordCount(); ++i) {
+//         const auto& w = rs.getWordAt(static_cast<size_t>(i));
+//         result += QString::number(i + 1) + ". " + w.getExpression();
+//         if (!w.getHint().isEmpty())
+//             result += " — " + w.getHint();
+//         result += "\n";
+//     }
+//     return result;
+// }
 
-bool RecSetManager::exportSetToXml(int idx, const QString& filePath) {
-    if (idx < 0 || idx >= m_recSetVec.size())
-        return false;
-    QFile file(localPath(filePath));
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        return false;
-    QXmlStreamWriter xml(&file);
-    xml.setAutoFormatting(true);
-    xml.writeStartDocument();
-    const auto& rs = m_recSetVec.at(idx);
-    xml.writeStartElement("RecSet");
-    xml.writeAttribute("name", rs.getSetName());
-    for (int i = 0; i < rs.getWordCount(); ++i) {
-        const auto& w = rs.getWordAt(static_cast<size_t>(i));
-        xml.writeStartElement("Word");
-        xml.writeTextElement("ExprLangID", QString::number(w.getExprLanguageID()));
-        xml.writeTextElement("HintLangID", QString::number(w.getHintLanguageID()));
-        xml.writeTextElement("Expression", w.getExpression());
-        xml.writeTextElement("Hint",       w.getHint());
-        xml.writeTextElement("AudioPath",  w.getAudioPath());
-        xml.writeTextElement("ImagePath",  w.getImagePath());
-        xml.writeEndElement();
-    }
-    xml.writeEndElement();
-    xml.writeEndDocument();
-    return true;
-}
+// bool RecSetManager::exportSetToXml(int idx, const QString& filePath) {
+//     if (idx < 0 || idx >= m_recSetVec.size())
+//         return false;
+//     QFile file(localPath(filePath));
+//     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//         return false;
+//     QXmlStreamWriter xml(&file);
+//     xml.setAutoFormatting(true);
+//     xml.writeStartDocument();
+//     const auto& rs = m_recSetVec.at(idx);
+//     xml.writeStartElement("RecSet");
+//     xml.writeAttribute("name", rs.getSetName());
+//     for (int i = 0; i < rs.getWordCount(); ++i) {
+//         const auto& w = rs.getWordAt(static_cast<size_t>(i));
+//         xml.writeStartElement("Word");
+//         xml.writeTextElement("ExprLangID", QString::number(w.getExprLanguageID()));
+//         xml.writeTextElement("HintLangID", QString::number(w.getHintLanguageID()));
+//         xml.writeTextElement("Expression", w.getExpression());
+//         xml.writeTextElement("Hint",       w.getHint());
+//         xml.writeTextElement("AudioPath",  w.getAudioPath());
+//         xml.writeTextElement("ImagePath",  w.getImagePath());
+//         xml.writeEndElement();
+//     }
+//     xml.writeEndElement();
+//     xml.writeEndDocument();
+//     return true;
+// }

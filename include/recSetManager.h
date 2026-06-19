@@ -53,8 +53,8 @@ public:
 
     // Export a single set
     Q_INVOKABLE bool exportSetToZip(int idx, const QString& filePath);
-    Q_INVOKABLE bool exportSetToBinary(int idx, const QString& filePath);
-    Q_INVOKABLE bool exportSetToXml(int idx, const QString& filePath);
+    // Q_INVOKABLE bool exportSetToBinary(int idx, const QString& filePath);
+    // Q_INVOKABLE bool exportSetToXml(int idx, const QString& filePath);
 
     // Import a set — returns {name, words:[{languageFrom,languageTo,expression,hint,audioPath,imagePath},...]}
     Q_INVOKABLE QVariantMap readSetFromZip(const QString& filePath);
@@ -62,7 +62,7 @@ public:
     Q_INVOKABLE QVariantMap readSetFromXml(const QString& filePath);
 
     // Returns human-readable text for sharing
-    Q_INVOKABLE QString exportSetToText(int idx);
+    // Q_INVOKABLE QString exportSetToText(int idx);
 
 private:
     QVector<RecSet> m_recSetVec;

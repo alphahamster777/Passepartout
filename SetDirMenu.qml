@@ -28,16 +28,16 @@ Page {
         }
     }
 
-    FileDialog {
-        id: xmlExportDialog
-        title: qsTr("Export as XML")
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["XML files (*.xml)"]
-        defaultSuffix: "xml"
-        onAccepted: {
-            AppController.recSetManager.exportSetToXml(page.exportSetIdx, selectedFile.toString())
-        }
-    }
+    // FileDialog {
+    //     id: xmlExportDialog
+    //     title: qsTr("Export as XML")
+    //     fileMode: FileDialog.SaveFile
+    //     nameFilters: ["XML files (*.xml)"]
+    //     defaultSuffix: "xml"
+    //     onAccepted: {
+    //         AppController.recSetManager.exportSetToXml(page.exportSetIdx, selectedFile.toString())
+    //     }
+    // }
 
     // ── Header ────────────────────────────────────────────────────────────────
     header: Rectangle {
@@ -125,14 +125,16 @@ Page {
                         }
                     }
                     MenuSeparator {}
+                    // MenuItem {
+                    //     text: qsTr("Share as text")
+                    //     onTriggered: {
+                    //         var text = AppController.recSetManager.exportSetToText(index)
+                    //         ShareHelper.shareText(text, modelData)
+                    //     }
+                    // }
                     MenuItem {
-                        text: qsTr("Share as text")
-                        onTriggered: {
-                            var text = AppController.recSetManager.exportSetToText(index)
-                            ShareHelper.shareText(text, modelData)
-                        }
-                    }
-                    MenuItem {
+                        // visible: Qt.platform.os === "android"
+                        enabled: Qt.platform.os === "android"
                         text: qsTr("Share .ppset file")
                         onTriggered: {
                             var path = ShareHelper.shareableExportPath(modelData)
@@ -148,13 +150,13 @@ Page {
                             zipExportDialog.open()
                         }
                     }
-                    MenuItem {
-                        text: qsTr("Export XML (.xml)")
-                        onTriggered: {
-                            page.exportSetIdx = index
-                            xmlExportDialog.open()
-                        }
-                    }
+                    // MenuItem {
+                    //     text: qsTr("Export XML (.xml)")
+                    //     onTriggered: {
+                    //         page.exportSetIdx = index
+                    //         xmlExportDialog.open()
+                    //     }
+                    // }
                 }
 
                 ToolButton {
