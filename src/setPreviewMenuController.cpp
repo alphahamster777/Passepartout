@@ -15,6 +15,8 @@ void SetPreviewMenuController::initialize(QObject *manager, int idx) {
     // m_recSetManager = m;
     m_expressionList.clear();
     m_recSetManager = m;
+    m_currentSetIndex = idx;
+    emit currentSetIndexChanged();
     auto recSet = m_recSetManager->getAllRecSets().at(idx);
     for (const auto& word : recSet) {
         QVariantMap expressionData;
@@ -22,6 +24,7 @@ void SetPreviewMenuController::initialize(QObject *manager, int idx) {
         expressionData["hint"]       = word.getHint();
         expressionData["imagePath"]  = word.getImagePath();
         expressionData["audioPath"]  = word.getAudioPath();
+        expressionData["exprLangID"] = word.getExprLanguageID();
         m_expressionList.append(expressionData);
     }
     emit expressionListChanged();

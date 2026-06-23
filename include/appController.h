@@ -14,7 +14,7 @@ class AppController: public QObject
     Q_OBJECT
     QML_ELEMENT
     QML_SINGLETON
-    Q_PROPERTY(RecSetManager* recSetManager READ recSetManager)
+    Q_PROPERTY(RecSetManager* recSetManager READ recSetManager CONSTANT)
     Q_PROPERTY(QList<QString> recSetNameList READ getRecSetNameList NOTIFY recSetNameListChanged)
 
 public:

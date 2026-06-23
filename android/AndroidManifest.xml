@@ -59,6 +59,19 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="application/zip"/>
             </intent-filter>
+            <!-- Fallback: Telegram and most messengers use octet-stream for unknown extensions -->
+            <intent-filter android:priority="5">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
+            <!-- Fallback: file-manager apps opening via file:// URI with .ppset extension -->
+            <intent-filter android:priority="5">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.ppset"/>
+                <data android:mimeType="*/*"/>
+            </intent-filter>
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="-- %%INSERT_APP_LIB_NAME%% --"/>

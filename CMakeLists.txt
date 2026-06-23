@@ -86,6 +86,13 @@ target_link_libraries(RecSetManager
     PRIVATE DictRec RecSet Qt6::Core Qt6::CorePrivate
 )
 
+add_library(BaseTestController STATIC
+    ${CMAKE_SOURCE_DIR}/include/baseTestController.h
+    ${CMAKE_SOURCE_DIR}/src/baseTestController.cpp
+)
+target_include_directories(BaseTestController PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(BaseTestController PRIVATE Qt6::Core RecSetManager)
+
 qt_add_qml_module(SpellingTestController
     URI SpellingTestController
     VERSION 1.0
@@ -97,7 +104,20 @@ qt_add_qml_module(SpellingTestController
       "${CMAKE_BINARY_DIR}/SpellingTestController"
 )
 
-target_link_libraries(SpellingTestController PRIVATE Qt6::Core RecSetManager)
+target_link_libraries(SpellingTestController PRIVATE Qt6::Core BaseTestController)
+
+qt_add_qml_module(LeitnerTestController
+    URI LeitnerTestController
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/leitnerTestController.h
+    ${CMAKE_SOURCE_DIR}/src/leitnerTestController.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/LeitnerTestController"
+)
+
+target_link_libraries(LeitnerTestController PRIVATE Qt6::Core BaseTestController)
 
 qt_add_qml_module(SetPreviewMenuController
     URI SetPreviewMenuController
@@ -167,6 +187,7 @@ qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
     QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml
+    IMPORTS LeitnerTestController SpellingTestController
 )
 
 # Include the resource file
@@ -192,6 +213,7 @@ set_target_properties(appPassepartout PROPERTIES
 target_link_libraries(appPassepartout
     PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
             Qt6::Network Qt6::TextToSpeech
+            SpellingTestController LeitnerTestController
 )
 
 set_target_properties(appPassepartout PROPERTIES

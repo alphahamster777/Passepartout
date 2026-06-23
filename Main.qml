@@ -5,6 +5,7 @@ import QtQuick.Window
 import AppController
 import SetPreviewMenuController
 import SpellingTestController
+import LeitnerTestController
 import RecSetManager
 import ShareHelper
 
@@ -29,6 +30,11 @@ ApplicationWindow {
 
             if (androidBackPressed || desktopLeftPressed) {
                 if (stackView.depth > 1) {
+                    // Save test progress when leaving the spelling test mid-run
+                    if (typeof stackView.currentItem.getResults === "function" &&
+                        !spellingTestController.isTestComplete()) {
+                        spellingTestController.saveProgress()
+                    }
                     stackView.pop()
                 } else {
                     Qt.quit()
@@ -38,8 +44,16 @@ ApplicationWindow {
         }
 
         SpellingTestController {
-            id: spellingTestController
+            id: regularTestController
         }
+
+        LeitnerTestController {
+            id: leitnerTestController
+        }
+
+        // Active controller — switches to leitnerTestController for TypeE_Leitner,
+        // stays on regularTestController for all other test types.
+        property var spellingTestController: regularTestController
 
         SetPreviewMenuController {
             id: setPreviewController
@@ -79,7 +93,6 @@ ApplicationWindow {
                 function onRecSetSelected(num: int) {
                     stackView.pop()
                     setPreviewController.initialize(AppController.recSetManager, num)
-                    spellingTestController.initialize(AppController.recSetManager, num)
                     stackView.push(setPreviewMenu)
                 }
                 function onAddRecSet() {
@@ -119,7 +132,15 @@ ApplicationWindow {
             id: setPreviewMenuConnectionComponent
             Connections {
                 target: stackView.currentItem
-                function onNavigateToTest() {
+                function onNavigateToTest(testType) {
+                    rootScope.spellingTestController =
+                        (testType === SpellingTestController.TypeE_Leitner)
+                            ? leitnerTestController
+                            : regularTestController
+                    rootScope.spellingTestController.initialize(
+                        AppController.recSetManager,
+                        setPreviewController.currentSetIndex,
+                        testType)
                     stackView.push(spellingTestPage)
                 }
             }
@@ -176,6 +197,11 @@ ApplicationWindow {
             Connections {
                 target: stackView.currentItem
                 function onResultsNextPressed() {
+                    // Clear the completed-run flag so the next launch starts fresh
+                    rootScope.spellingTestController.resetTestProgress(
+                        AppController.recSetManager,
+                        setPreviewController.currentSetIndex,
+                        rootScope.spellingTestController.testType)
                     stackView.pop(stackView.get(stackView.depth - 3))
                 }
             }
@@ -251,6 +277,18 @@ ApplicationWindow {
             if (incoming === "") return
             var page = stackView.push(creatingRecSetMenu)
             Qt.callLater(function() { page.importFromPath(incoming) })
+        }
+
+        Connections {
+            target: Qt.application
+            function onAboutToQuit() {
+                // Persist any in-progress test state when the app is closed
+                if (typeof stackView.currentItem !== "undefined" &&
+                    typeof stackView.currentItem.getResults === "function" &&
+                    !spellingTestController.isTestComplete()) {
+                    spellingTestController.saveProgress()
+                }
+            }
         }
     }
 }

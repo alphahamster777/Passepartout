@@ -143,10 +143,13 @@ void MediaHelper::fetchAndCacheImage(const QString& imgUrl, int cardIndex) {
         if (img.isNull())
             return;
 
-        QString dir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+        QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
                       + QStringLiteral("/wiki_images/");
         QDir().mkpath(dir);
-        QString path = dir + QString::number(cardIndex) + QStringLiteral(".png");
+        // Include timestamp so images from different word sets (or different fetch
+        // sessions) never collide even when both sets have a word at the same index.
+        QString ts = QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_HHmmsszzz"));
+        QString path = dir + ts + QLatin1Char('_') + QString::number(cardIndex) + QStringLiteral(".png");
         if (img.save(path, "PNG"))
             emit imageFetched(cardIndex, QUrl::fromLocalFile(path).toString());
     });

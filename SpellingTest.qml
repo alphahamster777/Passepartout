@@ -1,56 +1,130 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import SpellingTestController
 
 Page {
     id: root
     signal getResults()
+    signal saveAndGoBack()  // emitted when user presses Back mid-test
 
-    property int nextCounter: 0
-    property bool isExpressionEntered: false
-    property bool isCorrect: false
+    // Resolves to whichever controller is active in Main.qml (standard or Leitner).
+    property var spellingTestController: rootScope.spellingTestController
+
+    // Shorthand
+    readonly property int ttype: spellingTestController.testType
+    readonly property bool isMC:
+        ttype === SpellingTestController.TypeC_MCFromHint ||
+        ttype === SpellingTestController.TypeD_MCFromWord ||
+        (ttype === SpellingTestController.TypeE_Leitner && spellingTestController.leitnerMCPhase)
+    readonly property bool isWritePhase:
+        ttype === SpellingTestController.TypeA_WriteFromHint ||
+        ttype === SpellingTestController.TypeB_WriteFromWord ||
+        (ttype === SpellingTestController.TypeE_Leitner && !spellingTestController.leitnerMCPhase)
+
+    // Per-question state (reset each word)
+    property bool answerSubmitted: false
+    property bool answerIsCorrect: false
+
+    // Allow "mark as correct" for type A, B (write) and type D (MC pick hint)
+    readonly property bool canMarkAsCorrect:
+        answerSubmitted && !answerIsCorrect &&
+        (ttype === SpellingTestController.TypeA_WriteFromHint ||
+         ttype === SpellingTestController.TypeB_WriteFromWord ||
+         ttype === SpellingTestController.TypeD_MCFromWord ||
+         (ttype === SpellingTestController.TypeE_Leitner && !spellingTestController.leitnerMCPhase))
+
+    // Reset UI state whenever the controller loads a new word
+    Connections {
+        target: spellingTestController
+        function onCurrentWordChanged() { root.resetQuestion() }
+    }
+
+    // If the test was already completed before this page opened, go to results
+    Component.onCompleted: {
+        if (spellingTestController.isTestComplete()) {
+            Qt.callLater(function() { root.getResults() })
+        } else if (isWritePhase) {
+            guessInputField.forceActiveFocus()
+        }
+    }
+
+    function resetQuestion() {
+        answerSubmitted = false
+        answerIsCorrect = false
+        guessInputField.text = ""
+        guessInputField.color = "#2c3e50"
+    }
 
     background: Rectangle { color: "#f0f4f8" }
 
+    // ── Header ─────────────────────────────────────────────────────────────────
     header: Rectangle {
-        height: 56
+        height: ttype === SpellingTestController.TypeE_Leitner ? 72 : 56
         color: "#2c3e50"
 
-        RowLayout {
-            anchors { fill: parent; leftMargin: 16; rightMargin: 16 }
+        ColumnLayout {
+            anchors { fill: parent; leftMargin: 16; rightMargin: 16; topMargin: 4; bottomMargin: 4 }
+            spacing: 2
 
-            Label {
-                text: spellingTestController.currentHint
-                font.pixelSize: 20
-                font.bold: true
-                color: "white"
+            RowLayout {
                 Layout.fillWidth: true
-                elide: Text.ElideRight
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
+                spacing: 8
+
+                Label {
+                    text: {
+                        if (ttype === SpellingTestController.TypeB_WriteFromWord ||
+                            ttype === SpellingTestController.TypeD_MCFromWord //||
+                            // (ttype === SpellingTestController.TypeE_Leitner &&
+                            //  !spellingTestController.leitnerMCPhase)
+                                )
+                            return spellingTestController.currentWord
+                        return spellingTestController.currentHint
+                    }
+                    font.pixelSize: 18
+                    font.bold: true
+                    color: "white"
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    wrapMode: Text.WordWrap
+                    maximumLineCount: 2
+                }
+
+                Label {
+                    text: spellingTestController.correctAnswers + "/" +
+                          spellingTestController.totalQuestions
+                    font.pixelSize: 13
+                    color: "#3498db"
+                }
             }
 
+            // Leitner phase indicator
             Label {
-                text: spellingTestController.correctAnswers + "/" + spellingTestController.totalQuestions
-                font.pixelSize: 14
-                color: "#3498db"
+                visible: ttype === SpellingTestController.TypeE_Leitner
+                text: spellingTestController.leitnerMCPhase
+                    ? qsTr("Learning ▸ Set1: %1 remaining").arg(spellingTestController.leitnerSet1Count)
+                    : qsTr("Testing ▸ Set2: %1 to master").arg(spellingTestController.leitnerSet2Count)
+                font.pixelSize: 11
+                color: spellingTestController.leitnerMCPhase ? "#f39c12" : "#2ecc71"
             }
         }
     }
 
+    // ── Body ───────────────────────────────────────────────────────────────────
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 16
+        spacing: 12
 
-        // ── Image ─────────────────────────────────────────────────────────────
+        // Image
         Rectangle {
             Layout.fillWidth: true
-            height: 200
+            height: 160
             radius: 12
             color: spellingTestController.currentImageUrl !== "" ? "transparent" : "#eaf4fb"
             clip: true
             border.color: "#dce1e7"
+            visible: !isMC
 
             Image {
                 anchors.fill: parent
@@ -58,55 +132,192 @@ Page {
                 source: spellingTestController.currentImageUrl
                 visible: spellingTestController.currentImageUrl !== ""
             }
-
             Label {
                 anchors.centerIn: parent
                 text: "🖼"
-                font.pixelSize: 64
+                font.pixelSize: 56
                 opacity: 0.2
                 visible: spellingTestController.currentImageUrl === ""
             }
         }
 
-        // ── Input ─────────────────────────────────────────────────────────────
-        TextField {
-            id: guessInputField
+        // ── Text-input section (types A, B, Leitner write phase) ──────────────
+        ColumnLayout {
             Layout.fillWidth: true
-            placeholderText: qsTr("Type the expression…")
-            font.pixelSize: 18
-            color: isExpressionEntered ? (isCorrect ? "#27ae60" : "#e74c3c") : "#2c3e50"
-            background: Rectangle {
-                radius: 10
-                color: "white"
-                border.color: {
-                    if (!isExpressionEntered) return guessInputField.activeFocus ? "#3498db" : "#dce1e7"
-                    return isCorrect ? "#27ae60" : "#e74c3c"
-                }
-                border.width: isExpressionEntered ? 2 : (guessInputField.activeFocus ? 2 : 1)
-            }
-            leftPadding: 14
-            onEditingFinished: {
-                if (isExpressionEntered) return
-                isExpressionEntered = true
+            spacing: 8
+            visible: isWritePhase
 
-                if (spellingTestController.currentWord === guessInputField.text) {
-                    isCorrect = true
-                    spellingTestController.correctAnswers++
-                } else {
-                    isCorrect = false
-                    text = spellingTestController.currentWord
+            TextField {
+                id: guessInputField
+                Layout.fillWidth: true
+                placeholderText: ttype === SpellingTestController.TypeB_WriteFromWord
+                    ? qsTr("Type the hint / translation…")
+                    : qsTr("Type the expression…")
+                font.pixelSize: 18
+                color: {
+                    if (!answerSubmitted) return "#2c3e50"
+                    return answerIsCorrect ? "#27ae60" : "#e74c3c"
                 }
-                nextButton.forceActiveFocus()
+                background: Rectangle {
+                    radius: 10
+                    color: "white"
+                    border.color: {
+                        if (!answerSubmitted)
+                            return guessInputField.activeFocus ? "#3498db" : "#dce1e7"
+                        return answerIsCorrect ? "#27ae60" : "#e74c3c"
+                    }
+                    border.width: answerSubmitted ? 2 : (guessInputField.activeFocus ? 2 : 1)
+                }
+                leftPadding: 14
+                enabled: !answerSubmitted
+                onEditingFinished: submitTextAnswer()
+            }
+
+            // Show correct answer when wrong
+            Label {
+                visible: answerSubmitted && !answerIsCorrect
+                text: {
+                    if (ttype === SpellingTestController.TypeB_WriteFromWord)
+                        return qsTr("Correct: ") + spellingTestController.currentHint
+                    return qsTr("Correct: ") + spellingTestController.currentWord
+                }
+                color: "#e74c3c"
+                font.pixelSize: 15
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            // "Mark as correct" button for typos
+            Button {
+                visible: canMarkAsCorrect
+                text: qsTr("✓ Mark as correct (I mistyped)")
+                Layout.fillWidth: true
+                background: Rectangle {
+                    radius: 10
+                    color: parent.pressed ? "#1a6ca8" : "#3498db"
+                }
+                contentItem: Text {
+                    text: parent.text; color: "white"
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: {
+                    spellingTestController.markAsCorrect()
+                    answerIsCorrect = true
+                }
+            }
+
+            // Submit button (before answering)
+            Button {
+                visible: !answerSubmitted
+                text: qsTr("Submit")
+                Layout.fillWidth: true
+                background: Rectangle {
+                    radius: 10
+                    color: parent.pressed ? "#1e8449" : "#27ae60"
+                }
+                contentItem: Text {
+                    text: parent.text; color: "white"
+                    font.pixelSize: 15; font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: submitTextAnswer()
             }
         }
 
-        // ── Progress bar ──────────────────────────────────────────────────────
+        // ── Multiple-choice section (types C, D, Leitner MC phase) ────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            visible: isMC
+
+            Repeater {
+                model: spellingTestController.options
+
+                Button {
+                    id: optBtn
+                    required property int index
+                    required property string modelData
+                    Layout.fillWidth: true
+                    text: modelData
+                    height: 52
+
+                    readonly property bool isSelected: answerSubmitted &&
+                        spellingTestController.selectedOption === index
+                    readonly property bool isCorrect: answerSubmitted &&
+                        spellingTestController.correctOptionIndex === index
+
+                    background: Rectangle {
+                        radius: 10
+                        color: {
+                            if (!answerSubmitted) return optBtn.pressed ? "#d0d8e0" : "white"
+                            if (optBtn.isCorrect) return "#27ae60"
+                            if (optBtn.isSelected) return "#e74c3c"
+                            return "#f0f4f8"
+                        }
+                        border.color: {
+                            if (!answerSubmitted) return optBtn.pressed ? "#3498db" : "#dce1e7"
+                            if (optBtn.isCorrect) return "#1e8449"
+                            if (optBtn.isSelected) return "#c0392b"
+                            return "#dce1e7"
+                        }
+                        border.width: (optBtn.isCorrect || optBtn.isSelected) ? 2 : 1
+                    }
+                    contentItem: Text {
+                        text: optBtn.text
+                        color: {
+                            if (!answerSubmitted) return "#2c3e50"
+                            if (optBtn.isCorrect || optBtn.isSelected) return "white"
+                            return "#95a5a6"
+                        }
+                        font.pixelSize: 15
+                        font.bold: optBtn.isCorrect || optBtn.isSelected
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.WordWrap
+                    }
+                    enabled: !answerSubmitted
+                    onClicked: {
+                        spellingTestController.selectOption(index)
+                        answerIsCorrect = spellingTestController.lastAnswerCorrect
+                        answerSubmitted = true
+                    }
+                }
+            }
+
+            // "Mark as correct" for type D (misclicked)
+            Button {
+                visible: canMarkAsCorrect
+                text: qsTr("✓ Mark as correct (I misclicked)")
+                Layout.fillWidth: true
+                background: Rectangle {
+                    radius: 10
+                    color: parent.pressed ? "#1a6ca8" : "#3498db"
+                }
+                contentItem: Text {
+                    text: parent.text; color: "white"
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: {
+                    spellingTestController.markAsCorrect()
+                    answerIsCorrect = true
+                }
+            }
+        }
+
+        // ── Progress bar ───────────────────────────────────────────────────────
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 4
             Label {
-                text: qsTr("Correct: %1 / %2").arg(spellingTestController.correctAnswers).arg(spellingTestController.totalQuestions)
-                font.pixelSize: 13
+                text: qsTr("Correct: %1 / %2")
+                    .arg(spellingTestController.correctAnswers)
+                    .arg(spellingTestController.totalQuestions)
+                font.pixelSize: 12
                 color: "#7f8c8d"
             }
             ProgressBar {
@@ -114,7 +325,7 @@ Page {
                 from: 0
                 to: spellingTestController.totalQuestions
                 value: spellingTestController.correctAnswers
-                background: Rectangle { radius: 4; color: "#dce1e7"; implicitHeight: 10 }
+                background: Rectangle { radius: 4; color: "#dce1e7"; implicitHeight: 8 }
                 contentItem: Rectangle {
                     width: parent.visualPosition * parent.width
                     height: parent.height
@@ -127,6 +338,7 @@ Page {
         Item { Layout.fillHeight: true }
     }
 
+    // ── Footer ─────────────────────────────────────────────────────────────────
     footer: Rectangle {
         height: 64
         color: "#2c3e50"
@@ -136,32 +348,58 @@ Page {
             anchors.centerIn: parent
             width: parent.width * 0.7
             height: 44
-            text: nextCounter + 1 >= spellingTestController.totalQuestions ? qsTr("See Results") : qsTr("Next →")
+            text: spellingTestController.testComplete
+                ? qsTr("See Results")
+                : qsTr("Next →")
+            enabled: answerSubmitted
             background: Rectangle {
                 radius: 22
-                color: parent.pressed ? "#2980b9" : "#3498db"
+                color: !nextButton.enabled ? "#4a6070"
+                     : nextButton.pressed   ? "#2980b9"
+                     : "#3498db"
             }
             contentItem: Text {
-                text: parent.text
-                color: "white"
-                font.pixelSize: 17
-                font.bold: true
+                text: nextButton.text
+                color: nextButton.enabled ? "white" : "#8fa7b8"
+                font.pixelSize: 17; font.bold: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
             onClicked: {
-                nextCounter++
-                if (nextCounter >= spellingTestController.totalQuestions) {
+                spellingTestController.nextQuestion()///here
+                if (spellingTestController.testComplete) {///here
+                    spellingTestController.saveProgress()
                     getResults()
                     return
                 }
+
+                root.answerSubmitted = false
+                root.answerIsCorrect = false
                 guessInputField.text = ""
                 guessInputField.color = "#2c3e50"
-                isExpressionEntered = false
-                isCorrect = false
-                guessInputField.forceActiveFocus()
-                spellingTestController.nextQuestion()
+                if (isWritePhase)
+                    guessInputField.forceActiveFocus()
+                if (spellingTestController.testComplete)
+                    answerSubmitted = true
             }
         }
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function submitTextAnswer() {
+        if (answerSubmitted) return
+        const correct = spellingTestController.checkTypedAnswer(guessInputField.text)
+        answerIsCorrect = correct
+        answerSubmitted = true
+        if (!correct) {
+            const expected = (ttype === SpellingTestController.TypeB_WriteFromWord)
+                ? spellingTestController.currentHint
+                : spellingTestController.currentWord
+            guessInputField.text   = expected
+            guessInputField.color  = "#e74c3c"
+        } else {
+            guessInputField.color  = "#27ae60"
+        }
+        nextButton.forceActiveFocus()
     }
 }

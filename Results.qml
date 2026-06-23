@@ -6,6 +6,13 @@ Page {
     id: page
     signal resultsNextPressed()
 
+    property var spellingTestController: rootScope.spellingTestController
+    readonly property int ttype: spellingTestController.testType
+    readonly property bool isE_LeitnerType: ttype === spellingTestController.TypeE_Leitner
+    readonly property bool allCorrect:
+        spellingTestController.totalQuestions > 0 &&
+        spellingTestController.correctAnswers >= spellingTestController.totalQuestions
+
     background: Rectangle { color: "#f0f4f8" }
 
     header: Rectangle {
@@ -25,11 +32,12 @@ Page {
         spacing: 24
         width: parent.width * 0.8
 
-        // ── Score circle ──────────────────────────────────────────────────────
+        // ── Score circle (hidden when all correct) ────────────────────────────
         Rectangle {
             Layout.alignment: Qt.AlignHCenter
             width: 160; height: 160
             radius: 80
+            visible: !isE_LeitnerType
             color: {
                 var ratio = spellingTestController.totalQuestions > 0
                     ? spellingTestController.correctAnswers / spellingTestController.totalQuestions
@@ -63,6 +71,7 @@ Page {
         Label {
             Layout.fillWidth: true
             text: {
+                if (isE_LeitnerType) return qsTr("Excellent work! Keep it up!")
                 var ratio = spellingTestController.totalQuestions > 0
                     ? spellingTestController.correctAnswers / spellingTestController.totalQuestions
                     : 0
@@ -70,9 +79,10 @@ Page {
                 if (ratio >= 0.5) return qsTr("Good effort! Keep practising.")
                 return qsTr("Don't give up – practice makes perfect!")
             }
-            font.pixelSize: 16
-            font.italic: true
-            color: "#7f8c8d"
+            font.pixelSize: page.allCorrect ? 22 : 16
+            font.bold: page.allCorrect
+            font.italic: !page.allCorrect
+            color: page.allCorrect ? "#27ae60" : "#7f8c8d"
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
