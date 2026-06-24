@@ -17,11 +17,12 @@ class BaseTestController : public QObject {
 
 public:
     enum TestType {
-        TypeA_WriteFromHint = 0,
-        TypeB_WriteFromWord = 1,
-        TypeC_MCFromHint    = 2,
-        TypeD_MCFromWord    = 3,
-        TypeE_Leitner       = 4
+        TypeA_WriteFromHint    = 0,
+        TypeB_WriteFromWord    = 1,
+        TypeC_MCFromHint       = 2,
+        TypeD_MCFromWord       = 3,
+        TypeE_Leitner          = 4,
+        TypeF_LeitnerReversed  = 5
     };
     Q_ENUM(TestType)
 

@@ -103,7 +103,7 @@ void BaseTestController::buildMCOptions(int wordIdx, bool optionsAreWords) {
 bool BaseTestController::checkTypedAnswer(const QString& answer) {
     if (m_isAnswered) return m_lastAnswerCorrect;
 
-    const QString expected = (m_testType == TypeB_WriteFromWord)
+    const QString expected = (m_testType == TypeB_WriteFromWord || m_testType == TypeF_LeitnerReversed)
         ? m_currentHint
         : m_currentWord;
 
@@ -162,8 +162,11 @@ void BaseTestController::resetTestProgress(QObject* manager, int idx, int testTy
     QJsonObject root = QJsonDocument::fromJson(rf.readAll()).object();
     rf.close();
 
-    if (testType == TypeE_Leitner) {
-        root.remove(QStringLiteral("leitner"));
+    if (testType == TypeE_Leitner || testType == TypeF_LeitnerReversed) {
+        const QString lKey = (testType == TypeF_LeitnerReversed)
+            ? QStringLiteral("leitnerReversed")
+            : QStringLiteral("leitner");
+        root.remove(lKey);
     } else {
         QString key;
         switch (testType) {
@@ -190,14 +193,17 @@ int BaseTestController::getUnfinishedCount(QObject* manager, int idx, int testTy
     const int total = mgr->getAllRecSets().at(idx).getWordCount();
     if (total == 0) return total;
 
-    if (testType == TypeE_Leitner) {
+    if (testType == TypeE_Leitner || testType == TypeF_LeitnerReversed) {
+        const QString lKey = (testType == TypeF_LeitnerReversed)
+            ? QStringLiteral("leitnerReversed")
+            : QStringLiteral("leitner");
         const QString path = progressFilePath(const_cast<RecSetManager*>(mgr), idx);
         QFile f(path);
         if (!f.open(QIODevice::ReadOnly)) return total;
         const QJsonObject root = QJsonDocument::fromJson(f.readAll()).object();
         if (root[QStringLiteral("wordCount")].toInt() != total) return total;
-        if (!root.contains(QStringLiteral("leitner"))) return total;
-        const QJsonObject leit = root[QStringLiteral("leitner")].toObject();
+        if (!root.contains(lKey)) return total;
+        const QJsonObject leit = root[lKey].toObject();
         return leit[QStringLiteral("set1")].toArray().size()
              + leit[QStringLiteral("set2")].toArray().size();
     }

@@ -13,14 +13,17 @@ Page {
 
     // Shorthand
     readonly property int ttype: spellingTestController.testType
+    readonly property bool isLeitner:
+        ttype === SpellingTestController.TypeE_Leitner ||
+        ttype === SpellingTestController.TypeF_LeitnerReversed
     readonly property bool isMC:
         ttype === SpellingTestController.TypeC_MCFromHint ||
         ttype === SpellingTestController.TypeD_MCFromWord ||
-        (ttype === SpellingTestController.TypeE_Leitner && spellingTestController.leitnerMCPhase)
+        (isLeitner && spellingTestController.leitnerMCPhase)
     readonly property bool isWritePhase:
         ttype === SpellingTestController.TypeA_WriteFromHint ||
         ttype === SpellingTestController.TypeB_WriteFromWord ||
-        (ttype === SpellingTestController.TypeE_Leitner && !spellingTestController.leitnerMCPhase)
+        (isLeitner && !spellingTestController.leitnerMCPhase)
 
     // Per-question state (reset each word)
     property bool answerSubmitted: false
@@ -32,7 +35,7 @@ Page {
         (ttype === SpellingTestController.TypeA_WriteFromHint ||
          ttype === SpellingTestController.TypeB_WriteFromWord ||
          ttype === SpellingTestController.TypeD_MCFromWord ||
-         (ttype === SpellingTestController.TypeE_Leitner && !spellingTestController.leitnerMCPhase))
+         (isLeitner && !spellingTestController.leitnerMCPhase))
 
     // Reset UI state whenever the controller loads a new word
     Connections {
@@ -60,7 +63,7 @@ Page {
 
     // ── Header ─────────────────────────────────────────────────────────────────
     header: Rectangle {
-        height: ttype === SpellingTestController.TypeE_Leitner ? 72 : 56
+        height: isLeitner ? 72 : 56
         color: "#2c3e50"
 
         ColumnLayout {
@@ -74,10 +77,8 @@ Page {
                 Label {
                     text: {
                         if (ttype === SpellingTestController.TypeB_WriteFromWord ||
-                            ttype === SpellingTestController.TypeD_MCFromWord //||
-                            // (ttype === SpellingTestController.TypeE_Leitner &&
-                            //  !spellingTestController.leitnerMCPhase)
-                                )
+                            ttype === SpellingTestController.TypeD_MCFromWord ||
+                            ttype === SpellingTestController.TypeF_LeitnerReversed)
                             return spellingTestController.currentWord
                         return spellingTestController.currentHint
                     }
@@ -100,7 +101,7 @@ Page {
 
             // Leitner phase indicator
             Label {
-                visible: ttype === SpellingTestController.TypeE_Leitner
+                visible: isLeitner
                 text: spellingTestController.leitnerMCPhase
                     ? qsTr("Learning ▸ Set1: %1 remaining").arg(spellingTestController.leitnerSet1Count)
                     : qsTr("Testing ▸ Set2: %1 to master").arg(spellingTestController.leitnerSet2Count)
@@ -150,7 +151,8 @@ Page {
             TextField {
                 id: guessInputField
                 Layout.fillWidth: true
-                placeholderText: ttype === SpellingTestController.TypeB_WriteFromWord
+                placeholderText: (ttype === SpellingTestController.TypeB_WriteFromWord ||
+                                  ttype === SpellingTestController.TypeF_LeitnerReversed)
                     ? qsTr("Type the hint / translation…")
                     : qsTr("Type the expression…")
                 font.pixelSize: 18
@@ -177,7 +179,8 @@ Page {
             Label {
                 visible: answerSubmitted && !answerIsCorrect
                 text: {
-                    if (ttype === SpellingTestController.TypeB_WriteFromWord)
+                    if (ttype === SpellingTestController.TypeB_WriteFromWord ||
+                        ttype === SpellingTestController.TypeF_LeitnerReversed)
                         return qsTr("Correct: ") + spellingTestController.currentHint
                     return qsTr("Correct: ") + spellingTestController.currentWord
                 }
@@ -399,7 +402,8 @@ Page {
         answerIsCorrect = correct
         answerSubmitted = true
         if (!correct) {
-            const expected = (ttype === SpellingTestController.TypeB_WriteFromWord)
+            const expected = (ttype === SpellingTestController.TypeB_WriteFromWord ||
+                              ttype === SpellingTestController.TypeF_LeitnerReversed)
                 ? spellingTestController.currentHint
                 : spellingTestController.currentWord
             guessInputField.text   = expected

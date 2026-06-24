@@ -93,7 +93,10 @@ Page {
                               desc: qsTr("See the word — choose from 4 options") },
                             { type: SpellingTestController.TypeE_Leitner,
                               icon: "📚", title: qsTr("Progressive Learning"),
-                              desc: qsTr("MC to learn, then write to master all words") }
+                              desc: qsTr("MC to learn, then write to master all words") },
+                            { type: SpellingTestController.TypeF_LeitnerReversed,
+                              icon: "⇄ 📚", title: qsTr("Progressive Learning (Reversed)"),
+                              desc: qsTr("See the word — pick hint to learn, then type to master") }
                         ]
 
                         SwipeDelegate {

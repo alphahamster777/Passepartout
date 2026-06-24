@@ -18,6 +18,12 @@ static std::mt19937& leitnerRng() {
 
 LeitnerTestController::LeitnerTestController(QObject* parent) : BaseTestController(parent) {}
 
+QString LeitnerTestController::leitnerKey() const {
+    return (m_testType == TypeF_LeitnerReversed)
+        ? QStringLiteral("leitnerReversed")
+        : QStringLiteral("leitner");
+}
+
 // ── Progress load ─────────────────────────────────────────────────────────────
 
 void LeitnerTestController::loadProgress() {
@@ -31,10 +37,10 @@ void LeitnerTestController::loadProgress() {
     const QJsonObject root = QJsonDocument::fromJson(f.readAll()).object();
 
     if (root[QStringLiteral("wordCount")].toInt() != m_words.size()) return;
-    if (!root.contains(QStringLiteral("leitner"))) return;
+    if (!root.contains(leitnerKey())) return;
 
     m_hasLeitnerProgress = true;
-    const QJsonObject leit = root[QStringLiteral("leitner")].toObject();
+    const QJsonObject leit = root[leitnerKey()].toObject();
     m_set1.clear();
     m_set2.clear();
     for (const auto& v : leit[QStringLiteral("set1")].toArray())
@@ -65,7 +71,7 @@ void LeitnerTestController::saveProgress() {
     leit[QStringLiteral("set1")]    = s1arr;
     leit[QStringLiteral("set2")]    = s2arr;
     leit[QStringLiteral("mcPhase")] = m_leitnerMCPhase;
-    root[QStringLiteral("leitner")] = leit;
+    root[leitnerKey()]              = leit;
 
     QFile wf(path);
     if (wf.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -184,7 +190,9 @@ void LeitnerTestController::showLeitnerMCWord() {
 // This avoids spoiling words the learner hasn't encountered yet when few
 // remain in set1, and is also the correct behaviour when the set is small.
 void LeitnerTestController::buildLeitnerMCOptions(int wordIdx) {
-    const QString correct = m_words[wordIdx].getExpression();
+    const bool reversed   = (m_testType == TypeF_LeitnerReversed);
+    const QString correct = reversed ? m_words[wordIdx].getHint()
+                                     : m_words[wordIdx].getExpression();
 
     const QSet<int> set1Set(m_set1.begin(), m_set1.end());
     const QSet<int> set2Set(m_set2.begin(), m_set2.end());
@@ -205,14 +213,14 @@ void LeitnerTestController::buildLeitnerMCOptions(int wordIdx) {
 
     QStringList opts;
     for (int i : masteredPool) {
-        const QString cand = m_words[i].getExpression();
+        const QString cand = reversed ? m_words[i].getHint() : m_words[i].getExpression();
         if (!cand.isEmpty() && cand != correct && !opts.contains(cand))
             opts.append(cand);
         if (opts.size() == 3) break;
     }
     for (int i : activePool) {
         if (opts.size() == 3) break;
-        const QString cand = m_words[i].getExpression();
+        const QString cand = reversed ? m_words[i].getHint() : m_words[i].getExpression();
         if (!cand.isEmpty() && cand != correct && !opts.contains(cand))
             opts.append(cand);
     }

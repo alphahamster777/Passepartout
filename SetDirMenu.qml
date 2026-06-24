@@ -464,7 +464,7 @@ Page {
                                                     itm.index, targetFolder)
                                             }
                                             AppController.saveData()
-                                            page.refreshModel()
+                                            AppController.recSetNameListChanged()
                                         } else if (action === "parent") {
                                             var parentPath = page.folderPath.includes("/")
                                                 ? page.folderPath.substring(
@@ -479,7 +479,7 @@ Page {
                                                     itm2.index, parentPath)
                                             }
                                             AppController.saveData()
-                                            page.refreshModel()
+                                            AppController.recSetNameListChanged()
                                         } else {
                                             saveOrder()
                                         }

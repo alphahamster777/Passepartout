@@ -146,7 +146,8 @@ ApplicationWindow {
                 target: stackView.currentItem
                 function onNavigateToTest(testType) {
                     rootScope.spellingTestController =
-                        (testType === SpellingTestController.TypeE_Leitner)
+                        (testType === SpellingTestController.TypeE_Leitner ||
+                         testType === SpellingTestController.TypeF_LeitnerReversed)
                             ? leitnerTestController
                             : regularTestController
                     rootScope.spellingTestController.initialize(

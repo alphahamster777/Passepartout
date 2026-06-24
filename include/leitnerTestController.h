@@ -30,6 +30,7 @@ private:
     bool         m_leitnerMCPhase   = true;
     bool         m_hasLeitnerProgress = false;
 
+    QString leitnerKey() const;
     void loadProgress();
     void showLeitnerMCWord();
     void buildLeitnerMCOptions(int wordIdx);

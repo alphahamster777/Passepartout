@@ -44,11 +44,8 @@ void RecSetManager::ensureInOrder(const QString& folderPath, const QString& key)
 
 void RecSetManager::removeFromOrder(const QString& folderPath, const QString& key) {
     auto it = m_folderItemOrder.find(folderPath);
-    if (it != m_folderItemOrder.end()) {
+    if (it != m_folderItemOrder.end())
         it->removeAll(key);
-        if (it->isEmpty())
-            m_folderItemOrder.erase(it);
-    }
 }
 
 // ── Set CRUD ──────────────────────────────────────────────────────────────────
