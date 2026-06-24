@@ -17,7 +17,7 @@ public:
 
     // Fetch the best Wikimedia/Wikipedia thumbnail URL for a word.
     // Emits imageFetched(cardIndex, url) when done; silent on failure.
-    Q_INVOKABLE void fetchWikimediaImageUrl(const QString& word, int cardIndex);
+    Q_INVOKABLE void fetchWikimediaImageUrl(const QString& word, int cardIndex, int languageId = 0);
 
     // Text-to-speech — languageId matches LanguageHelper::Language enum values
     Q_INVOKABLE void speak(const QString& text, int languageId);

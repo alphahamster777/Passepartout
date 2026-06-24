@@ -41,6 +41,7 @@ public:
     Q_PROPERTY(int  leitnerSet2Count  READ leitnerSet2Count  NOTIFY leitnerProgressChanged)
     Q_PROPERTY(bool leitnerMCPhase    READ leitnerMCPhase    NOTIFY leitnerProgressChanged)
     Q_PROPERTY(bool testComplete      READ isTestComplete    NOTIFY testCompleteChanged)
+    Q_PROPERTY(int  progressVersion   READ progressVersion   NOTIFY progressVersionChanged)
 
     explicit BaseTestController(QObject* parent = nullptr);
     ~BaseTestController() override = default;
@@ -75,6 +76,7 @@ public:
     virtual int  leitnerSet1Count() const { return 0; }
     virtual int  leitnerSet2Count() const { return 0; }
     virtual bool leitnerMCPhase()   const { return false; }
+    int          progressVersion()  const { return m_progressVersion; }
 
 signals:
     void testTypeChanged();
@@ -90,6 +92,7 @@ signals:
     void lastAnswerCorrectChanged();
     void leitnerProgressChanged();
     void testCompleteChanged();
+    void progressVersionChanged();
 
 protected:
     RecSetManager*    m_recSetManager = nullptr;
@@ -114,4 +117,6 @@ protected:
     void buildMCOptions(int wordIdx, bool optionsAreWords);
     QString progressFilePath() const;
     QString progressFilePath(RecSetManager* mgr, int idx) const;
+    void notifyProgressSaved() { ++m_progressVersion; emit progressVersionChanged(); }
+    int m_progressVersion = 0;
 };

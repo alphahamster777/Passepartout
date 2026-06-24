@@ -321,16 +321,23 @@ Page {
                 color: "#7f8c8d"
             }
             ProgressBar {
+                id: progressBar
                 Layout.fillWidth: true
                 from: 0
                 to: spellingTestController.totalQuestions
                 value: spellingTestController.correctAnswers
                 background: Rectangle { radius: 4; color: "#dce1e7"; implicitHeight: 8 }
-                contentItem: Rectangle {
-                    width: parent.visualPosition * parent.width
-                    height: parent.height
-                    radius: 4
-                    color: "#27ae60"
+                // Qt's resizeContent() overrides width on a direct contentItem Rectangle,
+                // so wrap in Item and let the inner Rectangle compute its own width.
+                contentItem: Item {
+                    implicitHeight: 8
+                    clip: true
+                    Rectangle {
+                        width: progressBar.visualPosition * parent.width
+                        height: parent.height
+                        radius: 4
+                        color: "#27ae60"
+                    }
                 }
             }
         }

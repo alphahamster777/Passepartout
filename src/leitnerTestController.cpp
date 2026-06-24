@@ -70,6 +70,8 @@ void LeitnerTestController::saveProgress() {
     QFile wf(path);
     if (wf.open(QIODevice::WriteOnly | QIODevice::Truncate))
         wf.write(QJsonDocument(root).toJson());
+
+    notifyProgressSaved();
 }
 
 // ── Initialization ────────────────────────────────────────────────────────────

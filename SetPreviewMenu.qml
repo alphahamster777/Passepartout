@@ -15,6 +15,11 @@ Page {
     // handle any testType parameter regardless of which controller is active.
     property var spellingTestController: rootScope.spellingTestController
 
+    // Incremented each time the popup opens (and after a swipe-reset) to force
+    // all "remaining" bindings to re-read from disk even when progressVersion
+    // hasn't changed (e.g. navigating back mid-question).
+    property int popupRefresh: 0
+
     background: Rectangle { color: "#f0f4f8" }
 
     MediaPlayer {
@@ -35,6 +40,7 @@ Page {
         padding: 0
         modal: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        onAboutToShow: page.popupRefresh++
 
         background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
 
@@ -124,7 +130,7 @@ Page {
                                     AppController.recSetManager,
                                     setPreviewController.currentSetIndex,
                                     swipeRow.modelData.type)
-                                remainingLabel.refreshCounter++
+                                page.popupRefresh++
                                 Qt.callLater(function() { swipeRow.swipe.close() })
                             }
 
@@ -164,9 +170,9 @@ Page {
 
                                     Label {
                                         id: remainingLabel
-                                        property int refreshCounter: 0
                                         property int remaining: {
-                                            refreshCounter  // re-evaluate after reset
+                                            page.popupRefresh                         // re-evaluate when popup opens / after reset
+                                            spellingTestController.progressVersion    // re-evaluate during an active test session
                                             return spellingTestController.getUnfinishedCount(
                                                 AppController.recSetManager,
                                                 setPreviewController.currentSetIndex,

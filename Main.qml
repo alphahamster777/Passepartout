@@ -197,11 +197,11 @@ ApplicationWindow {
             Connections {
                 target: stackView.currentItem
                 function onResultsNextPressed() {
-                    // Clear the completed-run flag so the next launch starts fresh
-                    rootScope.spellingTestController.resetTestProgress(
-                        AppController.recSetManager,
-                        setPreviewController.currentSetIndex,
-                        rootScope.spellingTestController.testType)
+                    // // Clear the completed-run flag so the next launch starts fresh
+                    // rootScope.spellingTestController.resetTestProgress(
+                    //     AppController.recSetManager,
+                    //     setPreviewController.currentSetIndex,
+                    //     rootScope.spellingTestController.testType)
                     stackView.pop(stackView.get(stackView.depth - 3))
                 }
             }

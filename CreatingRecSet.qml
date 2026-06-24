@@ -22,6 +22,10 @@ Page {
     property int recordingCardIndex: -1   // card currently being recorded into
     property int pendingRecordCardIndex: -1  // waiting for mic permission
     property int pendingCameraCardIndex: -1  // waiting for camera permission
+    property int langPickerCardIndex: -1     // card whose language is being picked
+    property bool langPickerIsFrom: true     // true = word/expr language, false = hint language
+    property int langPickerCurrentId: -1    // enum value of the currently selected language
+    readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     background: Rectangle { color: "#f0f4f8" }
 
@@ -140,6 +144,131 @@ Page {
                 recSetModel.append(wordList[i])
             }
             page.selectedCardIndex = Math.max(0, recSetModel.count - 1)
+        }
+    }
+
+    // ── Language picker popup ─────────────────────────────────────────────────
+    Popup {
+        id: languagePickerPopup
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(parent.width - 32, 340)
+        padding: 0
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        // Scroll to the currently selected language after the popup has opened.
+        onOpened: Qt.callLater(function() {
+            var entries = page.langEntries
+            var currentId = page.langPickerCurrentId
+            for (var i = 0; i < entries.length; ++i) {
+                if (entries[i].id === currentId) {
+                    var itemH = 48
+                    var targetY = i * itemH
+                    var center = targetY - (langFlick.height - itemH) / 2
+                    langFlick.contentY = Math.max(0,
+                        Math.min(center, Math.max(0, langFlick.contentHeight - langFlick.height)))
+                    break
+                }
+            }
+        })
+
+        background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
+
+        contentItem: Column {
+            Rectangle {
+                width: languagePickerPopup.availableWidth
+                height: 52
+                color: "#2c3e50"
+                radius: 14
+                Rectangle {
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                    height: 14; color: "#2c3e50"
+                }
+                Label {
+                    anchors.centerIn: parent
+                    text: page.langPickerIsFrom ? qsTr("Word Language") : qsTr("Hint Language")
+                    font.pixelSize: 16; font.bold: true; color: "white"
+                }
+            }
+
+            Flickable {
+                id: langFlick
+                width: languagePickerPopup.availableWidth
+                height: Math.min(langCol.implicitHeight,
+                                 (Overlay.overlay ? Overlay.overlay.height * 0.65 : 380) - 52 - 52)
+                contentHeight: langCol.implicitHeight
+                clip: true
+
+                Column {
+                    id: langCol
+                    width: langFlick.width
+
+                    Repeater {
+                        model: page.langEntries
+                        delegate: ItemDelegate {
+                            width: langCol.width
+                            height: 48
+                            required property int index
+                            required property var modelData
+
+                            readonly property bool isCurrent: modelData.id === page.langPickerCurrentId
+
+                            background: Rectangle {
+                                color: isCurrent ? "#eaf4fb"
+                                     : parent.pressed ? "#f0f4f8" : "white"
+                                Rectangle {
+                                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                                    height: 1; color: "#ececec"
+                                }
+                            }
+                            contentItem: Item {
+                                RowLayout {
+                                    anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
+                                    spacing: 8
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: modelData.name
+                                        color: isCurrent ? "#3498db" : "#2c3e50"
+                                        font.pixelSize: 15
+                                        font.bold: isCurrent
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Label {
+                                        visible: isCurrent
+                                        text: "✓"
+                                        color: "#3498db"
+                                        font.pixelSize: 14
+                                    }
+                                }
+                            }
+                            onClicked: {
+                                var cardIdx = page.langPickerCardIndex
+                                if (cardIdx >= 0) {
+                                    if (page.langPickerIsFrom)
+                                        recSetModel.set(cardIdx, { languageFrom: modelData.id })
+                                    else
+                                        recSetModel.set(cardIdx, { languageTo: modelData.id })
+                                }
+                                languagePickerPopup.close()
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle { width: languagePickerPopup.availableWidth; height: 1; color: "#ececec" }
+            ItemDelegate {
+                width: languagePickerPopup.availableWidth
+                height: 50
+                background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white"; radius: 14 }
+                contentItem: Text {
+                    text: qsTr("Cancel"); color: "#e74c3c"
+                    font.pixelSize: 15; font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: languagePickerPopup.close()
+            }
         }
     }
 
@@ -311,15 +440,32 @@ Page {
                                     color: "#2c3e50"
                                     Layout.fillWidth: true
                                 }
-                                ComboBox {
-                                    id: langFromCombo
-                                    implicitWidth: 138
-                                    implicitHeight: 30
-                                    model: LanguageHelper.languageNames()
-                                    currentIndex: languageFrom
-                                    font.pixelSize: 11
-                                    onCurrentIndexChanged: recSetModel.set(index, { languageFrom: currentIndex })
-                                    Component.onCompleted: currentIndex = languageFrom
+                                Rectangle {
+                                    implicitWidth: 138; implicitHeight: 30
+                                    radius: 6
+                                    color: "#f0f4f8"
+                                    border.color: "#dce1e7"; border.width: 1
+                                    RowLayout {
+                                        anchors { fill: parent; leftMargin: 8; rightMargin: 6 }
+                                        spacing: 2
+                                        Label {
+                                            Layout.fillWidth: true
+                                            text: LanguageHelper.languageNames()[languageFrom]
+                                            font.pixelSize: 11; color: "#2c3e50"
+                                            elide: Text.ElideRight
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Label { text: "▾"; font.pixelSize: 10; color: "#7f8c8d" }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            page.langPickerCardIndex = index
+                                            page.langPickerIsFrom = true
+                                            page.langPickerCurrentId = languageFrom
+                                            languagePickerPopup.open()
+                                        }
+                                    }
                                 }
                             }
                             TextField {
@@ -337,7 +483,7 @@ Page {
                                 onEditingFinished: {
                                     recSetModel.set(index, { expression: exprField.text })
                                     if (page.autoMedia && exprField.text.trim() !== "" && imagePath === "")
-                                        MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index)
+                                        MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index, languageFrom)
                                 }
                             }
 
@@ -352,15 +498,32 @@ Page {
                                     color: "#2c3e50"
                                     Layout.fillWidth: true
                                 }
-                                ComboBox {
-                                    id: langToCombo
-                                    implicitWidth: 138
-                                    implicitHeight: 30
-                                    model: LanguageHelper.languageNames()
-                                    currentIndex: languageTo
-                                    font.pixelSize: 11
-                                    onCurrentIndexChanged: recSetModel.set(index, { languageTo: currentIndex })
-                                    Component.onCompleted: currentIndex = languageTo
+                                Rectangle {
+                                    implicitWidth: 138; implicitHeight: 30
+                                    radius: 6
+                                    color: "#f0f4f8"
+                                    border.color: "#dce1e7"; border.width: 1
+                                    RowLayout {
+                                        anchors { fill: parent; leftMargin: 8; rightMargin: 6 }
+                                        spacing: 2
+                                        Label {
+                                            Layout.fillWidth: true
+                                            text: LanguageHelper.languageNames()[languageTo]
+                                            font.pixelSize: 11; color: "#2c3e50"
+                                            elide: Text.ElideRight
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        Label { text: "▾"; font.pixelSize: 10; color: "#7f8c8d" }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            page.langPickerCardIndex = index
+                                            page.langPickerIsFrom = false
+                                            page.langPickerCurrentId = languageTo
+                                            languagePickerPopup.open()
+                                        }
+                                    }
                                 }
                             }
                             TextField {
@@ -445,7 +608,7 @@ Page {
                                                 }
                                                 onClicked: {
                                                     page.activeCardIndex = index
-                                                    MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index)
+                                                    MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index, languageFrom)
                                                 }
                                             }
 
