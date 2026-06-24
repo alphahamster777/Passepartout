@@ -15,6 +15,7 @@ Page {
     property alias recSetModelRef: recSetModel
     property alias recSetName: topTextField.text
     property int recSetIdx: -1
+    property string folderPath: ""
     property int activeCardIndex: -1
     property int selectedCardIndex: 0
     property bool autoMedia: false

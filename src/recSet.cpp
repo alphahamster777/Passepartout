@@ -5,16 +5,19 @@ RecSet::RecSet(const QString &setName) : m_setName(setName) {}
 
 RecSet::RecSet(const RecSet &other){
     m_setName = other.m_setName;
+    m_folderPath = other.m_folderPath;
     m_words = other.m_words;
 }
 
 RecSet::RecSet(RecSet &&other) {
     m_setName = std::move(other.m_setName);
+    m_folderPath = std::move(other.m_folderPath);
     m_words = std::move(other.m_words);
 }
 
 RecSet &RecSet::operator=(RecSet &&other) {
     m_setName = std::move(other.m_setName);
+    m_folderPath = std::move(other.m_folderPath);
     m_words = std::move(other.m_words);
     return *this;
 }
@@ -54,6 +57,7 @@ QVariantMap RecSet::getWordAtQML(size_t index) const {
 
 RecSet &RecSet::operator=(const RecSet &other) {
     m_setName = other.m_setName;
+    m_folderPath = other.m_folderPath;
     m_words = other.m_words;
     return *this;
 }

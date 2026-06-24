@@ -30,12 +30,16 @@ ApplicationWindow {
 
             if (androidBackPressed || desktopLeftPressed) {
                 if (stackView.depth > 1) {
-                    // Save test progress when leaving the spelling test mid-run
                     if (typeof stackView.currentItem.getResults === "function" &&
                         !spellingTestController.isTestComplete()) {
+                        // Mid-test back: save progress and jump past SetPreview
+                        // to the SetDirMenu that contains the word set.
+                        // Stack: [..., SetDirMenu, SetPreview, SpellingTest]
                         spellingTestController.saveProgress()
+                        stackView.pop(stackView.get(stackView.depth - 3))
+                    } else {
+                        stackView.pop()
                     }
-                    stackView.pop()
                 } else {
                     Qt.quit()
                 }
@@ -81,8 +85,9 @@ ApplicationWindow {
             id: setDirMenuConnectionLoader
             active: stackView.currentItem &&
                     typeof stackView.currentItem.recSetSelected === "function" &&
-                    typeof stackView.currentItem.addRecSet === "function" &&
-                    typeof stackView.currentItem.editRecSet === "function"
+                    typeof stackView.currentItem.addRecSet      === "function" &&
+                    typeof stackView.currentItem.editRecSet     === "function" &&
+                    typeof stackView.currentItem.folderSelected === "function"
             sourceComponent: setDirMenuConnectionComponent
         }
 
@@ -90,20 +95,24 @@ ApplicationWindow {
             id: setDirMenuConnectionComponent
             Connections {
                 target: stackView.currentItem
+
                 function onRecSetSelected(num: int) {
-                    stackView.pop()
+                    // Push SetPreview without popping the SetDirMenu so that
+                    // back-from-test can return to the correct directory.
                     setPreviewController.initialize(AppController.recSetManager, num)
                     stackView.push(setPreviewMenu)
                 }
                 function onAddRecSet() {
-                    stackView.push(creatingRecSetMenu)
+                    stackView.push(creatingRecSetMenu,
+                                   { folderPath: stackView.currentItem.folderPath })
                 }
                 function onEditRecSet(num: int) {
                     stackView.push(creatingRecSetMenu)
                     var mgr = AppController.recSetManager
                     var info = mgr.getRecSetInfoQML(num)
-                    stackView.currentItem.recSetName = info.name
-                    stackView.currentItem.recSetIdx  = num
+                    stackView.currentItem.recSetName   = info.name
+                    stackView.currentItem.recSetIdx    = num
+                    stackView.currentItem.folderPath   = info.folderPath
                     var modelRef = stackView.currentItem.recSetModelRef
                     modelRef.clear()
                     for (var i = 0; i < info.wordCount; ++i) {
@@ -118,6 +127,9 @@ ApplicationWindow {
                         })
                     }
                     stackView.currentItem.selectedCardIndex = info.wordCount > 0 ? info.wordCount - 1 : 0
+                }
+                function onFolderSelected(path: string) {
+                    stackView.push(setDirMenu, { folderPath: path })
                 }
             }
         }
@@ -197,11 +209,8 @@ ApplicationWindow {
             Connections {
                 target: stackView.currentItem
                 function onResultsNextPressed() {
-                    // // Clear the completed-run flag so the next launch starts fresh
-                    // rootScope.spellingTestController.resetTestProgress(
-                    //     AppController.recSetManager,
-                    //     setPreviewController.currentSetIndex,
-                    //     rootScope.spellingTestController.testType)
+                    // Pop back to SetPreview (Results → SpellingTest → SetPreview).
+                    // Stack: [..., SetDirMenu, SetPreview, SpellingTest, Results]
                     stackView.pop(stackView.get(stackView.depth - 3))
                 }
             }
@@ -233,13 +242,14 @@ ApplicationWindow {
                 function onCreatingRecSetSave() {
                     var recSetName   = stackView.currentItem.recSetName
                     var recSetIdx    = stackView.currentItem.recSetIdx
+                    var recFolderPath = stackView.currentItem.folderPath
                     var modelRef     = stackView.currentItem.recSetModelRef
                     var mgr          = AppController.recSetManager
 
                     if (recSetName === "") return
 
                     if (recSetIdx === -1) {
-                        mgr.createRecSet(recSetName)
+                        mgr.createRecSet(recSetName, recFolderPath)
                     } else {
                         var oldInfo = mgr.getRecSetInfoQML(recSetIdx)
                         mgr.clearRecordsFromRecSet(oldInfo.name)

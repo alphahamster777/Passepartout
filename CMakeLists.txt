@@ -197,6 +197,7 @@ qt_add_resources(appPassepartout "resources"
         images/bicycle.jpg
         images/cheese.jpg
         images/default_logo.jpg
+        images/directory_symbol.png
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

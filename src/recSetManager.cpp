@@ -9,34 +9,70 @@ RecSetManager::RecSetManager(QObject *parent) : QObject(parent) {}
 
 RecSetManager::RecSetManager(const RecSetManager &other) {
     m_recSetVec = other.m_recSetVec;
+    m_folderItemOrder = other.m_folderItemOrder;
 }
 
 RecSetManager::RecSetManager(RecSetManager &&other) {
     m_recSetVec = std::move(other.m_recSetVec);
+    m_folderItemOrder = std::move(other.m_folderItemOrder);
 }
 
 RecSetManager &RecSetManager::operator=(const RecSetManager &other) {
     m_recSetVec = other.m_recSetVec;
+    m_folderItemOrder = other.m_folderItemOrder;
     return *this;
 }
 
 RecSetManager &RecSetManager::operator=(RecSetManager &&other) {
     m_recSetVec = std::move(other.m_recSetVec);
+    m_folderItemOrder = std::move(other.m_folderItemOrder);
     return *this;
 }
 
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+QString RecSetManager::parentOf(const QString& fullPath) {
+    int slash = fullPath.lastIndexOf('/');
+    return slash == -1 ? QString() : fullPath.left(slash);
+}
+
+void RecSetManager::ensureInOrder(const QString& folderPath, const QString& key) {
+    auto& list = m_folderItemOrder[folderPath];
+    if (!list.contains(key))
+        list.append(key);
+}
+
+void RecSetManager::removeFromOrder(const QString& folderPath, const QString& key) {
+    auto it = m_folderItemOrder.find(folderPath);
+    if (it != m_folderItemOrder.end()) {
+        it->removeAll(key);
+        if (it->isEmpty())
+            m_folderItemOrder.erase(it);
+    }
+}
+
+// ── Set CRUD ──────────────────────────────────────────────────────────────────
+
 bool RecSetManager::createRecSet(const QString &setName) {
+    return createRecSet(setName, QString());
+}
+
+bool RecSetManager::createRecSet(const QString &setName, const QString &folderPath) {
     for (const auto& rs : m_recSetVec) {
         if (rs.getSetName() == setName)
             return false;
     }
-    m_recSetVec.emplace_back(RecSet{setName});
+    RecSet rs(setName);
+    rs.setFolderPath(folderPath);
+    m_recSetVec.push_back(std::move(rs));
+    ensureInOrder(folderPath, "set:" + setName);
     return true;
 }
 
 bool RecSetManager::deleteRecSet(const QString &setName) {
     for (auto it = m_recSetVec.begin(); it != m_recSetVec.end(); ++it) {
         if (it->getSetName() == setName) {
+            removeFromOrder(it->getFolderPath(), "set:" + setName);
             m_recSetVec.erase(it);
             return true;
         }
@@ -98,8 +134,9 @@ QVariantMap RecSetManager::getRecSetInfoQML(int idx) {
         return {};
     const auto& rs = m_recSetVec.at(idx);
     QVariantMap map;
-    map["name"]      = rs.getSetName();
-    map["wordCount"] = rs.getWordCount();
+    map["name"]       = rs.getSetName();
+    map["wordCount"]  = rs.getWordCount();
+    map["folderPath"] = rs.getFolderPath();
     return map;
 }
 
@@ -109,7 +146,243 @@ QVariantMap RecSetManager::getWordFromRecSetQML(int setIdx, int wordIdx) {
     return m_recSetVec.at(setIdx).getWordAtQML(static_cast<size_t>(wordIdx));
 }
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── Library (folder) API ──────────────────────────────────────────────────────
+
+QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
+    // Determine which item keys are valid (exist in sets or as folder entries)
+    QSet<QString> validFolderKeys;
+    for (auto it = m_folderItemOrder.begin(); it != m_folderItemOrder.end(); ++it) {
+        // Any folder that has an entry under some parent is a valid folder key
+        if (!it.key().isEmpty())
+            validFolderKeys.insert("folder:" + it.key());
+    }
+
+    QMap<QString, int> setIndexByName;
+    for (int i = 0; i < m_recSetVec.size(); ++i)
+        setIndexByName[m_recSetVec.at(i).getSetName()] = i;
+
+    // Start with explicitly ordered items for this folder
+    QVariantList result;
+    QSet<QString> seen;
+
+    auto it = m_folderItemOrder.find(folderPath);
+    if (it != m_folderItemOrder.end()) {
+        for (const QString& key : *it) {
+            seen.insert(key);
+            if (key.startsWith(QLatin1String("folder:"))) {
+                QString fp = key.mid(7);
+                // Only show immediate children
+                if (parentOf(fp) != folderPath) continue;
+                // Check if this folder still has any content or is explicitly tracked
+                bool exists = m_folderItemOrder.contains(fp);
+                if (!exists) {
+                    // Check if any set lives under it
+                    for (const auto& rs : m_recSetVec) {
+                        if (rs.getFolderPath() == fp ||
+                            rs.getFolderPath().startsWith(fp + "/")) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+                if (!exists) continue;
+                QString displayName = fp.section('/', -1);
+                QVariantMap item;
+                item["type"]     = QStringLiteral("folder");
+                item["name"]     = displayName;
+                item["fullPath"] = fp;
+                item["index"]    = -1;
+                item["wordCount"] = 0;
+                result.append(item);
+            } else if (key.startsWith(QLatin1String("set:"))) {
+                QString name = key.mid(4);
+                auto sit = setIndexByName.find(name);
+                if (sit == setIndexByName.end()) continue;
+                int idx = sit.value();
+                if (m_recSetVec.at(idx).getFolderPath() != folderPath) continue;
+                QVariantMap item;
+                item["type"]     = QStringLiteral("set");
+                item["name"]     = name;
+                item["fullPath"] = QString();
+                item["index"]    = idx;
+                item["wordCount"] = m_recSetVec.at(idx).getWordCount();
+                result.append(item);
+            }
+        }
+    }
+
+    // Append any sets in this folder not yet covered by the order list
+    for (int i = 0; i < m_recSetVec.size(); ++i) {
+        const auto& rs = m_recSetVec.at(i);
+        if (rs.getFolderPath() != folderPath) continue;
+        QString key = "set:" + rs.getSetName();
+        if (seen.contains(key)) continue;
+        QVariantMap item;
+        item["type"]     = QStringLiteral("set");
+        item["name"]     = rs.getSetName();
+        item["fullPath"] = QString();
+        item["index"]    = i;
+        item["wordCount"] = rs.getWordCount();
+        result.append(item);
+    }
+
+    return result;
+}
+
+bool RecSetManager::createFolder(const QString& folderPath) {
+    if (folderPath.isEmpty()) return false;
+    // Mark this folder in the parent's order list and ensure it has an entry in the map
+    QString parent = parentOf(folderPath);
+    ensureInOrder(parent, "folder:" + folderPath);
+    if (!m_folderItemOrder.contains(folderPath))
+        m_folderItemOrder[folderPath] = {};
+    return true;
+}
+
+bool RecSetManager::deleteFolder(const QString& folderPath) {
+    if (folderPath.isEmpty()) return false;
+
+    // Delete all sets whose path starts with folderPath or folderPath + "/"
+    auto sit = m_recSetVec.begin();
+    while (sit != m_recSetVec.end()) {
+        const QString& fp = sit->getFolderPath();
+        if (fp == folderPath || fp.startsWith(folderPath + "/")) {
+            sit = m_recSetVec.erase(sit);
+        } else {
+            ++sit;
+        }
+    }
+
+    // Remove all order entries for the folder and its children
+    QList<QString> toRemove;
+    for (auto it = m_folderItemOrder.begin(); it != m_folderItemOrder.end(); ++it) {
+        if (it.key() == folderPath || it.key().startsWith(folderPath + "/"))
+            toRemove.append(it.key());
+    }
+    for (const QString& k : toRemove)
+        m_folderItemOrder.remove(k);
+
+    // Remove the folder key from the parent
+    removeFromOrder(parentOf(folderPath), "folder:" + folderPath);
+    return true;
+}
+
+bool RecSetManager::renameFolder(const QString& oldPath, const QString& newPath) {
+    if (oldPath.isEmpty() || newPath.isEmpty()) return false;
+
+    // Update all sets whose folderPath starts with oldPath
+    for (auto& rs : m_recSetVec) {
+        const QString& fp = rs.getFolderPath();
+        if (fp == oldPath) {
+            rs.setFolderPath(newPath);
+        } else if (fp.startsWith(oldPath + "/")) {
+            rs.setFolderPath(newPath + fp.mid(oldPath.length()));
+        }
+    }
+
+    // Rebuild order map entries for the renamed subtree
+    QMap<QString, QStringList> rebuildEntries;
+    QList<QString> toRemove;
+    for (auto it = m_folderItemOrder.begin(); it != m_folderItemOrder.end(); ++it) {
+        const QString& key = it.key();
+        if (key == oldPath || key.startsWith(oldPath + "/")) {
+            QString newKey = newPath + key.mid(oldPath.length());
+            // Remap "folder:OLD/..." keys inside the list
+            QStringList newList;
+            for (const QString& item : it.value()) {
+                if (item.startsWith("folder:" + oldPath))
+                    newList.append("folder:" + newPath + item.mid(7 + oldPath.length()));
+                else
+                    newList.append(item);
+            }
+            rebuildEntries[newKey] = newList;
+            toRemove.append(key);
+        }
+    }
+    for (const QString& k : toRemove)
+        m_folderItemOrder.remove(k);
+    for (auto it = rebuildEntries.begin(); it != rebuildEntries.end(); ++it)
+        m_folderItemOrder[it.key()] = it.value();
+
+    // Update the parent's order list reference
+    QString parent = parentOf(oldPath);
+    auto& parentList = m_folderItemOrder[parent];
+    int idx = parentList.indexOf("folder:" + oldPath);
+    if (idx != -1)
+        parentList[idx] = "folder:" + newPath;
+
+    return true;
+}
+
+bool RecSetManager::moveSetToFolder(int setIdx, const QString& newFolderPath) {
+    if (setIdx < 0 || setIdx >= m_recSetVec.size()) return false;
+    auto& rs = m_recSetVec[setIdx];
+    QString oldFolder = rs.getFolderPath();
+    QString setName   = rs.getSetName();
+    if (oldFolder == newFolderPath) return false;
+
+    removeFromOrder(oldFolder, "set:" + setName);
+    rs.setFolderPath(newFolderPath);
+    ensureInOrder(newFolderPath, "set:" + setName);
+    return true;
+}
+
+bool RecSetManager::reorderFolderItems(const QString& folderPath, const QStringList& keys) {
+    m_folderItemOrder[folderPath] = keys;
+    return true;
+}
+
+bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString& newParentPath) {
+    if (folderPath.isEmpty()) return false;
+
+    QString lastName = folderPath.section('/', -1);
+    QString newPath  = newParentPath.isEmpty() ? lastName : newParentPath + "/" + lastName;
+
+    if (newPath == folderPath) return false;
+    // Prevent moving a folder into itself or any of its descendants
+    if (newParentPath == folderPath || newParentPath.startsWith(folderPath + "/"))
+        return false;
+
+    // 1. Update folderPath on every set inside this subtree
+    for (auto& rs : m_recSetVec) {
+        const QString& fp = rs.getFolderPath();
+        if (fp == folderPath)
+            rs.setFolderPath(newPath);
+        else if (fp.startsWith(folderPath + "/"))
+            rs.setFolderPath(newPath + fp.mid(folderPath.length()));
+    }
+
+    // 2. Rebuild the order map for the moved subtree
+    QMap<QString, QStringList> toAdd;
+    QList<QString> toRemove;
+    for (auto it = m_folderItemOrder.begin(); it != m_folderItemOrder.end(); ++it) {
+        const QString& key = it.key();
+        if (key == folderPath || key.startsWith(folderPath + "/")) {
+            QString newKey = newPath + key.mid(folderPath.length());
+            QStringList newList;
+            for (const QString& item : it.value()) {
+                if (item.startsWith("folder:" + folderPath))
+                    newList.append("folder:" + newPath + item.mid(7 + folderPath.length()));
+                else
+                    newList.append(item);
+            }
+            toAdd[newKey] = newList;
+            toRemove.append(key);
+        }
+    }
+    for (const QString& k : toRemove)
+        m_folderItemOrder.remove(k);
+    for (auto it = toAdd.begin(); it != toAdd.end(); ++it)
+        m_folderItemOrder[it.key()] = it.value();
+
+    // 3. Remove from old parent's order, add to new parent's order
+    removeFromOrder(parentOf(folderPath), "folder:" + folderPath);
+    ensureInOrder(newParentPath, "folder:" + newPath);
+
+    return true;
+}
+
+// ── static helpers ────────────────────────────────────────────────────────────
 
 QString RecSetManager::localPath(const QString& urlOrPath) {
     QUrl url(urlOrPath);
@@ -144,17 +417,32 @@ bool RecSetManager::saveAllToJson(const QString& filePath) {
     QJsonArray setsArr;
     for (const auto& rs : m_recSetVec) {
         QJsonObject setObj;
-        setObj["name"] = rs.getSetName();
+        setObj["name"]       = rs.getSetName();
+        setObj["folderPath"] = rs.getFolderPath();
         QJsonArray wordsArr;
         for (int i = 0; i < rs.getWordCount(); ++i)
             wordsArr.append(wordToJson(rs.getWordAt(static_cast<size_t>(i))));
         setObj["words"] = wordsArr;
         setsArr.append(setObj);
     }
+
+    QJsonObject orderObj;
+    for (auto it = m_folderItemOrder.begin(); it != m_folderItemOrder.end(); ++it) {
+        QJsonArray arr;
+        for (const QString& k : it.value())
+            arr.append(k);
+        orderObj[it.key()] = arr;
+    }
+
+    QJsonObject root;
+    root["version"] = 2;
+    root["sets"]    = setsArr;
+    root["order"]   = orderObj;
+
     QFile file(localPath(filePath));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return false;
-    file.write(QJsonDocument(setsArr).toJson());
+    file.write(QJsonDocument(root).toJson());
     return true;
 }
 
@@ -163,16 +451,45 @@ bool RecSetManager::loadFromJson(const QString& filePath) {
     if (!file.open(QIODevice::ReadOnly))
         return false;
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    if (!doc.isArray())
-        return false;
+
     m_recSetVec.clear();
-    for (const auto& setVal : doc.array()) {
+    m_folderItemOrder.clear();
+
+    // v1 format: bare JSON array of sets (no folderPath, no order)
+    if (doc.isArray()) {
+        for (const auto& setVal : doc.array()) {
+            QJsonObject setObj = setVal.toObject();
+            RecSet rs(setObj["name"].toString());
+            for (const auto& wv : setObj["words"].toArray())
+                rs.addWord(wordFromJson(wv.toObject()));
+            m_recSetVec.push_back(std::move(rs));
+        }
+        // Rebuild default order (flat, root-level)
+        for (const auto& rs : m_recSetVec)
+            ensureInOrder(QString(), "set:" + rs.getSetName());
+        return true;
+    }
+
+    if (!doc.isObject()) return false;
+    QJsonObject root = doc.object();
+
+    for (const auto& setVal : root["sets"].toArray()) {
         QJsonObject setObj = setVal.toObject();
         RecSet rs(setObj["name"].toString());
+        rs.setFolderPath(setObj["folderPath"].toString());
         for (const auto& wv : setObj["words"].toArray())
             rs.addWord(wordFromJson(wv.toObject()));
         m_recSetVec.push_back(std::move(rs));
     }
+
+    QJsonObject orderObj = root["order"].toObject();
+    for (auto it = orderObj.begin(); it != orderObj.end(); ++it) {
+        QStringList list;
+        for (const auto& v : it.value().toArray())
+            list.append(v.toString());
+        m_folderItemOrder[it.key()] = list;
+    }
+
     return true;
 }
 

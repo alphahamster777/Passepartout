@@ -45,7 +45,11 @@ public:
     // Getters
     Q_INVOKABLE QString getSetName() const { return m_setName; }
     Q_INVOKABLE int getWordCount() const { return m_words.size(); }
+    Q_INVOKABLE QString getFolderPath() const { return m_folderPath; }
+    Q_INVOKABLE void setFolderPath(const QString& path) { m_folderPath = path; }
+
 private:
     QString m_setName;               // Name of the word set.
+    QString m_folderPath;            // "" = root, "Lib" = inside Lib, "Lib/Sub" = nested.
     QVector<DictRec> m_words;        // Collection of words in the set.
 };
