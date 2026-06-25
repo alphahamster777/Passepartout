@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background color for adaptive launcher icon (matches emblem's cream color) -->
+    <color name="ic_launcher_background">#F5F0E8</color>
+</resources>

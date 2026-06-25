@@ -190,15 +190,15 @@ qt_add_qml_module(appPassepartout
     IMPORTS LeitnerTestController SpellingTestController
 )
 
-# Include the resource file
-qt_add_resources(appPassepartout "resources"
-    PREFIX "/"
-    FILES
-        images/bicycle.jpg
-        images/cheese.jpg
-        images/default_logo.jpg
-        images/directory_symbol.png
-)
+# # Include the resource file
+# qt_add_resources(appPassepartout "resources"
+#     PREFIX "/"
+#     FILES
+#         images/bicycle.jpg
+#         images/cheese.jpg
+#         images/default_logo.jpg
+#         images/directory_symbol.png
+# )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
