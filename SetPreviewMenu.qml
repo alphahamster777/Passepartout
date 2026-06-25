@@ -269,7 +269,8 @@ Page {
 
                             Rectangle {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 160
+                                Layout.fillHeight: true
+                                Layout.minimumHeight: 120
                                 radius: 10
                                 color: modelData.imagePath !== "" ? "transparent" : "#eaf4fb"
                                 clip: true
@@ -298,15 +299,23 @@ Page {
                                 wrapMode: Text.WordWrap
                             }
 
-                            Rectangle { Layout.fillWidth: true; height: 1; color: "#eee" }
-
-                            Label {
+                            // Only rendered when the word has a hint
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                text: modelData.hint
-                                font.pixelSize: 17
-                                color: "#3498db"
-                                horizontalAlignment: Text.AlignHCenter
-                                wrapMode: Text.WordWrap
+                                spacing: 0
+                                visible: modelData.hint !== ""
+
+                                Rectangle { Layout.fillWidth: true; height: 1; color: "#eee" }
+
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: modelData.hint
+                                    font.pixelSize: 17
+                                    color: "#3498db"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    wrapMode: Text.WordWrap
+                                    topPadding: 4
+                                }
                             }
 
                             Button {
@@ -352,8 +361,6 @@ Page {
                                     }
                                 }
                             }
-
-                            Item { Layout.fillHeight: true }
                         }
                     }
                 }

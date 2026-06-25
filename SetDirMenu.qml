@@ -246,8 +246,8 @@ Page {
                                 var from = drag.source.visualIndex
                                 var to   = delegateRoot.visualIndex
                                 if (from !== to) {
-                                    visualModel.items.move(from, to)
-                                    itemModel.move(from, to)
+                                    visualModel.items.move(from, to, 1)
+                                    itemModel.move(from, to, 1)
                                 }
                             }
                         }

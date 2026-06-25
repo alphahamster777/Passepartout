@@ -21,7 +21,11 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Core CorePrivate Multimedia QuickControls2 QuickDialogs2 Network TextToSpeech)
+find_package(Qt6 REQUIRED COMPONENTS Quick Core  Multimedia QuickControls2 QuickDialogs2 Network TextToSpeech)
+
+if(Qt6_VERSION VERSION_GREATER_EQUAL "6.10.0")
+    find_package(Qt6 REQUIRED COMPONENTS CorePrivate)
+endif()
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -83,8 +87,16 @@ target_include_directories(RecSetManager
 )
 
 target_link_libraries(RecSetManager
-    PRIVATE DictRec RecSet Qt6::Core Qt6::CorePrivate
+    PRIVATE DictRec RecSet Qt6::Core
 )
+
+# QZipReader/QZipWriter private headers require explicit CorePrivate linkage in Qt 6.10+;
+# on older Qt6 the private include dirs were exposed transitively through Qt6::Core.
+if(Qt6_VERSION VERSION_GREATER_EQUAL "6.10.0")
+    target_link_libraries(RecSetManager PRIVATE Qt6::CorePrivate)
+else()
+    target_include_directories(RecSetManager PRIVATE ${Qt6Core_PRIVATE_INCLUDE_DIRS})
+endif()
 
 add_library(BaseTestController STATIC
     ${CMAKE_SOURCE_DIR}/include/baseTestController.h

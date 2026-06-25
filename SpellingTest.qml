@@ -230,6 +230,10 @@ Page {
             }
         }
 
+        // In MC mode (no image, no write section) this spacer shares the empty
+        // vertical space with the bottom spacer, centering the option group.
+        Item { Layout.fillHeight: true; visible: isMC }
+
         // ── Multiple-choice section (types C, D, Leitner MC phase) ────────────
         ColumnLayout {
             Layout.fillWidth: true
@@ -245,7 +249,7 @@ Page {
                     required property string modelData
                     Layout.fillWidth: true
                     text: modelData
-                    height: 52
+                    height: 56
 
                     readonly property bool isSelected: answerSubmitted &&
                         spellingTestController.selectedOption === index

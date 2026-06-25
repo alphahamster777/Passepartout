@@ -456,7 +456,7 @@ Page {
                                             elide: Text.ElideRight
                                             verticalAlignment: Text.AlignVCenter
                                         }
-                                        Label { text: "▾"; font.pixelSize: 10; color: "#7f8c8d" }
+                                        // Label { text: "▾"; font.pixelSize: 10; color: "#7f8c8d" }
                                     }
                                     MouseArea {
                                         anchors.fill: parent
@@ -514,7 +514,7 @@ Page {
                                             elide: Text.ElideRight
                                             verticalAlignment: Text.AlignVCenter
                                         }
-                                        Label { text: "▾"; font.pixelSize: 10; color: "#7f8c8d" }
+                                        // Label { text: "▾"; font.pixelSize: 10; color: "#7f8c8d" }
                                     }
                                     MouseArea {
                                         anchors.fill: parent

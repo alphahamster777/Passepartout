@@ -1,14 +1,16 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import SpellingTestController
 
 Page {
     id: page
     signal resultsNextPressed()
 
     property var spellingTestController: rootScope.spellingTestController
-    readonly property int ttype: spellingTestController.testType
-    readonly property bool isE_LeitnerType: ttype === spellingTestController.TypeE_Leitner
+    readonly property bool isE_LeitnerType:
+        spellingTestController.testType === SpellingTestController.TypeE_Leitner ||
+        spellingTestController.testType === SpellingTestController.TypeF_LeitnerReversed
     readonly property bool allCorrect:
         spellingTestController.totalQuestions > 0 &&
         spellingTestController.correctAnswers >= spellingTestController.totalQuestions
@@ -32,15 +34,15 @@ Page {
         spacing: 24
         width: parent.width * 0.8
 
-        // ── Score circle (hidden when all correct) ────────────────────────────
+        // ── Score circle (hidden for Leitner types) ───────────────────────────
         Rectangle {
             Layout.alignment: Qt.AlignHCenter
-            width: 160; height: 160
+            Layout.preferredWidth: 160
+            Layout.preferredHeight: 160
             radius: 80
-            visible: !isE_LeitnerType
             color: {
-                var ratio = spellingTestController.totalQuestions > 0
-                    ? spellingTestController.correctAnswers / spellingTestController.totalQuestions
+                var ratio = page.spellingTestController.totalQuestions > 0
+                    ? page.spellingTestController.correctAnswers / page.spellingTestController.totalQuestions
                     : 0
                 if (ratio >= 0.8) return "#27ae60"
                 if (ratio >= 0.5) return "#f39c12"
@@ -52,15 +54,15 @@ Page {
                 spacing: 2
                 Label {
                     Layout.alignment: Qt.AlignHCenter
-                    text: spellingTestController.correctAnswers
+                    text: page.isE_LeitnerType? qsTr("Well"): page.spellingTestController.correctAnswers
                     font.pixelSize: 52
                     font.bold: true
                     color: "white"
                 }
                 Label {
                     Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("out of %1").arg(spellingTestController.totalQuestions)
-                    font.pixelSize: 14
+                    text: page.isE_LeitnerType? qsTr("done"): qsTr("out of %1").arg(page.spellingTestController.totalQuestions)
+                    font.pixelSize: page.isE_LeitnerType? 30 : 14
                     color: "white"
                     opacity: 0.85
                 }
@@ -71,9 +73,9 @@ Page {
         Label {
             Layout.fillWidth: true
             text: {
-                if (isE_LeitnerType) return qsTr("Excellent work! Keep it up!")
-                var ratio = spellingTestController.totalQuestions > 0
-                    ? spellingTestController.correctAnswers / spellingTestController.totalQuestions
+                if (page.isE_LeitnerType) return qsTr("Excellent work! Keep it up!")
+                var ratio = page.spellingTestController.totalQuestions > 0
+                    ? page.spellingTestController.correctAnswers / page.spellingTestController.totalQuestions
                     : 0
                 if (ratio >= 0.8) return qsTr("Excellent work! Keep it up!")
                 if (ratio >= 0.5) return qsTr("Good effort! Keep practising.")
@@ -93,23 +95,24 @@ Page {
         color: "#2c3e50"
 
         Button {
+            id: practiceAgainBtn
             anchors.centerIn: parent
             width: parent.width * 0.7
             height: 44
             text: qsTr("Practice Again")
             background: Rectangle {
                 radius: 22
-                color: parent.pressed ? "#2980b9" : "#3498db"
+                color: practiceAgainBtn.pressed ? "#2980b9" : "#3498db"
             }
             contentItem: Text {
-                text: parent.text
+                text: practiceAgainBtn.text
                 color: "white"
                 font.pixelSize: 17
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            onClicked: resultsNextPressed()
+            onClicked: page.resultsNextPressed()
         }
     }
 }
