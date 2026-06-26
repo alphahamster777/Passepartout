@@ -23,6 +23,7 @@ Page {
     signal addRecSet()
     signal editRecSet(idx: int)
     signal folderSelected(path: string)
+    signal aboutRequested()
 
     property int exportSetIdx: -1
 
@@ -152,6 +153,22 @@ Page {
                 color: "#95a5a6"
                 Layout.alignment: Qt.AlignHCenter
             }
+        }
+
+        ToolButton {
+            visible: page.folderPath === ""
+            anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 8 }
+            text: "ⓘ"
+            font.pixelSize: 22
+            contentItem: Label {
+                text: "ⓘ"
+                font.pixelSize: 22
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+            background: Item {}
+            onClicked: page.aboutRequested()
         }
     }
 

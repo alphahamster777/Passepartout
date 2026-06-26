@@ -1,0 +1,15 @@
+This application uses Qt.
+
+Qt is copyright The Qt Company Ltd. and other contributors.
+Qt is used under the GNU Lesser General Public License version 3.
+
+The Qt libraries used by this application are not owned by the application author.
+You may use, modify, and replace the Qt libraries under the terms of the GNU LGPL v3.
+
+Qt source code is available from:
+https://www.qt.io/development/offline-installers
+https://code.qt.io/
+
+This application uses Qt dynamically linked libraries.
+
+No modifications were made to Qt.

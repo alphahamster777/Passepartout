@@ -72,12 +72,14 @@ ApplicationWindow {
         // Saved reference to the CreatingRecSet page so the camera result can update it
         property var creatingPageRef: null
 
-        Component { id: setDirMenu;         SetDirMenu {}       }
-        Component { id: creatingRecSetMenu; CreatingRecSet {}   }
-        Component { id: setPreviewMenu;     SetPreviewMenu {}   }
-        Component { id: spellingTestPage;   SpellingTest {}     }
-        Component { id: resultsPage;        Results {}          }
-        Component { id: cameraCaptureMenu;  CameraCapture {}    }
+        Component { id: setDirMenu;         SetDirMenu {}           }
+        Component { id: creatingRecSetMenu; CreatingRecSet {}       }
+        Component { id: setPreviewMenu;     SetPreviewMenu {}       }
+        Component { id: spellingTestPage;   SpellingTest {}         }
+        Component { id: resultsPage;        Results {}              }
+        Component { id: cameraCaptureMenu;  CameraCapture {}        }
+        Component { id: aboutPage;          AboutOpenSourcePage {}  }
+        Component { id: licenseTextPage;    LicenseTextPage {}      }
 
         ///////////////////////////////connections/////////////////////////////////////////
 
@@ -278,6 +280,28 @@ ApplicationWindow {
                     AppController.saveData()
                     AppController.recSetNameListChanged()
                     stackView.pop()
+                }
+            }
+        }
+
+        Loader {
+            active: stackView.currentItem && typeof stackView.currentItem.aboutRequested === "function"
+            sourceComponent: Component {
+                Connections {
+                    target: stackView.currentItem
+                    function onAboutRequested() { stackView.push(aboutPage) }
+                }
+            }
+        }
+
+        Loader {
+            active: stackView.currentItem && typeof stackView.currentItem.licenseRequested === "function"
+            sourceComponent: Component {
+                Connections {
+                    target: stackView.currentItem
+                    function onLicenseRequested(title, url) {
+                        stackView.push(licenseTextPage, { pageTitle: title, licenseUrl: url })
+                    }
                 }
             }
         }

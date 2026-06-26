@@ -198,7 +198,7 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml 
     IMPORTS LeitnerTestController SpellingTestController
 )
 
@@ -211,6 +211,13 @@ qt_add_qml_module(appPassepartout
 #         images/default_logo.jpg
 #         images/directory_symbol.png
 # )
+qt_add_resources(appPassepartout "license_resources"
+    PREFIX "/"
+    FILES
+        licenses/LGPL-3.0.txt
+        licenses/GPL-3.0.txt
+        licenses/qt_notice.txt
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
