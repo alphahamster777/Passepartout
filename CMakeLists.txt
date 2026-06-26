@@ -202,15 +202,12 @@ qt_add_qml_module(appPassepartout
     IMPORTS LeitnerTestController SpellingTestController
 )
 
-# # Include the resource file
-# qt_add_resources(appPassepartout "resources"
-#     PREFIX "/"
-#     FILES
-#         images/bicycle.jpg
-#         images/cheese.jpg
-#         images/default_logo.jpg
-#         images/directory_symbol.png
-# )
+target_link_libraries(appPassepartout
+    PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
+            Qt6::Network Qt6::TextToSpeech
+            SpellingTestController LeitnerTestController
+)
+
 qt_add_resources(appPassepartout "license_resources"
     PREFIX "/"
     FILES
@@ -230,14 +227,13 @@ set_target_properties(appPassepartout PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(appPassepartout
-    PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
-            Qt6::Network Qt6::TextToSpeech
-            SpellingTestController LeitnerTestController
+set_target_properties(appPassepartout PROPERTIES
+    QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android"
 )
 
 set_target_properties(appPassepartout PROPERTIES
-    QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android"
+    QT_ANDROID_VERSION_CODE "1"
+    QT_ANDROID_VERSION_NAME "1.0.0"
 )
 
 # Bundle OpenSSL 3.x for Android so HTTPS (Wikipedia image fetch) works.
