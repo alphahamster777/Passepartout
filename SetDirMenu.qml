@@ -156,7 +156,6 @@ Page {
         }
 
         ToolButton {
-            visible: page.folderPath === ""
             anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 8 }
             text: "ⓘ"
             font.pixelSize: 22
