@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Android 15 (API 35) enforces edge-to-edge by default for apps targeting SDK 35,
+        making the window extend behind the transparent status bar and navigation bar.
+        Qt 6.8 does not yet fully compensate for this in its ApplicationWindow safe-area
+        handling, causing the Page header to overlap with the status bar.
+
+        This attribute opts out of the forced edge-to-edge behaviour so the window is
+        positioned the classic way (content starts below the status bar) until the QML
+        layout is updated to handle insets explicitly.  The attribute is silently ignored
+        on API < 35.
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+</resources>

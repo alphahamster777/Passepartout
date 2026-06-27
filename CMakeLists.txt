@@ -219,26 +219,37 @@ qt_add_resources(appPassepartout "license_resources"
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
-set_target_properties(appPassepartout PROPERTIES
-#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appPassepartout
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
+if(IOS)
+    set_target_properties(appPassepartout PROPERTIES
+    #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.passepartout
+        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        MACOSX_BUNDLE TRUE
+        WIN32_EXECUTABLE TRUE
+    )
+elseif(ANDROID)
+    set_target_properties(appPassepartout PROPERTIES
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android"
+        # Display name shown on the launcher icon
+        QT_ANDROID_APP_NAME "Passepartout"
+        # Google Play use the number to decide whether one build is newer than another.
+        # Every public release must use a higher value than the previous one.
+        QT_ANDROID_VERSION_CODE "3"
+        # Human-readable app version
+        QT_ANDROID_VERSION_NAME "1.0.1"
 
-set_target_properties(appPassepartout PROPERTIES
-    QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android"
-)
+        # Minimum Android version your app can run on (e.g., Android 8.0)
+        QT_ANDROID_MIN_SDK_VERSION "26"
 
-set_target_properties(appPassepartout PROPERTIES
-    QT_ANDROID_VERSION_CODE "1"
-    QT_ANDROID_VERSION_NAME "1.0.0"
-)
+        # Target SDK version forced to API 35 to fix the Play Store error
+        QT_ANDROID_TARGET_SDK_VERSION "35"
 
-# Bundle OpenSSL 3.x for Android so HTTPS (Wikipedia image fetch) works.
-# KDAB's android_openssl provides pre-built arm64-v8a libssl_3.so / libcrypto_3.so.
-if(ANDROID)
+        # Automatically signs the bundle if you configure keystore in Qt Creator
+        QT_ANDROID_SIGN_PACKAGE ON
+    )
+
+    # Bundle OpenSSL 3.x for Android so HTTPS (Wikipedia image fetch) works.
+    # KDAB's android_openssl provides pre-built arm64-v8a libssl_3.so / libcrypto_3.so.
     include(FetchContent)
     FetchContent_Declare(
         android_openssl
