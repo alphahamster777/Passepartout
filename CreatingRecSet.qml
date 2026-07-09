@@ -26,6 +26,7 @@ Page {
     property int langPickerCardIndex: -1     // card whose language is being picked
     property bool langPickerIsFrom: true     // true = word/expr language, false = hint language
     property int langPickerCurrentId: -1    // enum value of the currently selected language
+    property bool titleError: false
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     background: Rectangle { color: "#f0f4f8" }
@@ -328,10 +329,12 @@ Page {
             background: Rectangle {
                 radius: 8
                 color: "white"
-                border.color: topTextField.activeFocus ? "#3498db" : "#dce1e7"
-                border.width: topTextField.activeFocus ? 2 : 1
+                border.color: page.titleError ? "#e74c3c"
+                            : topTextField.activeFocus ? "#3498db" : "#dce1e7"
+                border.width: (page.titleError || topTextField.activeFocus) ? 2 : 1
             }
             leftPadding: 12
+            onTextChanged: page.titleError = false
         }
 
         // ── Auto-fetch toggle ─────────────────────────────────────────────────
@@ -960,7 +963,13 @@ Page {
                     text: parent.text; color: "white"; font.pixelSize: 16; font.bold: true
                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                 }
-                onClicked: creatingRecSetSave()
+                onClicked: {
+                    if (topTextField.text.trim() === "") {
+                        page.titleError = true
+                    } else {
+                        creatingRecSetSave()
+                    }
+                }
             }
 
             Button {
