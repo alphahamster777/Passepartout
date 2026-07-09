@@ -16,9 +16,11 @@ Page {
             spacing: 16
 
             Label {
-                text: qsTr("Passepartout")
+                text: qsTr(
+                    "<b>Passepartout</b>" +
+                    "<font color='#1e88e5'> v%1</font>"
+                ).arg(Qt.application.version)
                 font.pixelSize: 24
-                font.bold: true
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }

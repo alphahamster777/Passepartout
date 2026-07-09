@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 0.1 LANGUAGES CXX)
+project(Passepartout VERSION 1.0.2 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
@@ -223,7 +223,7 @@ if(IOS)
     set_target_properties(appPassepartout PROPERTIES
     #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.passepartout
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
         MACOSX_BUNDLE TRUE
         WIN32_EXECUTABLE TRUE
     )
@@ -236,7 +236,7 @@ elseif(ANDROID)
         # Every public release must use a higher value than the previous one.
         QT_ANDROID_VERSION_CODE "4"
         # Human-readable app version
-        QT_ANDROID_VERSION_NAME "1.0.2"
+        QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 
         # Minimum Android version your app can run on (e.g., Android 8.0)
         QT_ANDROID_MIN_SDK_VERSION "26"
@@ -261,6 +261,8 @@ elseif(ANDROID)
     include("${android_openssl_SOURCE_DIR}/android_openssl.cmake")
     add_android_openssl_libraries(appPassepartout)
 endif()
+
+target_compile_definitions(appPassepartout PRIVATE APP_VERSION="${PROJECT_VERSION}")
 
 include(GNUInstallDirs)
 install(TARGETS appPassepartout
