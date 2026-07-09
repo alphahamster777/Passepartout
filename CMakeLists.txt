@@ -234,9 +234,9 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "3"
+        QT_ANDROID_VERSION_CODE "4"
         # Human-readable app version
-        QT_ANDROID_VERSION_NAME "1.0.1"
+        QT_ANDROID_VERSION_NAME "1.0.2"
 
         # Minimum Android version your app can run on (e.g., Android 8.0)
         QT_ANDROID_MIN_SDK_VERSION "26"

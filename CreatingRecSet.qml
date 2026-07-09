@@ -562,7 +562,7 @@ Page {
                                 // Image box
                                 Rectangle {
                                     Layout.fillWidth: true
-                                    height: 72
+                                    height: 96
                                     radius: 8
                                     color: "#f7f9fb"
                                     border.color: "#c8d6e5"
@@ -578,34 +578,41 @@ Page {
                                     }
 
                                     ColumnLayout {
-                                        anchors.centerIn: parent
-                                        spacing: 3
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        spacing: 4
 
                                         Label {
                                             text: imagePath !== "" ? qsTr("Change image") : qsTr("Add image")
                                             font.pixelSize: 11
                                             color: imagePath !== "" ? "#27ae60" : "#95a5a6"
-                                            Layout.alignment: Qt.AlignHCenter
+                                            Layout.fillWidth: true
+                                            horizontalAlignment: Text.AlignHCenter
                                         }
 
                                         RowLayout {
-                                            Layout.alignment: Qt.AlignHCenter
+                                            Layout.fillWidth: true
                                             spacing: 4
 
                                             // Auto-fetch button
                                             Button {
                                                 visible: imagePath === "" && page.autoMedia && exprField.text.trim() !== ""
-                                                implicitWidth: 56; implicitHeight: 22
+                                                Layout.fillWidth: true
+                                                implicitHeight: 38
                                                 text: qsTr("Fetch")
                                                 font.pixelSize: 10
                                                 background: Rectangle {
-                                                    radius: 11
+                                                    radius: 19
                                                     color: parent.pressed ? "#2980b9" : "#3498db"
                                                 }
-                                                contentItem: Text {
-                                                    text: parent.text; color: "white"; font: parent.font
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    verticalAlignment: Text.AlignVCenter
+                                                contentItem: Item {
+                                                    anchors.fill: parent
+                                                    Text {
+                                                        anchors.centerIn: parent
+                                                        text: parent.parent.text
+                                                        color: "white"
+                                                        font.pixelSize: 10
+                                                    }
                                                 }
                                                 onClicked: {
                                                     page.activeCardIndex = index
@@ -615,17 +622,22 @@ Page {
 
                                             // Camera button
                                             Button {
-                                                implicitWidth: 56; implicitHeight: 22
+                                                Layout.fillWidth: true
+                                                implicitHeight: 38
                                                 text: qsTr("Camera")
                                                 font.pixelSize: 10
                                                 background: Rectangle {
-                                                    radius: 11
+                                                    radius: 19
                                                     color: parent.pressed ? "#7f5b00" : "#f39c12"
                                                 }
-                                                contentItem: Text {
-                                                    text: parent.text; color: "white"; font: parent.font
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    verticalAlignment: Text.AlignVCenter
+                                                contentItem: Item {
+                                                    anchors.fill: parent
+                                                    Text {
+                                                        anchors.centerIn: parent
+                                                        text: parent.parent.text
+                                                        color: "white"
+                                                        font.pixelSize: 10
+                                                    }
                                                 }
                                                 onClicked: {
                                                     page.activeCardIndex = index
@@ -643,13 +655,15 @@ Page {
                                     // Remove image button
                                     Rectangle {
                                         visible: imagePath !== ""
-                                        width: 20; height: 20
-                                        radius: 10
+                                        width: 24; height: 24
+                                        radius: 12
                                         color: "#e74c3c"
                                         anchors { top: parent.top; right: parent.right; margins: 4 }
-                                        Label {
-                                            text: "x"; color: "white"; font.pixelSize: 12
+                                        Text {
+                                            text: "x"; color: "white"; font.pixelSize: 14; font.bold: true
                                             anchors.centerIn: parent
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
                                         }
                                         MouseArea {
                                             anchors.fill: parent
@@ -661,7 +675,7 @@ Page {
                                 // Audio box
                                 Rectangle {
                                     Layout.fillWidth: true
-                                    height: 72
+                                    height: 96
                                     radius: 8
                                     color: "#f7f9fb"
                                     border.color: "#c8d6e5"
@@ -677,7 +691,8 @@ Page {
                                     }
 
                                     ColumnLayout {
-                                        anchors.centerIn: parent
+                                        anchors.fill: parent
+                                        anchors.margins: 8
                                         spacing: 4
 
                                         Label {
@@ -689,124 +704,143 @@ Page {
                                             }
                                             font.pixelSize: 11
                                             color: audioPath !== "" ? "#27ae60" : "#95a5a6"
-                                            Layout.alignment: Qt.AlignHCenter
+                                            Layout.fillWidth: true
+                                            horizontalAlignment: Text.AlignHCenter
                                             wrapMode: Text.NoWrap
                                         }
 
-                                        // Play / Stop button for file audio
-                                        Button {
-                                            visible: audioPath !== ""
-                                            Layout.alignment: Qt.AlignHCenter
-                                            implicitWidth: 52; implicitHeight: 26
+                                        // One 32px slot — Play or TTS+Rec, never both
+                                        Item {
+                                            Layout.fillWidth: true
+                                            implicitHeight: 38
 
-                                            readonly property bool isPlaying:
-                                                audioPlayer.playbackState === MediaPlayer.PlayingState &&
-                                                page.currentPlayingPath === audioPath
-
-                                            text: isPlaying ? qsTr("■ Stop") : qsTr("▶ Play")
-                                            font.pixelSize: 10
-
-                                            background: Rectangle {
-                                                radius: 13
-                                                color: parent.isPlaying
-                                                    ? (parent.pressed ? "#c0392b" : "#e74c3c")
-                                                    : (parent.pressed ? "#1a6ca8" : "#3498db")
-                                            }
-                                            contentItem: Text {
-                                                text: parent.text; color: "white"; font: parent.font
-                                                horizontalAlignment: Text.AlignHCenter
-                                                verticalAlignment: Text.AlignVCenter
-                                            }
-                                            onClicked: {
-                                                if (isPlaying) {
-                                                    audioPlayer.stop()
-                                                    page.currentPlayingPath = ""
-                                                } else {
-                                                    audioPlayer.stop()
-                                                    page.currentPlayingPath = audioPath
-                                                    audioPlayer.source = audioPath
-                                                    audioPlayer.play()
-                                                }
-                                            }
-                                        }
-
-                                        // Row: TTS preview + Record mic (when no audio file set)
-                                        RowLayout {
-                                            visible: audioPath === ""
-                                            Layout.alignment: Qt.AlignHCenter
-                                            spacing: 6
-
-                                            // TTS preview
+                                            // Play / Stop (when audio file exists)
                                             Button {
-                                                visible: exprField.text.trim() !== ""
-                                                implicitWidth: 58; implicitHeight: 24
+                                                visible: audioPath !== ""
+                                                anchors.fill: parent
 
-                                                readonly property bool isSpeakingThis:
-                                                    MediaHelper.speaking &&
-                                                    page.currentPlayingPath === ("tts://" + expression)
+                                                readonly property bool isPlaying:
+                                                    audioPlayer.playbackState === MediaPlayer.PlayingState &&
+                                                    page.currentPlayingPath === audioPath
 
-                                                text: isSpeakingThis ? qsTr("■") : qsTr("▶ TTS")
+                                                text: isPlaying ? qsTr("■ Stop") : qsTr("▶ Play")
                                                 font.pixelSize: 10
 
                                                 background: Rectangle {
-                                                    radius: 12
-                                                    color: parent.isSpeakingThis
+                                                    radius: 19
+                                                    color: parent.isPlaying
                                                         ? (parent.pressed ? "#c0392b" : "#e74c3c")
-                                                        : (parent.pressed ? "#7f5b00" : "#f39c12")
+                                                        : (parent.pressed ? "#1a6ca8" : "#3498db")
                                                 }
-                                                contentItem: Text {
-                                                    text: parent.text; color: "white"; font: parent.font
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    verticalAlignment: Text.AlignVCenter
+                                                contentItem: Item {
+                                                    anchors.fill: parent
+                                                    Text {
+                                                        anchors.centerIn: parent
+                                                        text: parent.parent.text
+                                                        color: "white"
+                                                        font.pixelSize: 10
+                                                    }
                                                 }
                                                 onClicked: {
-                                                    var key = "tts://" + expression
-                                                    if (isSpeakingThis) {
-                                                        MediaHelper.stopSpeaking()
+                                                    if (isPlaying) {
+                                                        audioPlayer.stop()
                                                         page.currentPlayingPath = ""
                                                     } else {
-                                                        MediaHelper.stopSpeaking()
                                                         audioPlayer.stop()
-                                                        page.currentPlayingPath = key
-                                                        MediaHelper.speak(exprField.text.trim(), languageFrom)
+                                                        page.currentPlayingPath = audioPath
+                                                        audioPlayer.source = audioPath
+                                                        audioPlayer.play()
                                                     }
                                                 }
                                             }
 
-                                            // Microphone record button
-                                            Button {
-                                                implicitWidth: 58; implicitHeight: 24
+                                            // TTS + Rec (when no audio file)
+                                            RowLayout {
+                                                visible: audioPath === ""
+                                                anchors.fill: parent
+                                                spacing: 6
 
-                                                readonly property bool isRecordingThis:
-                                                    audioRecorder.recorderState === MediaRecorder.RecordingState &&
-                                                    page.recordingCardIndex === index
+                                                // TTS preview
+                                                Button {
+                                                    visible: exprField.text.trim() !== ""
+                                                    Layout.fillWidth: true
+                                                    implicitHeight: 38
 
-                                                text: isRecordingThis ? qsTr("⬛ Stop") : qsTr("● Rec")
-                                                font.pixelSize: 10
+                                                    readonly property bool isSpeakingThis:
+                                                        MediaHelper.speaking &&
+                                                        page.currentPlayingPath === ("tts://" + expression)
 
-                                                background: Rectangle {
-                                                    radius: 12
-                                                    color: parent.isRecordingThis
-                                                        ? (parent.pressed ? "#c0392b" : "#e74c3c")
-                                                        : (parent.pressed ? "#1a3a00" : "#27ae60")
-                                                }
-                                                contentItem: Text {
-                                                    text: parent.text; color: "white"; font: parent.font
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    verticalAlignment: Text.AlignVCenter
-                                                }
-                                                onClicked: {
-                                                    if (isRecordingThis) {
-                                                        audioRecorder.stop()
-                                                    } else {
-                                                        // Stop any other active recording first
-                                                        if (audioRecorder.recorderState === MediaRecorder.RecordingState)
-                                                            audioRecorder.stop()
-                                                        if (MediaHelper.hasMicrophonePermission()) {
-                                                            page.startRecording(index)
+                                                    text: isSpeakingThis ? qsTr("■") : qsTr("▶ TTS")
+                                                    font.pixelSize: 10
+
+                                                    background: Rectangle {
+                                                        radius: 19
+                                                        color: parent.isSpeakingThis
+                                                            ? (parent.pressed ? "#c0392b" : "#e74c3c")
+                                                            : (parent.pressed ? "#7f5b00" : "#f39c12")
+                                                    }
+                                                    contentItem: Item {
+                                                        anchors.fill: parent
+                                                        Text {
+                                                            anchors.centerIn: parent
+                                                            text: parent.parent.text
+                                                            color: "white"
+                                                            font.pixelSize: 10
+                                                        }
+                                                    }
+                                                    onClicked: {
+                                                        var key = "tts://" + expression
+                                                        if (isSpeakingThis) {
+                                                            MediaHelper.stopSpeaking()
+                                                            page.currentPlayingPath = ""
                                                         } else {
-                                                            page.pendingRecordCardIndex = index
-                                                            MediaHelper.requestMicrophonePermission()
+                                                            MediaHelper.stopSpeaking()
+                                                            audioPlayer.stop()
+                                                            page.currentPlayingPath = key
+                                                            MediaHelper.speak(exprField.text.trim(), languageFrom)
+                                                        }
+                                                    }
+                                                }
+
+                                                // Microphone record button
+                                                Button {
+                                                    Layout.fillWidth: true
+                                                    implicitHeight: 38
+
+                                                    readonly property bool isRecordingThis:
+                                                        audioRecorder.recorderState === MediaRecorder.RecordingState &&
+                                                        page.recordingCardIndex === index
+
+                                                    text: isRecordingThis ? qsTr("⬛ Stop") : qsTr("● Rec")
+                                                    font.pixelSize: 10
+
+                                                    background: Rectangle {
+                                                        radius: 19
+                                                        color: parent.isRecordingThis
+                                                            ? (parent.pressed ? "#c0392b" : "#e74c3c")
+                                                            : (parent.pressed ? "#1a3a00" : "#27ae60")
+                                                    }
+                                                    contentItem: Item {
+                                                        anchors.fill: parent
+                                                        Text {
+                                                            anchors.centerIn: parent
+                                                            text: parent.parent.text
+                                                            color: "white"
+                                                            font.pixelSize: 10
+                                                        }
+                                                    }
+                                                    onClicked: {
+                                                        if (isRecordingThis) {
+                                                            audioRecorder.stop()
+                                                        } else {
+                                                            if (audioRecorder.recorderState === MediaRecorder.RecordingState)
+                                                                audioRecorder.stop()
+                                                            if (MediaHelper.hasMicrophonePermission()) {
+                                                                page.startRecording(index)
+                                                            } else {
+                                                                page.pendingRecordCardIndex = index
+                                                                MediaHelper.requestMicrophonePermission()
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -817,13 +851,15 @@ Page {
                                     // Remove audio
                                     Rectangle {
                                         visible: audioPath !== ""
-                                        width: 20; height: 20
-                                        radius: 10
+                                        width: 24; height: 24
+                                        radius: 12
                                         color: "#e74c3c"
                                         anchors { top: parent.top; right: parent.right; margins: 4 }
-                                        Label {
-                                            text: "x"; color: "white"; font.pixelSize: 12
+                                        Text {
+                                            text: "x"; color: "white"; font.pixelSize: 14; font.bold: true
                                             anchors.centerIn: parent
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
                                         }
                                         MouseArea {
                                             anchors.fill: parent
