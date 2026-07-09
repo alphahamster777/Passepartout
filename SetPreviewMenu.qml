@@ -83,7 +83,7 @@ Page {
                               icon: "✍️", title: qsTr("Write the Word"),
                               desc: qsTr("See the hint — type the expression") },
                             { type: SpellingTestController.TypeB_WriteFromWord,
-                              icon: "\u21c4 ✍️", title: qsTr("Write the Hint (Reversed)"),
+                              icon: "\u21c4 ✍️", title: qsTr("Write the Hint"),
                               desc: qsTr("See the word — type its translation") },
                             { type: SpellingTestController.TypeC_MCFromHint,
                               icon: "🔍", title: qsTr("Pick the Word"),
@@ -95,8 +95,8 @@ Page {
                               icon: "📚", title: qsTr("Progressive Learning"),
                               desc: qsTr("MC to learn, then write to master all words") },
                             { type: SpellingTestController.TypeF_LeitnerReversed,
-                              icon: "⇄ 📚", title: qsTr("Progressive Learning (Reversed)"),
-                              desc: qsTr("See the word — pick hint to learn, then type to master") }
+                              icon: "⇄ 📚", title: qsTr("Reversed Progressive Learning"),
+                              desc: qsTr("MC to learn, then write to master all hints") }
                         ]
 
                         SwipeDelegate {
