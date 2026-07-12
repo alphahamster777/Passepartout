@@ -243,20 +243,31 @@ ApplicationWindow {
                 }
 
                 function onCreatingRecSetSave() {
-                    var recSetName   = stackView.currentItem.recSetName
-                    var recSetIdx    = stackView.currentItem.recSetIdx
+                    var recSetName    = stackView.currentItem.recSetName
+                    var recSetIdx     = stackView.currentItem.recSetIdx
                     var recFolderPath = stackView.currentItem.folderPath
-                    var modelRef     = stackView.currentItem.recSetModelRef
-                    var mgr          = AppController.recSetManager
+                    var modelRef      = stackView.currentItem.recSetModelRef
+                    var mgr           = AppController.recSetManager
 
                     if (recSetName === "") return
 
                     if (recSetIdx === -1) {
-                        mgr.createRecSet(recSetName, recFolderPath)
+                        // Names only need to be unique within their own folder.
+                        recSetIdx = mgr.createRecSet(recSetName, recFolderPath)
+                        if (recSetIdx === -1) {
+                            stackView.currentItem.titleErrorMessage =
+                                qsTr("A library or set with this name already exists here.")
+                            stackView.currentItem.titleError = true
+                            return
+                        }
                     } else {
-                        var oldInfo = mgr.getRecSetInfoQML(recSetIdx)
-                        mgr.clearRecordsFromRecSet(oldInfo.name)
-                        mgr.renameRecSet(recSetIdx, recSetName)
+                        if (!mgr.renameRecSet(recSetIdx, recSetName)) {
+                            stackView.currentItem.titleErrorMessage =
+                                qsTr("A library or set with this name already exists here.")
+                            stackView.currentItem.titleError = true
+                            return
+                        }
+                        mgr.clearRecordsFromRecSetAt(recSetIdx)
                     }
 
                     for (var i = 0; i < modelRef.count; ++i) {
@@ -274,7 +285,7 @@ ApplicationWindow {
                             audioPath:    rec.audioPath,
                             imagePath:    rec.imagePath
                         }
-                        mgr.addRecToRecSet(recSetName, wordData)
+                        mgr.addRecToRecSetAt(recSetIdx, wordData)
                     }
 
                     AppController.saveData()

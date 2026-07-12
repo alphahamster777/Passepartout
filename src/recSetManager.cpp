@@ -3,6 +3,7 @@
 #include <private/qzipreader_p.h>
 #include <private/qzipwriter_p.h>
 #include <QFileInfo>
+#include <QPair>
 #include <QUuid>
 
 RecSetManager::RecSetManager(QObject *parent) : QObject(parent) {}
@@ -50,20 +51,18 @@ void RecSetManager::removeFromOrder(const QString& folderPath, const QString& ke
 
 // ── Set CRUD ──────────────────────────────────────────────────────────────────
 
-bool RecSetManager::createRecSet(const QString &setName) {
+int RecSetManager::createRecSet(const QString &setName) {
     return createRecSet(setName, QString());
 }
 
-bool RecSetManager::createRecSet(const QString &setName, const QString &folderPath) {
-    for (const auto& rs : m_recSetVec) {
-        if (rs.getSetName() == setName)
-            return false;
-    }
+int RecSetManager::createRecSet(const QString &setName, const QString &folderPath) {
+    if (isFolderNameTaken(folderPath, setName))
+        return -1;
     RecSet rs(setName);
     rs.setFolderPath(folderPath);
     m_recSetVec.push_back(std::move(rs));
     ensureInOrder(folderPath, "set:" + setName);
-    return true;
+    return static_cast<int>(m_recSetVec.size()) - 1;
 }
 
 bool RecSetManager::deleteRecSet(const QString &setName) {
@@ -77,12 +76,36 @@ bool RecSetManager::deleteRecSet(const QString &setName) {
     return false;
 }
 
+bool RecSetManager::deleteRecSetAt(int idx) {
+    if (idx < 0 || idx >= m_recSetVec.size()) return false;
+    const auto& rs = m_recSetVec.at(idx);
+    removeFromOrder(rs.getFolderPath(), "set:" + rs.getSetName());
+    m_recSetVec.erase(m_recSetVec.begin() + idx);
+    return true;
+}
+
 bool RecSetManager::renameRecSet(int i, const QString &setName) {
-    if (i >= 0 && i < m_recSetVec.size()) {
-        m_recSetVec[i].setRecSetName(setName);
-        return true;
-    }
-    return false;
+    if (i < 0 || i >= m_recSetVec.size()) return false;
+    const QString folderPath = m_recSetVec.at(i).getFolderPath();
+    const QString oldName    = m_recSetVec.at(i).getSetName();
+    if (oldName == setName) return true;
+    if (isFolderNameTaken(folderPath, setName))
+        return false;
+    removeFromOrder(folderPath, "set:" + oldName);
+    m_recSetVec[i].setRecSetName(setName);
+    ensureInOrder(folderPath, "set:" + setName);
+    return true;
+}
+
+DictRec RecSetManager::dictRecFromVariant(const QVariantMap &rec) {
+    return DictRec{
+        static_cast<size_t>(rec.value("languageFrom").toInt()),
+        static_cast<size_t>(rec.value("languageTo"  ).toInt()),
+        rec.value("expression").toString(),
+        rec.value("hint"      ).toString(),
+        rec.value("audioPath" ).toString(),
+        rec.value("imagePath" ).toString()
+    };
 }
 
 void RecSetManager::addRecToRecSet(const QString &setName, const DictRec &newWord) {
@@ -97,15 +120,12 @@ void RecSetManager::addRecToRecSet(const QString &setName, const DictRec &newWor
 }
 
 void RecSetManager::addRecToRecSet(const QString &setName, const QVariantMap &rec) {
-    DictRec dr{
-        static_cast<size_t>(rec.value("languageFrom").toInt()),
-        static_cast<size_t>(rec.value("languageTo"  ).toInt()),
-        rec.value("expression").toString(),
-        rec.value("hint"      ).toString(),
-        rec.value("audioPath" ).toString(),
-        rec.value("imagePath" ).toString()
-    };
-    addRecToRecSet(setName, dr);
+    addRecToRecSet(setName, dictRecFromVariant(rec));
+}
+
+void RecSetManager::addRecToRecSetAt(int idx, const QVariantMap &rec) {
+    if (idx < 0 || idx >= m_recSetVec.size()) return;
+    m_recSetVec[idx].addWord(dictRecFromVariant(rec));
 }
 
 bool RecSetManager::removeRecFromRecSet(const QString &setName, const DictRec &setElement) {
@@ -124,6 +144,12 @@ bool RecSetManager::clearRecordsFromRecSet(const QString &setName) {
         }
     }
     return false;
+}
+
+bool RecSetManager::clearRecordsFromRecSetAt(int idx) {
+    if (idx < 0 || idx >= m_recSetVec.size()) return false;
+    m_recSetVec[idx].clearWords();
+    return true;
 }
 
 QVariantMap RecSetManager::getRecSetInfoQML(int idx) {
@@ -154,9 +180,13 @@ QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
             validFolderKeys.insert("folder:" + it.key());
     }
 
-    QMap<QString, int> setIndexByName;
-    for (int i = 0; i < m_recSetVec.size(); ++i)
-        setIndexByName[m_recSetVec.at(i).getSetName()] = i;
+    // Set names are only unique within a folder, so index sets by (folder, name) —
+    // not by name alone — to avoid resolving to a same-named set in another folder.
+    QMap<QPair<QString, QString>, int> setIndexByFolderAndName;
+    for (int i = 0; i < m_recSetVec.size(); ++i) {
+        const auto& rs = m_recSetVec.at(i);
+        setIndexByFolderAndName[{rs.getFolderPath(), rs.getSetName()}] = i;
+    }
 
     // Start with explicitly ordered items for this folder
     QVariantList result;
@@ -193,10 +223,9 @@ QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
                 result.append(item);
             } else if (key.startsWith(QLatin1String("set:"))) {
                 QString name = key.mid(4);
-                auto sit = setIndexByName.find(name);
-                if (sit == setIndexByName.end()) continue;
+                auto sit = setIndexByFolderAndName.find({folderPath, name});
+                if (sit == setIndexByFolderAndName.end()) continue;
                 int idx = sit.value();
-                if (m_recSetVec.at(idx).getFolderPath() != folderPath) continue;
                 QVariantMap item;
                 item["type"]     = QStringLiteral("set");
                 item["name"]     = name;
@@ -226,10 +255,41 @@ QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
     return result;
 }
 
+bool RecSetManager::isLibraryNameTaken(const QString& parentPath, const QString& name,
+                                        const QString& excludeFullPath) const {
+    if (name.isEmpty()) return false;
+    QString fullPath = parentPath.isEmpty() ? name : parentPath + "/" + name;
+    if (fullPath == excludeFullPath) return false;
+
+    auto it = m_folderItemOrder.find(parentPath);
+    return it != m_folderItemOrder.end() && it->contains("folder:" + fullPath);
+}
+
+bool RecSetManager::isSetNameTaken(const QString& parentPath, const QString& name,
+                                    int excludeSetIdx) const {
+    if (name.isEmpty()) return false;
+    for (int i = 0; i < m_recSetVec.size(); ++i) {
+        if (i == excludeSetIdx) continue;
+        const auto& rs = m_recSetVec.at(i);
+        if (rs.getFolderPath() == parentPath && rs.getSetName() == name)
+            return true;
+    }
+    return false;
+}
+
+bool RecSetManager::isFolderNameTaken(const QString& parentPath, const QString& name,
+                                       const QString& excludeFullPath) const {
+    return isLibraryNameTaken(parentPath, name, excludeFullPath) ||
+           isSetNameTaken(parentPath, name);
+}
+
 bool RecSetManager::createFolder(const QString& folderPath) {
     if (folderPath.isEmpty()) return false;
-    // Mark this folder in the parent's order list and ensure it has an entry in the map
     QString parent = parentOf(folderPath);
+    QString name   = folderPath.section('/', -1);
+    if (isFolderNameTaken(parent, name))
+        return false;
+    // Mark this folder in the parent's order list and ensure it has an entry in the map
     ensureInOrder(parent, "folder:" + folderPath);
     if (!m_folderItemOrder.contains(folderPath))
         m_folderItemOrder[folderPath] = {};
@@ -266,6 +326,12 @@ bool RecSetManager::deleteFolder(const QString& folderPath) {
 
 bool RecSetManager::renameFolder(const QString& oldPath, const QString& newPath) {
     if (oldPath.isEmpty() || newPath.isEmpty()) return false;
+    if (oldPath == newPath) return true;
+
+    QString newParent = parentOf(newPath);
+    QString newName   = newPath.section('/', -1);
+    if (isFolderNameTaken(newParent, newName, oldPath))
+        return false;
 
     // Update all sets whose folderPath starts with oldPath
     for (auto& rs : m_recSetVec) {
@@ -311,15 +377,33 @@ bool RecSetManager::renameFolder(const QString& oldPath, const QString& newPath)
     return true;
 }
 
-bool RecSetManager::moveSetToFolder(int setIdx, const QString& newFolderPath) {
+bool RecSetManager::moveSetToFolder(int setIdx, const QString& newFolderPath, bool overwrite) {
     if (setIdx < 0 || setIdx >= m_recSetVec.size()) return false;
-    auto& rs = m_recSetVec[setIdx];
-    QString oldFolder = rs.getFolderPath();
-    QString setName   = rs.getSetName();
+    QString oldFolder = m_recSetVec.at(setIdx).getFolderPath();
+    QString setName   = m_recSetVec.at(setIdx).getSetName();
     if (oldFolder == newFolderPath) return false;
 
+    // A library with the same name can't be overwritten by a set.
+    if (isLibraryNameTaken(newFolderPath, setName)) return false;
+
+    int clashIdx = -1;
+    for (int i = 0; i < m_recSetVec.size(); ++i) {
+        if (i == setIdx) continue;
+        if (m_recSetVec.at(i).getFolderPath() == newFolderPath &&
+            m_recSetVec.at(i).getSetName() == setName) {
+            clashIdx = i;
+            break;
+        }
+    }
+    if (clashIdx != -1) {
+        if (!overwrite) return false;
+        removeFromOrder(newFolderPath, "set:" + setName);
+        m_recSetVec.erase(m_recSetVec.begin() + clashIdx);
+        if (clashIdx < setIdx) --setIdx;
+    }
+
     removeFromOrder(oldFolder, "set:" + setName);
-    rs.setFolderPath(newFolderPath);
+    m_recSetVec[setIdx].setFolderPath(newFolderPath);
     ensureInOrder(newFolderPath, "set:" + setName);
     return true;
 }
@@ -329,7 +413,8 @@ bool RecSetManager::reorderFolderItems(const QString& folderPath, const QStringL
     return true;
 }
 
-bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString& newParentPath) {
+bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString& newParentPath,
+                                        bool merge, const QStringList& overwriteKeys) {
     if (folderPath.isEmpty()) return false;
 
     QString lastName = folderPath.section('/', -1);
@@ -339,6 +424,15 @@ bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString&
     // Prevent moving a folder into itself or any of its descendants
     if (newParentPath == folderPath || newParentPath.startsWith(folderPath + "/"))
         return false;
+    // A set with the same name can't be merged into or replaced by a library.
+    if (isSetNameTaken(newParentPath, lastName)) return false;
+
+    if (isLibraryNameTaken(newParentPath, lastName, folderPath)) {
+        if (!merge) return false;
+        mergeFolderInto(folderPath, newPath,
+                         QSet<QString>(overwriteKeys.cbegin(), overwriteKeys.cend()));
+        return true;
+    }
 
     // 1. Update folderPath on every set inside this subtree
     for (auto& rs : m_recSetVec) {
@@ -377,6 +471,102 @@ bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString&
     ensureInOrder(newParentPath, "folder:" + newPath);
 
     return true;
+}
+
+QVariantList RecSetManager::findMergeSetConflicts(const QString& sourcePath, const QString& destPath) const {
+    QVariantList result;
+
+    for (const auto& rs : m_recSetVec) {
+        if (rs.getFolderPath() == sourcePath && isSetNameTaken(destPath, rs.getSetName())) {
+            QVariantMap m;
+            m["name"]       = rs.getSetName();
+            m["destFolder"] = destPath;
+            result.append(m);
+        }
+    }
+
+    auto orderIt = m_folderItemOrder.find(sourcePath);
+    if (orderIt != m_folderItemOrder.end()) {
+        for (const QString& key : orderIt.value()) {
+            if (!key.startsWith(QLatin1String("folder:"))) continue;
+            QString fp = key.mid(7);
+            if (parentOf(fp) != sourcePath) continue;
+            QString childName = fp.section('/', -1);
+            if (isLibraryNameTaken(destPath, childName)) {
+                QString childDest = destPath.isEmpty() ? childName : destPath + "/" + childName;
+                result += findMergeSetConflicts(fp, childDest);
+            }
+            // No library collision at destPath — the whole subtree just moves over,
+            // so nothing pre-exists there for its sets to clash with.
+        }
+    }
+
+    return result;
+}
+
+void RecSetManager::mergeFolderInto(const QString& sourcePath, const QString& destPath,
+                                     const QSet<QString>& overwriteKeys) {
+    // Move every direct set out of sourcePath into destPath. A colliding set is
+    // overwritten only if the caller approved its "destFolder|name" key; otherwise
+    // (declined, or it clashes with a same-named sub-library) it's left behind.
+    QSet<int> stuckSetIdx;
+    for (;;) {
+        int idx = -1;
+        for (int i = 0; i < m_recSetVec.size(); ++i) {
+            if (m_recSetVec.at(i).getFolderPath() == sourcePath && !stuckSetIdx.contains(i)) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx == -1) break;
+
+        const QString setName = m_recSetVec.at(idx).getSetName();
+        if (isSetNameTaken(destPath, setName) &&
+            !overwriteKeys.contains(destPath + "|" + setName)) {
+            stuckSetIdx.insert(idx);
+            continue;
+        }
+        if (!moveSetToFolder(idx, destPath, /*overwrite=*/true))
+            stuckSetIdx.insert(idx);
+    }
+
+    // Move every direct sub-library, merging into same-named siblings recursively.
+    QStringList childFolders;
+    auto orderIt = m_folderItemOrder.find(sourcePath);
+    if (orderIt != m_folderItemOrder.end()) {
+        for (const QString& key : orderIt.value()) {
+            if (!key.startsWith(QLatin1String("folder:"))) continue;
+            QString fp = key.mid(7);
+            if (parentOf(fp) == sourcePath)
+                childFolders.append(fp);
+        }
+    }
+    for (const QString& childSource : childFolders) {
+        QString childName = childSource.section('/', -1);
+        if (isLibraryNameTaken(destPath, childName)) {
+            // Recursive merge cleans up childSource's own bookkeeping when done.
+            QString childDest = destPath.isEmpty() ? childName : destPath + "/" + childName;
+            mergeFolderInto(childSource, childDest, overwriteKeys);
+        } else {
+            // No clash — a plain move re-parents childSource (and its whole subtree).
+            moveFolderToFolder(childSource, destPath);
+        }
+    }
+
+    // Drop sourcePath's own bookkeeping only if it's actually empty now — a stuck
+    // set (see above) keeps it alive so nothing becomes invisible/orphaned.
+    bool stillHasSets = !stuckSetIdx.isEmpty();
+    bool stillHasFolders = false;
+    auto remainingIt = m_folderItemOrder.find(sourcePath);
+    if (remainingIt != m_folderItemOrder.end()) {
+        for (const QString& key : remainingIt.value()) {
+            if (key.startsWith(QLatin1String("folder:"))) { stillHasFolders = true; break; }
+        }
+    }
+    if (!stillHasSets && !stillHasFolders) {
+        removeFromOrder(parentOf(sourcePath), "folder:" + sourcePath);
+        m_folderItemOrder.remove(sourcePath);
+    }
 }
 
 // ── static helpers ────────────────────────────────────────────────────────────

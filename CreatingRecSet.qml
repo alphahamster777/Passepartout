@@ -27,6 +27,7 @@ Page {
     property bool langPickerIsFrom: true     // true = word/expr language, false = hint language
     property int langPickerCurrentId: -1    // enum value of the currently selected language
     property bool titleError: false
+    property string titleErrorMessage: ""
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     background: Rectangle { color: "#f0f4f8" }
@@ -337,6 +338,15 @@ Page {
             onTextChanged: page.titleError = false
         }
 
+        Label {
+            visible: page.titleError && page.titleErrorMessage !== ""
+            text: page.titleErrorMessage
+            color: "#e74c3c"
+            font.pixelSize: 11
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+        }
+
         // ── Auto-fetch toggle ─────────────────────────────────────────────────
         Rectangle {
             Layout.fillWidth: true
@@ -454,7 +464,8 @@ Page {
                                         spacing: 2
                                         Label {
                                             Layout.fillWidth: true
-                                            text: LanguageHelper.languageNames()[languageFrom]
+                                            text: languageFrom >= 0 ? LanguageHelper.languageNames()[languageFrom]
+                                                                    : qsTr("Not selected")
                                             font.pixelSize: 11; color: "#2c3e50"
                                             elide: Text.ElideRight
                                             verticalAlignment: Text.AlignVCenter
@@ -512,7 +523,8 @@ Page {
                                         spacing: 2
                                         Label {
                                             Layout.fillWidth: true
-                                            text: LanguageHelper.languageNames()[languageTo]
+                                            text: languageTo >= 0 ? LanguageHelper.languageNames()[languageTo]
+                                                                  : qsTr("Not selected")
                                             font.pixelSize: 11; color: "#2c3e50"
                                             elide: Text.ElideRight
                                             verticalAlignment: Text.AlignVCenter
@@ -965,6 +977,7 @@ Page {
                 }
                 onClicked: {
                     if (topTextField.text.trim() === "") {
+                        page.titleErrorMessage = qsTr("Title is required")
                         page.titleError = true
                     } else {
                         creatingRecSetSave()

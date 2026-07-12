@@ -47,6 +47,151 @@ Page {
 
     Component.onCompleted: refreshModel()
 
+    // ── Drag-and-drop move, with overwrite/merge confirmation on name clashes ──
+    // itemType: "set" | "folder"; sourceRef: set index (int) or folder full path (string)
+    function requestMove(itemType, sourceRef, name, destFolder) {
+        var mgr = AppController.recSetManager
+        if (itemType === "set") {
+            if (mgr.isLibraryNameTaken(destFolder, name))
+                return // can't drop a set onto a library of the same name
+            if (mgr.isSetNameTaken(destFolder, name, sourceRef)) {
+                moveConflictDialog.mode = "overwriteSet"
+                moveConflictDialog.itemName = name
+                moveConflictDialog.pendingType = itemType
+                moveConflictDialog.pendingSource = sourceRef
+                moveConflictDialog.pendingDest = destFolder
+                moveConflictDialog.open()
+                return
+            }
+            mgr.moveSetToFolder(sourceRef, destFolder)
+        } else {
+            if (mgr.isSetNameTaken(destFolder, name))
+                return // can't merge a library into a set of the same name
+            if (mgr.isLibraryNameTaken(destFolder, name, sourceRef)) {
+                moveConflictDialog.mode = "mergeFolder"
+                moveConflictDialog.itemName = name
+                moveConflictDialog.pendingType = itemType
+                moveConflictDialog.pendingSource = sourceRef
+                moveConflictDialog.pendingDest = destFolder
+                moveConflictDialog.open()
+                return
+            }
+            mgr.moveFolderToFolder(sourceRef, destFolder)
+        }
+        AppController.saveData()
+        AppController.recSetNameListChanged()
+    }
+
+    // ── Overwrite / merge confirmation dialog ───────────────────────────────────
+    Dialog {
+        id: moveConflictDialog
+        anchors.centerIn: parent
+        width: Math.min(parent.width - 32, 320)
+        modal: true
+        standardButtons: Dialog.Yes | Dialog.No
+
+        property string mode: ""          // "overwriteSet" | "mergeFolder"
+        property string itemName: ""
+        property string pendingType: ""
+        property var pendingSource: null
+        property string pendingDest: ""
+
+        title: mode === "overwriteSet" ? qsTr("Overwrite word set?") : qsTr("Merge libraries?")
+
+        ColumnLayout {
+            width: parent.width
+            Label {
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                text: moveConflictDialog.mode === "overwriteSet"
+                    ? qsTr("A word set named \"%1\" already exists here. Overwrite it with the moved set?").arg(moveConflictDialog.itemName)
+                    : qsTr("A library named \"%1\" already exists here. Merge its contents into it?").arg(moveConflictDialog.itemName)
+            }
+        }
+
+        onAccepted: {
+            if (mode === "overwriteSet") {
+                AppController.recSetManager.moveSetToFolder(pendingSource, pendingDest, true)
+                AppController.saveData()
+                AppController.recSetNameListChanged()
+            } else if (mode === "mergeFolder") {
+                page.startMergeConflictResolution(pendingSource, pendingDest)
+            }
+        }
+        // onRejected: nothing happens — the move is simply abandoned.
+    }
+
+    // ── Per-set overwrite confirmation, asked once for each name clash found while
+    // merging two libraries ─────────────────────────────────────────────────────
+    property var mergeConflictQueue: []   // remaining [{name, destFolder}, ...] to ask about
+    property var mergeApprovedKeys: []    // accumulated "destFolder|name" the user approved
+    property string mergeFolderSource: ""
+    property string mergeFolderParent: "" // newParentPath, as passed to moveFolderToFolder
+
+    function startMergeConflictResolution(sourcePath, newParentPath) {
+        var mgr = AppController.recSetManager
+        var lastName = sourcePath.split("/").pop()
+        var existingDest = newParentPath === "" ? lastName : newParentPath + "/" + lastName
+        page.mergeFolderSource = sourcePath
+        page.mergeFolderParent = newParentPath
+        page.mergeApprovedKeys = []
+        page.mergeConflictQueue = mgr.findMergeSetConflicts(sourcePath, existingDest)
+        page.askNextMergeConflict()
+    }
+
+    function askNextMergeConflict() {
+        if (page.mergeConflictQueue.length === 0) {
+            var mgr = AppController.recSetManager
+            mgr.moveFolderToFolder(page.mergeFolderSource, page.mergeFolderParent,
+                                    true, page.mergeApprovedKeys)
+            AppController.saveData()
+            AppController.recSetNameListChanged()
+            return
+        }
+        var next = page.mergeConflictQueue[0]
+        setConflictDialog.pendingName = next.name
+        setConflictDialog.pendingDestFolder = next.destFolder
+        setConflictDialog.open()
+    }
+
+    Dialog {
+        id: setConflictDialog
+        anchors.centerIn: parent
+        width: Math.min(parent.width - 32, 320)
+        modal: true
+        standardButtons: Dialog.Yes | Dialog.No
+        title: qsTr("Overwrite word set?")
+
+        property string pendingName: ""
+        property string pendingDestFolder: ""
+
+        ColumnLayout {
+            width: parent.width
+            Label {
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                text: qsTr("A word set named \"%1\" already exists in %2. Overwrite it with the version being merged in?")
+                    .arg(setConflictDialog.pendingName)
+                    .arg(setConflictDialog.pendingDestFolder === "" ? qsTr("the destination library")
+                                                                     : "\"" + setConflictDialog.pendingDestFolder + "\"")
+            }
+        }
+
+        function resolve(overwrite) {
+            if (overwrite)
+                page.mergeApprovedKeys.push(pendingDestFolder + "|" + pendingName)
+            page.mergeConflictQueue.shift()
+            // Advance from onClosed, not here: this Dialog is still mid-way through
+            // its own exit transition while accepted/rejected fires, and re-opening
+            // it immediately for the next conflict gets silently dropped once that
+            // transition finishes and forces visible back to false.
+        }
+
+        onAccepted: resolve(true)
+        onRejected: resolve(false)
+        onClosed: page.askNextMergeConflict()
+    }
+
     Connections {
         target: AppController
         function onRecSetNameListChanged() { page.refreshModel() }
@@ -71,7 +216,17 @@ Page {
         anchors.centerIn: parent
         width: Math.min(parent.width - 32, 320)
         modal: true
-        standardButtons: Dialog.Ok | Dialog.Cancel
+        standardButtons: Dialog.Cancel
+
+        readonly property string trimmedName: folderNameField.text.trim()
+        readonly property bool nameTaken: trimmedName !== "" &&
+            AppController.recSetManager.isFolderNameTaken(page.folderPath, trimmedName)
+        readonly property bool nameValid: trimmedName !== "" && !nameTaken
+
+        function tryAccept() {
+            if (newFolderDialog.nameValid)
+                newFolderDialog.accept()
+        }
 
         ColumnLayout {
             width: parent.width
@@ -81,16 +236,44 @@ Page {
                 id: folderNameField
                 Layout.fillWidth: true
                 placeholderText: qsTr("e.g. Travel, Work, School…")
-                onAccepted: newFolderDialog.accept()
+                background: Rectangle {
+                    radius: 6
+                    color: "white"
+                    border.color: newFolderDialog.nameTaken ? "#e74c3c"
+                                : newFolderDialog.nameValid  ? "#3498db" : "#dce1e7"
+                    border.width: (newFolderDialog.nameTaken || newFolderDialog.nameValid) ? 2 : 1
+                }
+                onAccepted: newFolderDialog.tryAccept()
+            }
+            Label {
+                visible: newFolderDialog.nameTaken
+                text: qsTr("A library or set with this name already exists here.")
+                color: "#e74c3c"
+                font.pixelSize: 11
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            Button {
+                text: qsTr("Create")
+                Layout.fillWidth: true
+                enabled: newFolderDialog.nameValid
+                background: Rectangle {
+                    radius: 8
+                    color: parent.enabled ? (parent.pressed ? "#2980b9" : "#3498db") : "#bbb"
+                }
+                contentItem: Text {
+                    text: parent.text; color: "white"; font: parent.font
+                    horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: newFolderDialog.tryAccept()
             }
         }
 
         onOpened:  { folderNameField.text = ""; folderNameField.forceActiveFocus() }
         onAccepted: {
-            var name = folderNameField.text.trim()
-            if (name === "") return
-            var fullPath = page.folderPath === "" ? name : page.folderPath + "/" + name
-            AppController.recSetManager.createFolder(fullPath)
+            if (!nameValid) return
+            var fullPath = page.folderPath === "" ? trimmedName : page.folderPath + "/" + trimmedName
+            if (!AppController.recSetManager.createFolder(fullPath)) return
             AppController.saveData()
             page.refreshModel()
         }
@@ -103,9 +286,22 @@ Page {
         anchors.centerIn: parent
         width: Math.min(parent.width - 32, 320)
         modal: true
-        standardButtons: Dialog.Ok | Dialog.Cancel
+        standardButtons: Dialog.Cancel
 
         property string targetFullPath: ""
+
+        readonly property string trimmedName: renameFolderField.text.trim()
+        readonly property string targetParent: targetFullPath.includes("/")
+            ? targetFullPath.substring(0, targetFullPath.lastIndexOf("/"))
+            : ""
+        readonly property bool nameTaken: trimmedName !== "" &&
+            AppController.recSetManager.isFolderNameTaken(targetParent, trimmedName, targetFullPath)
+        readonly property bool nameValid: trimmedName !== "" && !nameTaken
+
+        function tryAccept() {
+            if (renameFolderDialog.nameValid)
+                renameFolderDialog.accept()
+        }
 
         ColumnLayout {
             width: parent.width
@@ -114,19 +310,44 @@ Page {
             TextField {
                 id: renameFolderField
                 Layout.fillWidth: true
-                onAccepted: renameFolderDialog.accept()
+                background: Rectangle {
+                    radius: 6
+                    color: "white"
+                    border.color: renameFolderDialog.nameTaken ? "#e74c3c"
+                                : renameFolderDialog.nameValid  ? "#3498db" : "#dce1e7"
+                    border.width: (renameFolderDialog.nameTaken || renameFolderDialog.nameValid) ? 2 : 1
+                }
+                onAccepted: renameFolderDialog.tryAccept()
+            }
+            Label {
+                visible: renameFolderDialog.nameTaken
+                text: qsTr("A library or set with this name already exists here.")
+                color: "#e74c3c"
+                font.pixelSize: 11
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            Button {
+                text: qsTr("Rename")
+                Layout.fillWidth: true
+                enabled: renameFolderDialog.nameValid
+                background: Rectangle {
+                    radius: 8
+                    color: parent.enabled ? (parent.pressed ? "#2980b9" : "#3498db") : "#bbb"
+                }
+                contentItem: Text {
+                    text: parent.text; color: "white"; font: parent.font
+                    horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: renameFolderDialog.tryAccept()
             }
         }
 
         onOpened: renameFolderField.forceActiveFocus()
         onAccepted: {
-            var newName = renameFolderField.text.trim()
-            if (newName === "" || targetFullPath === "") return
-            var parentPart = targetFullPath.includes("/")
-                ? targetFullPath.substring(0, targetFullPath.lastIndexOf("/"))
-                : ""
-            var newPath = parentPart === "" ? newName : parentPart + "/" + newName
-            AppController.recSetManager.renameFolder(targetFullPath, newPath)
+            if (!nameValid || targetFullPath === "") return
+            var newPath = targetParent === "" ? trimmedName : targetParent + "/" + trimmedName
+            if (!AppController.recSetManager.renameFolder(targetFullPath, newPath)) return
             AppController.saveData()
             page.refreshModel()
         }
@@ -408,7 +629,7 @@ Page {
                                     height: visible ? implicitHeight : 0
                                     text: qsTr("Delete")
                                     onTriggered: {
-                                        AppController.recSetManager.deleteRecSet(model.name)
+                                        AppController.recSetManager.deleteRecSetAt(model.index)
                                         AppController.saveData()
                                         AppController.recSetNameListChanged()
                                     }
@@ -472,30 +693,20 @@ Page {
                                         if (action.startsWith("into:")) {
                                             var targetFolder = action.substring(5)
                                             var itm = itemModel.get(myIndex)
-                                            if (itm.type === "folder") {
-                                                AppController.recSetManager.moveFolderToFolder(
-                                                    itm.fullPath, targetFolder)
-                                            } else {
-                                                AppController.recSetManager.moveSetToFolder(
-                                                    itm.index, targetFolder)
-                                            }
-                                            AppController.saveData()
-                                            AppController.recSetNameListChanged()
+                                            if (itm.type === "folder")
+                                                page.requestMove("folder", itm.fullPath, itm.name, targetFolder)
+                                            else
+                                                page.requestMove("set", itm.index, itm.name, targetFolder)
                                         } else if (action === "parent") {
                                             var parentPath = page.folderPath.includes("/")
                                                 ? page.folderPath.substring(
                                                       0, page.folderPath.lastIndexOf("/"))
                                                 : ""
                                             var itm2 = itemModel.get(myIndex)
-                                            if (itm2.type === "folder") {
-                                                AppController.recSetManager.moveFolderToFolder(
-                                                    itm2.fullPath, parentPath)
-                                            } else {
-                                                AppController.recSetManager.moveSetToFolder(
-                                                    itm2.index, parentPath)
-                                            }
-                                            AppController.saveData()
-                                            AppController.recSetNameListChanged()
+                                            if (itm2.type === "folder")
+                                                page.requestMove("folder", itm2.fullPath, itm2.name, parentPath)
+                                            else
+                                                page.requestMove("set", itm2.index, itm2.name, parentPath)
                                         } else {
                                             saveOrder()
                                         }

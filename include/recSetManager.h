@@ -7,6 +7,7 @@
 #include <QVariantMap>
 #include <QVector>
 #include <QMap>
+#include <QSet>
 #include <QStringList>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -32,16 +33,25 @@ public:
     RecSetManager& operator=(RecSetManager&& other);
 
     // Set CRUD
-    Q_INVOKABLE bool createRecSet(const QString& setName);
-    Q_INVOKABLE bool createRecSet(const QString& setName, const QString& folderPath);
+    // Returns the index of the newly created set, or -1 if a library or set already
+    // named `setName` exists directly in `folderPath` (names are unique per-folder,
+    // not app-wide — the same name may exist in different folders).
+    Q_INVOKABLE int createRecSet(const QString& setName);
+    Q_INVOKABLE int createRecSet(const QString& setName, const QString& folderPath);
     Q_INVOKABLE bool deleteRecSet(const QString& setName);
+    Q_INVOKABLE bool deleteRecSetAt(int idx);
+
+    // Renames the set at idx; refused if another set/library already has that name
+    // in the same folder.
     Q_INVOKABLE bool renameRecSet(int i, const QString& setName);
 
     Q_INVOKABLE void addRecToRecSet(const QString& setName, const DictRec& newWord);
     Q_INVOKABLE void addRecToRecSet(const QString& setName, const QVariantMap& rec);
+    Q_INVOKABLE void addRecToRecSetAt(int idx, const QVariantMap& rec);
 
     Q_INVOKABLE bool removeRecFromRecSet(const QString& setName, const DictRec& setElement);
     Q_INVOKABLE bool clearRecordsFromRecSet(const QString& setName);
+    Q_INVOKABLE bool clearRecordsFromRecSetAt(int idx);
 
     // Returns {name, wordCount, folderPath} for the set at idx
     Q_INVOKABLE QVariantMap getRecSetInfoQML(int idx);
@@ -64,12 +74,48 @@ public:
     // Renames a folder at the given full path; updates all child paths
     Q_INVOKABLE bool renameFolder(const QString& oldPath, const QString& newPath);
 
-    // Moves a set to a different folder (updates order lists)
-    Q_INVOKABLE bool moveSetToFolder(int setIdx, const QString& newFolderPath);
+    // Moves a set to a different folder (updates order lists).
+    // If a set with the same name already exists at newFolderPath: with overwrite=false
+    // the move is refused (returns false, nothing changes); with overwrite=true the
+    // existing destination set is replaced by the moved one.
+    Q_INVOKABLE bool moveSetToFolder(int setIdx, const QString& newFolderPath, bool overwrite = false);
 
     // Moves an entire library (and its contents) under a new parent path.
     // E.g. moveFolderToFolder("Travel/Europe", "Work") → library becomes "Work/Europe".
-    Q_INVOKABLE bool moveFolderToFolder(const QString& folderPath, const QString& newParentPath);
+    // If a library with the same name already exists at newParentPath: with merge=false
+    // the move is refused (returns false, nothing changes); with merge=true the two
+    // libraries' contents are combined into one, leaving a single library with that name.
+    // Any set-name collision among their children is overwritten only if its
+    // "destFolderPath|setName" key (see findMergeSetConflicts) is present in
+    // overwriteKeys; otherwise that one set is left behind, unmerged, in its
+    // original library.
+    Q_INVOKABLE bool moveFolderToFolder(const QString& folderPath, const QString& newParentPath,
+                                         bool merge = false, const QStringList& overwriteKeys = {});
+
+    // Dry-runs a moveFolderToFolder(..., merge=true) of sourcePath into the
+    // already-existing destPath library and returns every set-name collision it
+    // would need to resolve, recursing into colliding sub-libraries too:
+    // [{name, destFolder}, ...]. Ask the user about each before calling
+    // moveFolderToFolder with the approved "destFolder|name" keys.
+    Q_INVOKABLE QVariantList findMergeSetConflicts(const QString& sourcePath, const QString& destPath) const;
+
+    // Returns true if a sibling library already named `name` exists directly under
+    // `parentPath`. Pass the full path of the library being renamed/moved as
+    // `excludeFullPath` so it doesn't collide with itself.
+    Q_INVOKABLE bool isLibraryNameTaken(const QString& parentPath, const QString& name,
+                                         const QString& excludeFullPath = QString()) const;
+
+    // Returns true if a sibling set already named `name` exists directly under
+    // `parentPath`. Pass the index of the set being moved as `excludeSetIdx` so it
+    // doesn't collide with itself.
+    Q_INVOKABLE bool isSetNameTaken(const QString& parentPath, const QString& name,
+                                     int excludeSetIdx = -1) const;
+
+    // Returns true if a library or set already named `name` exists directly under
+    // `parentPath`. Pass the full path of the library being renamed/moved as
+    // `excludeFullPath` so it doesn't collide with itself.
+    Q_INVOKABLE bool isFolderNameTaken(const QString& parentPath, const QString& name,
+                                        const QString& excludeFullPath = QString()) const;
 
     // Persists a new drag-and-drop ordering for a folder.
     // keys = ordered list of "folder:FULLPATH" or "set:SETNAME" strings.
@@ -103,4 +149,14 @@ private:
     static QString parentOf(const QString& fullPath);
 
     static QString localPath(const QString& urlOrPath);
+
+    // Merges every set and sub-library directly/indirectly under sourcePath into the
+    // already-existing destPath library. A colliding set is overwritten only if its
+    // "destFolderPath|setName" key is in overwriteKeys; otherwise it's left behind.
+    void mergeFolderInto(const QString& sourcePath, const QString& destPath,
+                          const QSet<QString>& overwriteKeys);
+
+    // Builds a DictRec from a QML-supplied word map (languageFrom, languageTo,
+    // expression, hint, audioPath, imagePath).
+    static DictRec dictRecFromVariant(const QVariantMap& rec);
 };
