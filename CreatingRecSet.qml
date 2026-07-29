@@ -277,11 +277,15 @@ Page {
 
     // ── Header ────────────────────────────────────────────────────────────────
     header: ToolBar {
-        height: 56
+        height: 56 + SafeArea.margins.top
         background: Rectangle { color: "#2c3e50" }
 
         RowLayout {
-            anchors { fill: parent; leftMargin: 8; rightMargin: 8 }
+            anchors {
+                left: parent.left; right: parent.right; bottom: parent.bottom
+                leftMargin: 8; rightMargin: 8
+            }
+            height: 56
             spacing: 4
 
             Item { implicitWidth: 76 }
@@ -959,12 +963,15 @@ Page {
 
     // ── Footer ────────────────────────────────────────────────────────────────
     footer: Rectangle {
-        height: footerRow.implicitHeight + 24
+        height: footerRow.implicitHeight + 24 + SafeArea.margins.bottom
         color: "#2c3e50"
 
         RowLayout {
             id: footerRow
-            anchors { fill: parent; leftMargin: 16; rightMargin: 16; topMargin: 12; bottomMargin: 12 }
+            anchors {
+                left: parent.left; right: parent.right; top: parent.top
+                leftMargin: 16; rightMargin: 16; topMargin: 12
+            }
             spacing: 12
 
             Button {

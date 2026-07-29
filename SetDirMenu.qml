@@ -355,40 +355,48 @@ Page {
 
     // ── Header ────────────────────────────────────────────────────────────────
     header: Rectangle {
-        height: 64
+        height: 64 + SafeArea.margins.top
         color: "#2c3e50"
 
-        ColumnLayout {
-            anchors.centerIn: parent
-            spacing: 2
-            Label {
-                text: page.folderName
-                font.pixelSize: 22
-                font.bold: true
-                color: "white"
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Label {
-                text: page.folderPath === "" ? qsTr("Your word sets") : qsTr("Library")
-                font.pixelSize: 12
-                color: "#95a5a6"
-                Layout.alignment: Qt.AlignHCenter
-            }
-        }
+        // Content band kept below the status bar; the rest of the Rectangle is
+        // just navy background extending behind it (edge-to-edge is mandatory
+        // at API 36, so this can no longer be avoided via the manifest theme).
+        Item {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 64
 
-        ToolButton {
-            anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 8 }
-            text: "ⓘ"
-            font.pixelSize: 22
-            contentItem: Label {
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 2
+                Label {
+                    text: page.folderName
+                    font.pixelSize: 22
+                    font.bold: true
+                    color: "white"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                Label {
+                    text: page.folderPath === "" ? qsTr("Your word sets") : qsTr("Library")
+                    font.pixelSize: 12
+                    color: "#95a5a6"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+            }
+
+            ToolButton {
+                anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 8 }
                 text: "ⓘ"
                 font.pixelSize: 22
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                contentItem: Label {
+                    text: "ⓘ"
+                    font.pixelSize: 22
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Item {}
+                onClicked: page.aboutRequested()
             }
-            background: Item {}
-            onClicked: page.aboutRequested()
         }
     }
 
@@ -778,7 +786,10 @@ Page {
     }
 
     Rectangle {
-        anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: 16 }
+        anchors {
+            bottom: parent.bottom; horizontalCenter: parent.horizontalCenter
+            bottomMargin: 16 + SafeArea.margins.bottom
+        }
         width: 160; height: 48
         radius: 24
         color: "#3498db"

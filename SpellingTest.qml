@@ -63,11 +63,16 @@ Page {
 
     // ── Header ─────────────────────────────────────────────────────────────────
     header: Rectangle {
-        height: isLeitner ? 72 : 56
+        readonly property int contentHeight: isLeitner ? 72 : 56
+        height: contentHeight + SafeArea.margins.top
         color: "#2c3e50"
 
         ColumnLayout {
-            anchors { fill: parent; leftMargin: 16; rightMargin: 16; topMargin: 4; bottomMargin: 4 }
+            anchors {
+                left: parent.left; right: parent.right; bottom: parent.bottom
+                leftMargin: 16; rightMargin: 16; bottomMargin: 4
+            }
+            height: parent.contentHeight - 8
             spacing: 2
 
             RowLayout {
@@ -354,12 +359,15 @@ Page {
 
     // ── Footer ─────────────────────────────────────────────────────────────────
     footer: Rectangle {
-        height: 64
+        height: 64 + SafeArea.margins.bottom
         color: "#2c3e50"
 
         Button {
             id: nextButton
-            anchors.centerIn: parent
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top; topMargin: (64 - height) / 2
+            }
             width: parent.width * 0.7
             height: 44
             text: spellingTestController.testComplete

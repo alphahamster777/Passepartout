@@ -18,10 +18,13 @@ Page {
     background: Rectangle { color: "#f0f4f8" }
 
     header: Rectangle {
-        height: 56
+        height: 56 + SafeArea.margins.top
         color: "#2c3e50"
         Label {
-            anchors.centerIn: parent
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom; bottomMargin: (56 - implicitHeight) / 2
+            }
             text: qsTr("Results")
             font.pixelSize: 18
             font.bold: true
@@ -91,12 +94,15 @@ Page {
     }
 
     footer: Rectangle {
-        height: 64
+        height: 64 + SafeArea.margins.bottom
         color: "#2c3e50"
 
         Button {
             id: practiceAgainBtn
-            anchors.centerIn: parent
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top; topMargin: (64 - height) / 2
+            }
             width: parent.width * 0.7
             height: 44
             text: qsTr("Practice Again")

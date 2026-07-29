@@ -44,11 +44,14 @@ Page {
 
     // ── Header ────────────────────────────────────────────────────────────────
     header: Rectangle {
-        height: 56
+        height: 56 + SafeArea.margins.top
         color: "#80000000"
 
         Label {
-            anchors.centerIn: parent
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom; bottomMargin: (56 - implicitHeight) / 2
+            }
             text: qsTr("Take Photo")
             font.pixelSize: 18
             font.bold: true
@@ -58,11 +61,15 @@ Page {
 
     // ── Shutter + cancel controls ─────────────────────────────────────────────
     footer: Rectangle {
-        height: 100
+        height: 100 + SafeArea.margins.bottom
         color: "#80000000"
 
         RowLayout {
-            anchors { fill: parent; leftMargin: 24; rightMargin: 24; topMargin: 12; bottomMargin: 12 }
+            anchors {
+                left: parent.left; right: parent.right; top: parent.top
+                leftMargin: 24; rightMargin: 24; topMargin: 12
+            }
+            height: 100 - 24
             spacing: 16
 
             // Cancel

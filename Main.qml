@@ -16,6 +16,13 @@ ApplicationWindow {
     height: 640
     title: "Passepartout"
 
+    // ApplicationWindow auto-pads contentItem by SafeArea.margins (top/bottom)
+    // by default; disabled here because each Page's header/footer already grows
+    // by the same margins itself so its colored bar can extend behind the system
+    // bars instead of leaving a gap in the window's own plain background.
+    topPadding: 0
+    bottomPadding: 0
+
     FocusScope {
         id: rootScope
         anchors.fill: parent
