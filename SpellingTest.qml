@@ -63,7 +63,7 @@ Page {
 
     // ── Header ─────────────────────────────────────────────────────────────────
     header: Rectangle {
-        readonly property int contentHeight: isLeitner ? 72 : 56
+        readonly property int contentHeight: 56
         height: contentHeight + SafeArea.margins.top
         color: "#2c3e50"
 

@@ -3,10 +3,33 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Page {
+    id: page
     title: qsTr("About")
 
     signal licenseRequested(string title, string url)
 
+    background: Rectangle { color: "#f0f4f8" }
+
+    // Status bar icons are forced white app-wide (themes.xml) to read against
+    // the navy header used on every other page — this page needs one too,
+    // otherwise the icons are invisible against the plain light background.
+    header: Rectangle {
+        height: 56 + SafeArea.margins.top
+        color: "#2c3e50"
+        Label {
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom; bottomMargin: (56 - implicitHeight) / 2
+            }
+            text: qsTr("About")
+            font.pixelSize: 18; font.bold: true
+            color: "white"
+        }
+    }
+
+    // A ScrollView must not be positioned from its own SafeArea (that's a
+    // binding loop — see Qt's SafeArea docs); read it from the Page instead,
+    // whose geometry is fixed by the StackView and unaffected by this margin.
     ScrollView {
         anchors.fill: parent
         contentWidth: availableWidth
@@ -14,6 +37,8 @@ Page {
         ColumnLayout {
             width: parent.width
             spacing: 16
+
+            Item { Layout.preferredHeight: 16 }
 
             Label {
                 text: qsTr(
@@ -83,6 +108,8 @@ Page {
                     }
                 }
             }
+
+            Item { Layout.preferredHeight: page.SafeArea.margins.bottom }
         }
     }
 }

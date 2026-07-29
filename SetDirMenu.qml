@@ -355,7 +355,7 @@ Page {
 
     // ── Header ────────────────────────────────────────────────────────────────
     header: Rectangle {
-        height: 64 + SafeArea.margins.top
+        height: 56 + SafeArea.margins.top
         color: "#2c3e50"
 
         // Content band kept below the status bar; the rest of the Rectangle is
@@ -363,7 +363,7 @@ Page {
         // at API 36, so this can no longer be avoided via the manifest theme).
         Item {
             anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            height: 64
+            height: 56
 
             ColumnLayout {
                 anchors.centerIn: parent
@@ -785,10 +785,13 @@ Page {
         }
     }
 
+    // bottomMargin reads page.SafeArea, not its own — this Rectangle would
+    // otherwise be positioned from its own safe area, which is a binding loop
+    // (see Qt's SafeArea docs) and would collapse the margin back to 0.
     Rectangle {
         anchors {
             bottom: parent.bottom; horizontalCenter: parent.horizontalCenter
-            bottomMargin: 16 + SafeArea.margins.bottom
+            bottomMargin: 16 + page.SafeArea.margins.bottom
         }
         width: 160; height: 48
         radius: 24
