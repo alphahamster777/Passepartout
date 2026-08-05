@@ -132,7 +132,8 @@ ApplicationWindow {
                             expression:   rec.expression,
                             hint:         rec.hint,
                             audioPath:    rec.audioPath,
-                            imagePath:    rec.imagePath
+                            imagePath:    rec.imagePath,
+                            exampleUsage: rec.exampleUsage
                         })
                     }
                     stackView.currentItem.selectedCardIndex = info.wordCount > 0 ? info.wordCount - 1 : 0
@@ -280,17 +281,19 @@ ApplicationWindow {
                     for (var i = 0; i < modelRef.count; ++i) {
                         var rec = modelRef.get(i)
                         if (rec.expression === null || rec.expression.trim() === "") continue
-                        var hintSet  = rec.hint      != null && rec.hint.trim()      !== ""
-                        var audioSet = rec.audioPath != null && rec.audioPath.trim() !== ""
-                        var imageSet = rec.imagePath != null && rec.imagePath.trim() !== ""
-                        if (!hintSet && !audioSet && !imageSet) continue
+                        var hintSet    = rec.hint         != null && rec.hint.trim()         !== ""
+                        var audioSet   = rec.audioPath    != null && rec.audioPath.trim()    !== ""
+                        var imageSet   = rec.imagePath    != null && rec.imagePath.trim()    !== ""
+                        var exampleSet = rec.exampleUsage != null && rec.exampleUsage.trim() !== ""
+                        if (!hintSet && !audioSet && !imageSet && !exampleSet) continue
                         var wordData = {
                             languageFrom: rec.languageFrom,
                             languageTo:   rec.languageTo,
                             expression:   rec.expression,
                             hint:         rec.hint,
                             audioPath:    rec.audioPath,
-                            imagePath:    rec.imagePath
+                            imagePath:    rec.imagePath,
+                            exampleUsage: rec.exampleUsage
                         }
                         mgr.addRecToRecSetAt(recSetIdx, wordData)
                     }

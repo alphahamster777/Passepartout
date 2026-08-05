@@ -49,6 +49,7 @@ void BaseTestController::showWord(int wordIdx) {
     m_currentHint       = w.getHint();
     m_currentImageUrl   = w.getImagePath();
     m_currentAudioUrl   = w.getAudioPath();
+    m_currentExampleUsage = w.getExampleUsage();
     m_isAnswered        = false;
     m_lastAnswerCorrect = false;
     m_selectedOpt       = -1;
@@ -58,6 +59,7 @@ void BaseTestController::showWord(int wordIdx) {
     emit currentHintChanged();
     emit currentImageUrlChanged();
     emit currentAudioUrlChanged();
+    emit currentExampleUsageChanged();
     emit isAnsweredChanged();
     emit lastAnswerCorrectChanged();
     emit selectedOptionChanged();

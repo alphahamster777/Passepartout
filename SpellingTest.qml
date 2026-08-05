@@ -147,6 +147,18 @@ Page {
             }
         }
 
+        // Only rendered when the word has an example usage
+        Label {
+            Layout.fillWidth: true
+            text: spellingTestController.currentExampleUsage
+            visible: !isMC && spellingTestController.currentExampleUsage !== ""
+            font.italic: true
+            font.pixelSize: 13
+            color: "#7f8c8d"
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+        }
+
         // ── Text-input section (types A, B, Leitner write phase) ──────────────
         ColumnLayout {
             Layout.fillWidth: true

@@ -3,45 +3,49 @@
 // #include <tuple>
 
 DictRec::DictRec(size_t exprlangID, size_t hintLangID, const QString &expression, const QString &hint,
-                 const QString &audioPath, const QString &imagePath)
+                 const QString &audioPath, const QString &imagePath, const QString &exampleUsage)
     : m_exprLangID(exprlangID), m_hintLangID(hintLangID), m_expression(expression), m_hint(hint),
-      m_audioPath(audioPath), m_imagePath(imagePath) {}
+      m_audioPath(audioPath), m_imagePath(imagePath), m_exampleUsage(exampleUsage) {}
 
 DictRec::DictRec(const DictRec &other) {
-    m_exprLangID = other.m_exprLangID;
-    m_hintLangID = other.m_hintLangID;
-    m_expression = other.m_expression;
-    m_hint       = other.m_hint;
-    m_audioPath  = other.m_audioPath;
-    m_imagePath  = other.m_imagePath;
+    m_exprLangID   = other.m_exprLangID;
+    m_hintLangID   = other.m_hintLangID;
+    m_expression   = other.m_expression;
+    m_hint         = other.m_hint;
+    m_audioPath    = other.m_audioPath;
+    m_imagePath    = other.m_imagePath;
+    m_exampleUsage = other.m_exampleUsage;
 }
 
 DictRec::DictRec(DictRec &&other) {
-    m_exprLangID = std::move(other.m_exprLangID);
-    m_hintLangID = std::move(other.m_hintLangID);
-    m_expression = std::move(other.m_expression);
-    m_hint       = std::move(other.m_hint);
-    m_audioPath  = std::move(other.m_audioPath);
-    m_imagePath  = std::move(other.m_imagePath);
+    m_exprLangID   = std::move(other.m_exprLangID);
+    m_hintLangID   = std::move(other.m_hintLangID);
+    m_expression   = std::move(other.m_expression);
+    m_hint         = std::move(other.m_hint);
+    m_audioPath    = std::move(other.m_audioPath);
+    m_imagePath    = std::move(other.m_imagePath);
+    m_exampleUsage = std::move(other.m_exampleUsage);
 }
 
 DictRec &DictRec::operator=(const DictRec &other) {
-    m_exprLangID = other.m_exprLangID;
-    m_hintLangID = other.m_hintLangID;
-    m_expression = other.m_expression;
-    m_hint       = other.m_hint;
-    m_audioPath  = other.m_audioPath;
-    m_imagePath  = other.m_imagePath;
+    m_exprLangID   = other.m_exprLangID;
+    m_hintLangID   = other.m_hintLangID;
+    m_expression   = other.m_expression;
+    m_hint         = other.m_hint;
+    m_audioPath    = other.m_audioPath;
+    m_imagePath    = other.m_imagePath;
+    m_exampleUsage = other.m_exampleUsage;
     return *this;
 }
 
 DictRec &DictRec::operator=(DictRec &&other) {
-    m_exprLangID = std::move(other.m_exprLangID);
-    m_hintLangID = std::move(other.m_hintLangID);
-    m_expression = std::move(other.m_expression);
-    m_hint       = std::move(other.m_hint);
-    m_audioPath  = std::move(other.m_audioPath);
-    m_imagePath  = std::move(other.m_imagePath);
+    m_exprLangID   = std::move(other.m_exprLangID);
+    m_hintLangID   = std::move(other.m_hintLangID);
+    m_expression   = std::move(other.m_expression);
+    m_hint         = std::move(other.m_hint);
+    m_audioPath    = std::move(other.m_audioPath);
+    m_imagePath    = std::move(other.m_imagePath);
+    m_exampleUsage = std::move(other.m_exampleUsage);
     return *this;
 }
 
@@ -67,10 +71,11 @@ DictRec &DictRec::operator=(DictRec &&other) {
 // }
 
 bool DictRec::operator==(const DictRec &other) const {
-    return m_exprLangID == other.m_exprLangID
-        && m_hintLangID == other.m_hintLangID
-        && m_expression == other.m_expression
-        && m_hint       == other.m_hint
-        && m_audioPath  == other.m_audioPath
-        && m_imagePath  == other.m_imagePath;
+    return m_exprLangID   == other.m_exprLangID
+        && m_hintLangID   == other.m_hintLangID
+        && m_expression   == other.m_expression
+        && m_hint         == other.m_hint
+        && m_audioPath    == other.m_audioPath
+        && m_imagePath    == other.m_imagePath
+        && m_exampleUsage == other.m_exampleUsage;
 }

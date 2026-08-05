@@ -293,6 +293,18 @@ Page {
                                 }
                             }
 
+                            // Only rendered when the word has an example usage
+                            Label {
+                                Layout.fillWidth: true
+                                text: modelData.exampleUsage
+                                visible: modelData.exampleUsage !== ""
+                                font.italic: true
+                                font.pixelSize: 13
+                                color: "#7f8c8d"
+                                horizontalAlignment: Text.AlignHCenter
+                                wrapMode: Text.WordWrap
+                            }
+
                             Label {
                                 Layout.fillWidth: true
                                 text: modelData.expression

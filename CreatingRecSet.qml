@@ -561,6 +561,28 @@ Page {
                                 onEditingFinished: recSetModel.set(index, { hint: hintField.text })
                             }
 
+                            // ── Example usage ────────────────────────────────
+                            Label {
+                                text: qsTr("Example usage")
+                                font.pixelSize: 12
+                                font.bold: true
+                                color: "#2c3e50"
+                            }
+                            TextField {
+                                id: exampleUsageField
+                                Layout.fillWidth: true
+                                placeholderText: qsTr("Example sentence using the word...")
+                                text: exampleUsage
+                                font.pixelSize: 15
+                                background: Rectangle {
+                                    radius: 6; color: "#f7f9fb"
+                                    border.color: exampleUsageField.activeFocus ? "#3498db" : "#e0e6ed"
+                                }
+                                leftPadding: 10
+                                onActiveFocusChanged: if (activeFocus) page.selectedCardIndex = index
+                                onEditingFinished: recSetModel.set(index, { exampleUsage: exampleUsageField.text })
+                            }
+
                             // ── Image preview — height adapts to aspect ratio ──
                             Image {
                                 id: imagePreview
@@ -900,7 +922,7 @@ Page {
                 recSetModel.append({
                     languageFrom: LanguageHelper.English,
                     languageTo:   LanguageHelper.English,
-                    expression: "", hint: "", audioPath: "", imagePath: ""
+                    expression: "", hint: "", audioPath: "", imagePath: "", exampleUsage: ""
                 })
                 page.selectedCardIndex = 0
             }
@@ -929,7 +951,7 @@ Page {
                     recSetModel.append({
                         languageFrom: lastLangFrom,
                         languageTo:   lastLangTo,
-                        expression: "", hint: "", audioPath: "", imagePath: ""
+                        expression: "", hint: "", audioPath: "", imagePath: "", exampleUsage: ""
                     })
                     page.selectedCardIndex = recSetModel.count - 1
                 }

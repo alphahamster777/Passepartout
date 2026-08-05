@@ -101,10 +101,11 @@ DictRec RecSetManager::dictRecFromVariant(const QVariantMap &rec) {
     return DictRec{
         static_cast<size_t>(rec.value("languageFrom").toInt()),
         static_cast<size_t>(rec.value("languageTo"  ).toInt()),
-        rec.value("expression").toString(),
-        rec.value("hint"      ).toString(),
-        rec.value("audioPath" ).toString(),
-        rec.value("imagePath" ).toString()
+        rec.value("expression"  ).toString(),
+        rec.value("hint"        ).toString(),
+        rec.value("audioPath"   ).toString(),
+        rec.value("imagePath"   ).toString(),
+        rec.value("exampleUsage").toString()
     };
 }
 
@@ -578,12 +579,13 @@ QString RecSetManager::localPath(const QString& urlOrPath) {
 
 static QJsonObject wordToJson(const DictRec& w) {
     QJsonObject o;
-    o["exprLangID"] = w.getExprLanguageID();
-    o["hintLangID"] = w.getHintLanguageID();
-    o["expression"] = w.getExpression();
-    o["hint"]       = w.getHint();
-    o["audioPath"]  = w.getAudioPath();
-    o["imagePath"]  = w.getImagePath();
+    o["exprLangID"]   = w.getExprLanguageID();
+    o["hintLangID"]   = w.getHintLanguageID();
+    o["expression"]   = w.getExpression();
+    o["hint"]         = w.getHint();
+    o["audioPath"]    = w.getAudioPath();
+    o["imagePath"]    = w.getImagePath();
+    o["exampleUsage"] = w.getExampleUsage();
     return o;
 }
 
@@ -594,7 +596,8 @@ static DictRec wordFromJson(const QJsonObject& o) {
         o["expression"].toString(),
         o["hint"].toString(),
         o["audioPath"].toString(),
-        o["imagePath"].toString()
+        o["imagePath"].toString(),
+        o["exampleUsage"].toString()
     };
 }
 
@@ -707,8 +710,9 @@ bool RecSetManager::exportSetToZip(int idx, const QString& filePath) {
         QJsonObject obj;
         obj[QStringLiteral("exprLangID")] = w.getExprLanguageID();
         obj[QStringLiteral("hintLangID")] = w.getHintLanguageID();
-        obj[QStringLiteral("expression")] = w.getExpression();
-        obj[QStringLiteral("hint")]       = w.getHint();
+        obj[QStringLiteral("expression")]   = w.getExpression();
+        obj[QStringLiteral("hint")]         = w.getHint();
+        obj[QStringLiteral("exampleUsage")] = w.getExampleUsage();
 
         // image
         QString imgPath = w.getImagePath();
@@ -799,6 +803,7 @@ QVariantMap RecSetManager::readSetFromZip(const QString& filePath) {
         w[QStringLiteral("hint")]         = wo[QStringLiteral("hint")].toString();
         w[QStringLiteral("audioPath")]    = audPath;
         w[QStringLiteral("imagePath")]    = imgPath;
+        w[QStringLiteral("exampleUsage")] = wo[QStringLiteral("exampleUsage")].toString();
         words.append(w);
     }
 
@@ -861,6 +866,7 @@ QVariantMap RecSetManager::readSetFromBinary(const QString& filePath) {
         w["hint"]         = hint;
         w["audioPath"]    = audioPath;
         w["imagePath"]    = imagePath;
+        w["exampleUsage"] = QString{};
         words.append(w);
     }
     QVariantMap result;
@@ -889,18 +895,20 @@ QVariantMap RecSetManager::readSetFromXml(const QString& filePath) {
             w["hint"]         = QString{};
             w["audioPath"]    = QString{};
             w["imagePath"]    = QString{};
+            w["exampleUsage"] = QString{};
             while (!xml.atEnd() && !xml.hasError()) {
                 xml.readNext();
                 if (xml.isEndElement() && xml.name() == QLatin1String("Word")) break;
                 if (!xml.isStartElement()) continue;
                 const QString tag = xml.name().toString();
                 const QString val = xml.readElementText();
-                if      (tag == "ExprLangID") w["languageFrom"] = val.toInt();
-                else if (tag == "HintLangID") w["languageTo"]   = val.toInt();
-                else if (tag == "Expression") w["expression"]   = val;
-                else if (tag == "Hint")       w["hint"]         = val;
-                else if (tag == "AudioPath")  w["audioPath"]    = val;
-                else if (tag == "ImagePath")  w["imagePath"]    = val;
+                if      (tag == "ExprLangID")   w["languageFrom"] = val.toInt();
+                else if (tag == "HintLangID")   w["languageTo"]   = val.toInt();
+                else if (tag == "Expression")   w["expression"]   = val;
+                else if (tag == "Hint")         w["hint"]         = val;
+                else if (tag == "AudioPath")    w["audioPath"]    = val;
+                else if (tag == "ImagePath")    w["imagePath"]    = val;
+                else if (tag == "ExampleUsage") w["exampleUsage"] = val;
             }
             words.append(w);
         }

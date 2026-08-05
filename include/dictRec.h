@@ -10,7 +10,7 @@ class DictRec : public QObject {
     Q_OBJECT
 public:
     DictRec(size_t exprlangID, size_t hintLangID, const QString& expression, const QString& hint,
-            const QString& audioPath = {}, const QString& imagePath = {});
+            const QString& audioPath = {}, const QString& imagePath = {}, const QString& exampleUsage = {});
 
     DictRec(const DictRec& other);
     DictRec(DictRec&& other);
@@ -24,6 +24,7 @@ public:
     Q_INVOKABLE QString getHint() const { return m_hint; }
     Q_INVOKABLE QString getImagePath() const { return m_imagePath; }
     Q_INVOKABLE QString getAudioPath() const { return m_audioPath; }
+    Q_INVOKABLE QString getExampleUsage() const { return m_exampleUsage; }
 
     // Setters
     void setExprLangID(int languageID) { m_exprLangID = languageID; }
@@ -32,6 +33,7 @@ public:
     void setMeaning(const QString& hint) { m_hint = hint; }
     void setAudioPath(QString& audioPath) { m_audioPath = audioPath; }
     void setImagePath(const QString& imagePath) { m_imagePath = imagePath; }
+    void setExampleUsage(const QString& exampleUsage) { m_exampleUsage = exampleUsage; }
 
     // auto operator<=>(const DictRec& other) const;
     bool operator==(const DictRec& other) const;
@@ -44,4 +46,5 @@ private:
     QString m_hint;
     QString m_audioPath;
     QString m_imagePath;
+    QString m_exampleUsage;
 };

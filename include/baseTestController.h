@@ -33,6 +33,7 @@ public:
     Q_PROPERTY(QString currentHint   READ currentHint       NOTIFY currentHintChanged)
     Q_PROPERTY(QString currentImageUrl READ currentImageUrl NOTIFY currentImageUrlChanged)
     Q_PROPERTY(QString currentAudioUrl READ currentAudioUrl NOTIFY currentAudioUrlChanged)
+    Q_PROPERTY(QString currentExampleUsage READ currentExampleUsage NOTIFY currentExampleUsageChanged)
     Q_PROPERTY(QStringList options        READ options           NOTIFY optionsChanged)
     Q_PROPERTY(int correctOptionIndex     READ correctOptionIndex NOTIFY optionsChanged)
     Q_PROPERTY(int selectedOption         READ selectedOption    NOTIFY selectedOptionChanged)
@@ -69,6 +70,7 @@ public:
     QString     currentHint()       const { return m_currentHint; }
     QString     currentImageUrl()   const { return m_currentImageUrl; }
     QString     currentAudioUrl()   const { return m_currentAudioUrl; }
+    QString     currentExampleUsage() const { return m_currentExampleUsage; }
     QStringList options()           const { return m_options; }
     int         correctOptionIndex()const { return m_correctOptIdx; }
     int         selectedOption()    const { return m_selectedOpt; }
@@ -87,6 +89,7 @@ signals:
     void currentHintChanged();
     void currentImageUrlChanged();
     void currentAudioUrlChanged();
+    void currentExampleUsageChanged();
     void optionsChanged();
     void selectedOptionChanged();
     void isAnsweredChanged();
@@ -105,6 +108,7 @@ protected:
     QString           m_currentHint;
     QString           m_currentImageUrl;
     QString           m_currentAudioUrl;
+    QString           m_currentExampleUsage;
     QStringList       m_options;
     int               m_correctOptIdx = -1;
     int               m_selectedOpt   = -1;

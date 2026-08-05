@@ -170,6 +170,7 @@ void LeitnerTestController::showLeitnerMCWord() {
     m_currentHint        = w.getHint();
     m_currentImageUrl    = w.getImagePath();
     m_currentAudioUrl    = w.getAudioPath();
+    m_currentExampleUsage = w.getExampleUsage();
     m_isAnswered         = false;
     m_lastAnswerCorrect  = false;
     m_selectedOpt        = -1;
@@ -178,6 +179,7 @@ void LeitnerTestController::showLeitnerMCWord() {
     emit currentHintChanged();
     emit currentImageUrlChanged();
     emit currentAudioUrlChanged();
+    emit currentExampleUsageChanged();
     emit isAnsweredChanged();
     emit lastAnswerCorrectChanged();
     emit selectedOptionChanged();
