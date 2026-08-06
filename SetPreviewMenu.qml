@@ -79,6 +79,9 @@ Page {
 
                     Repeater {
                         model: [
+                            { type: SpellingTestController.TypeG_FlashCard,
+                              icon: "🗂️", title: qsTr("Flash Cards"),
+                              desc: qsTr("Flip to reveal — swipe right if you know it") },
                             { type: SpellingTestController.TypeA_WriteFromHint,
                               icon: "✍️", title: qsTr("Write the Word"),
                               desc: qsTr("See the hint — type the expression") },

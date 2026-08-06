@@ -6,6 +6,7 @@ import AppController
 import SetPreviewMenuController
 import SpellingTestController
 import LeitnerTestController
+import FlashCardController
 import RecSetManager
 import ShareHelper
 
@@ -62,6 +63,10 @@ ApplicationWindow {
             id: leitnerTestController
         }
 
+        FlashCardController {
+            id: flashCardController
+        }
+
         // Active controller — switches to leitnerTestController for TypeE_Leitner,
         // stays on regularTestController for all other test types.
         property var spellingTestController: regularTestController
@@ -83,6 +88,7 @@ ApplicationWindow {
         Component { id: creatingRecSetMenu; CreatingRecSet {}       }
         Component { id: setPreviewMenu;     SetPreviewMenu {}       }
         Component { id: spellingTestPage;   SpellingTest {}         }
+        Component { id: flashCardPage;      FlashCard {}            }
         Component { id: resultsPage;        Results {}              }
         Component { id: cameraCaptureMenu;  CameraCapture {}        }
         Component { id: aboutPage;          AboutOpenSourcePage {}  }
@@ -159,12 +165,15 @@ ApplicationWindow {
                         (testType === SpellingTestController.TypeE_Leitner ||
                          testType === SpellingTestController.TypeF_LeitnerReversed)
                             ? leitnerTestController
-                            : regularTestController
+                            : (testType === SpellingTestController.TypeG_FlashCard)
+                                ? flashCardController
+                                : regularTestController
                     rootScope.spellingTestController.initialize(
                         AppController.recSetManager,
                         setPreviewController.currentSetIndex,
                         testType)
-                    stackView.push(spellingTestPage)
+                    stackView.push(testType === SpellingTestController.TypeG_FlashCard
+                                   ? flashCardPage : spellingTestPage)
                 }
             }
         }
@@ -190,6 +199,23 @@ ApplicationWindow {
             id: resultsConnectionLoader
             active: stackView.currentItem && typeof stackView.currentItem.resultsNextPressed === "function"
             sourceComponent: resultsConnectionComponent
+        }
+
+        Loader {
+            id: flashCardConnectionLoader
+            active: stackView.currentItem && typeof stackView.currentItem.flashCardExit === "function"
+            sourceComponent: flashCardConnectionComponent
+        }
+
+        Component {
+            id: flashCardConnectionComponent
+            Connections {
+                target: stackView.currentItem
+                function onFlashCardExit() {
+                    flashCardController.saveProgress()
+                    stackView.pop(stackView.get(stackView.depth - 3))
+                }
+            }
         }
 
         Loader {

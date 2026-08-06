@@ -131,6 +131,19 @@ qt_add_qml_module(LeitnerTestController
 
 target_link_libraries(LeitnerTestController PRIVATE Qt6::Core BaseTestController)
 
+qt_add_qml_module(FlashCardController
+    URI FlashCardController
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/flashCardController.h
+    ${CMAKE_SOURCE_DIR}/src/flashCardController.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/FlashCardController"
+)
+
+target_link_libraries(FlashCardController PRIVATE Qt6::Core BaseTestController)
+
 qt_add_qml_module(SetPreviewMenuController
     URI SetPreviewMenuController
     VERSION 1.0
@@ -198,14 +211,14 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml 
-    IMPORTS LeitnerTestController SpellingTestController
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml FlashCard.qml
+    IMPORTS LeitnerTestController SpellingTestController FlashCardController
 )
 
 target_link_libraries(appPassepartout
     PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
             Qt6::Network Qt6::TextToSpeech
-            SpellingTestController LeitnerTestController
+            SpellingTestController LeitnerTestController FlashCardController
 )
 
 qt_add_resources(appPassepartout "license_resources"
@@ -234,7 +247,7 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "7"
+        QT_ANDROID_VERSION_CODE "8"
         # Human-readable app version
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 

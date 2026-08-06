@@ -22,7 +22,8 @@ public:
         TypeC_MCFromHint       = 2,
         TypeD_MCFromWord       = 3,
         TypeE_Leitner          = 4,
-        TypeF_LeitnerReversed  = 5
+        TypeF_LeitnerReversed  = 5,
+        TypeG_FlashCard        = 6
     };
     Q_ENUM(TestType)
 

@@ -169,6 +169,9 @@ void BaseTestController::resetTestProgress(QObject* manager, int idx, int testTy
             ? QStringLiteral("leitnerReversed")
             : QStringLiteral("leitner");
         root.remove(lKey);
+    } else if (testType == TypeG_FlashCard) {
+        // Drops the persisted "known" set too, so every word is shown again.
+        root.remove(QStringLiteral("flashCard"));
     } else {
         QString key;
         switch (testType) {
@@ -208,6 +211,26 @@ int BaseTestController::getUnfinishedCount(QObject* manager, int idx, int testTy
         const QJsonObject leit = root[lKey].toObject();
         return leit[QStringLiteral("set1")].toArray().size()
              + leit[QStringLiteral("set2")].toArray().size();
+    }
+
+    if (testType == TypeG_FlashCard) {
+        const QString path = progressFilePath(const_cast<RecSetManager*>(mgr), idx);
+        QFile f(path);
+        if (!f.open(QIODevice::ReadOnly)) return total;
+        const QJsonObject root = QJsonDocument::fromJson(f.readAll()).object();
+        if (root[QStringLiteral("wordCount")].toInt() != total) return total;
+        if (!root.contains(QStringLiteral("flashCard"))) return total;
+        const QJsonObject fc = root[QStringLiteral("flashCard")].toObject();
+
+        const QJsonArray queueArr = fc[QStringLiteral("queue")].toArray();
+        if (!queueArr.isEmpty()) {
+            // Mid-session: cards left to decide on before this session ends.
+            const int queuePos = fc[QStringLiteral("queuePos")].toInt(0);
+            return queueArr.size() - queuePos;
+        }
+        // Between sessions: words never marked "known" yet.
+        const int knownCount = fc[QStringLiteral("known")].toArray().size();
+        return total - knownCount;
     }
 
     QString key;
