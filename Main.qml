@@ -29,6 +29,17 @@ ApplicationWindow {
         anchors.fill: parent
         focus: true
 
+        // Pops the current test page and returns to the Choose Test Type popup
+        // on Review Expressions (reopening it also refreshes its "remaining"
+        // counts, since that's wired to popupRefresh via testTypePopup.onAboutToShow).
+        function backToTestTypeMenu() {
+            stackView.pop()
+            Qt.callLater(function() {
+                if (typeof stackView.currentItem.openTestTypePopup === "function")
+                    stackView.currentItem.openTestTypePopup()
+            })
+        }
+
         Keys.onReleased: function(event) {
             const androidBackPressed =
                 Qt.platform.os === "android" && event.key === Qt.Key_Back
@@ -37,14 +48,33 @@ ApplicationWindow {
                 Qt.platform.os !== "android" && event.key === Qt.Key_Left
 
             if (androidBackPressed || desktopLeftPressed) {
+                // If the current page has its own popup open (e.g. Choose Test
+                // Type), close that first instead of navigating the stack.
+                if (stackView.currentItem &&
+                    typeof stackView.currentItem.testTypePopupVisible !== "undefined" &&
+                    stackView.currentItem.testTypePopupVisible) {
+                    stackView.currentItem.closeTestTypePopup()
+                    event.accepted = true
+                    return
+                }
+
                 if (stackView.depth > 1) {
                     if (typeof stackView.currentItem.getResults === "function" &&
                         !spellingTestController.isTestComplete()) {
-                        // Mid-test back: save progress and jump past SetPreview
-                        // to the SetDirMenu that contains the word set.
-                        // Stack: [..., SetDirMenu, SetPreview, SpellingTest]
-                        spellingTestController.saveProgress()
-                        stackView.pop(stackView.get(stackView.depth - 3))
+                        // Mid-test back. If an answer was already submitted but
+                        // "Next" wasn't pressed yet, commit it first (nextQuestion
+                        // advances the queue position and saves) — otherwise the
+                        // saved queuePos stays one behind the already-counted
+                        // answer, and resuming lets that same word be answered
+                        // (and counted) again, eventually pushing correctAnswers
+                        // past totalQuestions.
+                        if (typeof stackView.currentItem.answerSubmitted !== "undefined" &&
+                            stackView.currentItem.answerSubmitted) {
+                            spellingTestController.nextQuestion()
+                        } else {
+                            spellingTestController.saveProgress()
+                        }
+                        rootScope.backToTestTypeMenu()
                     } else {
                         stackView.pop()
                     }
@@ -213,7 +243,7 @@ ApplicationWindow {
                 target: stackView.currentItem
                 function onFlashCardExit() {
                     flashCardController.saveProgress()
-                    stackView.pop(stackView.get(stackView.depth - 3))
+                    rootScope.backToTestTypeMenu()
                 }
             }
         }

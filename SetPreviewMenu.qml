@@ -20,6 +20,13 @@ Page {
     // hasn't changed (e.g. navigating back mid-question).
     property int popupRefresh: 0
 
+    // Exposed so Main.qml can send the hardware/close back-button here: reopen
+    // (with fresh remaining counts) when returning mid-test, and close instead
+    // of navigating the stack when it's already open.
+    property alias testTypePopupVisible: testTypePopup.visible
+    function openTestTypePopup() { testTypePopup.open() }
+    function closeTestTypePopup() { testTypePopup.close() }
+
     background: Rectangle { color: "#f0f4f8" }
 
     MediaPlayer {
@@ -39,7 +46,15 @@ Page {
         width: Math.min(parent.width - 32, 360)
         padding: 0
         modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        // No CloseOnPressOutside: the touch-down of an edge-swipe back gesture
+        // lands "outside" the popup and would close it via this policy on its
+        // own, independently of Main.qml's Keys.onReleased handler. When the
+        // gesture is decisive enough that Android also delivers a real Back
+        // key event, both fire — the popup closing here, and the handler
+        // then finding it already closed and falling through to pop the whole
+        // stack, jumping back two screens instead of one. Explicit closes
+        // (Cancel, picking a row, or the back button) are enough on their own.
+        closePolicy: Popup.CloseOnEscape
         onAboutToShow: page.popupRefresh++
 
         background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
