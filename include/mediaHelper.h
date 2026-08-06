@@ -15,7 +15,9 @@ class MediaHelper : public QObject {
 public:
     explicit MediaHelper(QObject* parent = nullptr);
 
-    // Fetch the best Wikimedia/Wikipedia thumbnail URL for a word.
+    // Fetch the best Wikimedia/Wikipedia thumbnail URL for a word. Falls back
+    // to Openverse (openly-licensed images — CC/public domain, no API key
+    // needed) when Wikipedia has no article/thumbnail for it.
     // Emits imageFetched(cardIndex, url) when done; silent on failure.
     Q_INVOKABLE void fetchWikimediaImageUrl(const QString& word, int cardIndex, int languageId = 0);
 
@@ -47,6 +49,8 @@ signals:
 
 private:
     void fetchAndCacheImage(const QString& imgUrl, int cardIndex);
+    // Fallback used when Wikipedia has nothing for the word.
+    void fetchOpenverseImageUrl(const QString& word, int cardIndex);
 
     QNetworkAccessManager* m_nam;
     QTextToSpeech*         m_tts;

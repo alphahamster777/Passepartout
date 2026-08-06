@@ -2,6 +2,7 @@
 
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocale>
@@ -161,13 +162,44 @@ void MediaHelper::fetchWikimediaImageUrl(const QString& word, int cardIndex, int
     req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("Passepartout/1.0"));
 
     auto* reply = m_nam->get(req);
+    connect(reply, &QNetworkReply::finished, this, [this, reply, word, cardIndex]() {
+        reply->deleteLater();
+        QString imgUrl;
+        if (reply->error() == QNetworkReply::NoError) {
+            auto obj = QJsonDocument::fromJson(reply->readAll()).object();
+            imgUrl = obj[QStringLiteral("thumbnail")].toObject()
+                         [QStringLiteral("source")].toString();
+        }
+        if (!imgUrl.isEmpty())
+            fetchAndCacheImage(imgUrl, cardIndex);
+        else
+            fetchOpenverseImageUrl(word, cardIndex);
+    });
+}
+
+void MediaHelper::fetchOpenverseImageUrl(const QString& word, int cardIndex) {
+    // No API key required for this volume of traffic (a single lookup per
+    // word, only when Wikipedia had nothing). Every result is CC-licensed or
+    // public domain by construction — that's the whole point of Openverse.
+    QString encoded = QString::fromUtf8(QUrl::toPercentEncoding(word));
+    QUrl url(QStringLiteral("https://api.openverse.org/v1/images/?q=") + encoded
+             + QStringLiteral("&page_size=1&mature=false"));
+    QNetworkRequest req(url);
+    req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("Passepartout/1.0"));
+
+    auto* reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply, cardIndex]() {
         reply->deleteLater();
         if (reply->error() != QNetworkReply::NoError)
             return;
-        auto obj = QJsonDocument::fromJson(reply->readAll()).object();
-        QString imgUrl = obj[QStringLiteral("thumbnail")].toObject()
-                             [QStringLiteral("source")].toString();
+        auto results = QJsonDocument::fromJson(reply->readAll())
+                            .object()[QStringLiteral("results")].toArray();
+        if (results.isEmpty())
+            return;
+        auto first = results.first().toObject();
+        QString imgUrl = first[QStringLiteral("thumbnail")].toString();
+        if (imgUrl.isEmpty())
+            imgUrl = first[QStringLiteral("url")].toString();
         if (!imgUrl.isEmpty())
             fetchAndCacheImage(imgUrl, cardIndex);
     });
