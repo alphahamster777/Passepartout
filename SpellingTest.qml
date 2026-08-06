@@ -75,11 +75,15 @@ Page {
             height: parent.contentHeight - 8
             spacing: 2
 
-            RowLayout {
+            Item {
                 Layout.fillWidth: true
-                spacing: 8
+                Layout.preferredHeight: Math.max(wordLabel.implicitHeight, questionCountLabel.implicitHeight)
 
+                // Centered across the whole header bar, not just the space left
+                // over next to the counter.
                 Label {
+                    id: wordLabel
+                    anchors.fill: parent
                     text: {
                         if (ttype === SpellingTestController.TypeB_WriteFromWord ||
                             ttype === SpellingTestController.TypeD_MCFromWord ||
@@ -90,13 +94,16 @@ Page {
                     font.pixelSize: 18
                     font.bold: true
                     color: "white"
-                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                 }
 
                 Label {
+                    id: questionCountLabel
+                    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
                     text: spellingTestController.correctAnswers + "/" +
                           spellingTestController.totalQuestions
                     font.pixelSize: 13
@@ -426,11 +433,6 @@ Page {
         answerIsCorrect = correct
         answerSubmitted = true
         if (!correct) {
-            const expected = (ttype === SpellingTestController.TypeB_WriteFromWord ||
-                              ttype === SpellingTestController.TypeF_LeitnerReversed)
-                ? spellingTestController.currentHint
-                : spellingTestController.currentWord
-            guessInputField.text   = expected
             guessInputField.color  = "#e74c3c"
         } else {
             guessInputField.color  = "#27ae60"

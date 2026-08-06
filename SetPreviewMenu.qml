@@ -296,6 +296,15 @@ Page {
                                 }
                             }
 
+                            Label {
+                                Layout.fillWidth: true
+                                text: modelData.expression
+                                font.pixelSize: 24; font.bold: true
+                                color: "#2c3e50"
+                                horizontalAlignment: Text.AlignHCenter
+                                wrapMode: Text.WordWrap
+                            }
+
                             // Only rendered when the word has an example usage
                             Label {
                                 Layout.fillWidth: true
@@ -304,15 +313,6 @@ Page {
                                 font.italic: true
                                 font.pixelSize: 13
                                 color: "#7f8c8d"
-                                horizontalAlignment: Text.AlignHCenter
-                                wrapMode: Text.WordWrap
-                            }
-
-                            Label {
-                                Layout.fillWidth: true
-                                text: modelData.expression
-                                font.pixelSize: 24; font.bold: true
-                                color: "#2c3e50"
                                 horizontalAlignment: Text.AlignHCenter
                                 wrapMode: Text.WordWrap
                             }
