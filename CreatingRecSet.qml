@@ -93,6 +93,17 @@ Page {
         audioRecorder.record()
     }
 
+    // Fires off an image fetch for every existing card that has a word but no
+    // image yet — used when Auto-fetch is switched on for a set that already
+    // has words in it, not just words typed afterward.
+    function fetchMissingImagesForAllCards() {
+        for (var i = 0; i < recSetModel.count; i++) {
+            var w = recSetModel.get(i)
+            if (w.expression && w.expression.trim() !== "" && w.imagePath === "")
+                MediaHelper.fetchWikimediaImageUrl(w.expression.trim(), i, w.languageFrom)
+        }
+    }
+
     // ── MediaHelper signal handlers ───────────────────────────────────────────
     Connections {
         target: MediaHelper
@@ -128,6 +139,8 @@ Page {
                 recSetModel.append(words[i])
             if (topTextField.text.trim() === "")
                 topTextField.text = aiThemeField.text.trim()
+            if (page.autoMedia)
+                page.fetchMissingImagesForAllCards()
             page.selectedCardIndex = Math.max(0, recSetModel.count - 1)
             page.aiError = ""
             aiGeneratorPopup.close()
@@ -801,7 +814,7 @@ Page {
                 spacing: 10
 
                 Label {
-                    text: qsTr("Auto-fetch image & pronunciation")
+                    text: qsTr("Auto-fetch images")
                     font.pixelSize: 13
                     color: "#2c3e50"
                     Layout.fillWidth: true
@@ -810,7 +823,11 @@ Page {
                 Switch {
                     id: autoMediaSwitch
                     checked: page.autoMedia
-                    onCheckedChanged: page.autoMedia = checked
+                    onCheckedChanged: {
+                        page.autoMedia = checked
+                        if (checked)
+                            page.fetchMissingImagesForAllCards()
+                    }
                 }
             }
         }
