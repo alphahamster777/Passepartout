@@ -1,11 +1,13 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtMultimedia
 import LanguageHelper
 import AppController
 import MediaHelper
+import GeminiHelper
 
 Page {
     id: page
@@ -28,6 +30,13 @@ Page {
     property int langPickerCurrentId: -1    // enum value of the currently selected language
     property bool titleError: false
     property string titleErrorMessage: ""
+    property string aiError: ""
+    property bool aiEditingKey: GeminiHelper.apiKey === ""
+    readonly property bool aiGenerating: GeminiHelper.generating
+    // "card" = languagePickerPopup edits recSetModel[langPickerCardIndex]; "aiFrom"/"aiTo" = it edits the AI dialog's own selection instead.
+    property string langPickerTarget: "card"
+    property int aiFromLanguageId: LanguageHelper.English
+    property int aiToLanguageId: LanguageHelper.English
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     background: Rectangle { color: "#f0f4f8" }
@@ -102,6 +111,29 @@ Page {
                 page.requestCameraCapture(page.pendingCameraCardIndex)
                 page.pendingCameraCardIndex = -1
             }
+        }
+    }
+
+    // ── GeminiHelper signal handlers ──────────────────────────────────────────
+    Connections {
+        target: GeminiHelper
+        function onWordSetGenerated(words) {
+            // Replace the single blank starter card, if nothing else was typed.
+            if (recSetModel.count === 1) {
+                var only = recSetModel.get(0)
+                if (only.expression === "" && only.hint === "")
+                    recSetModel.remove(0)
+            }
+            for (var i = 0; i < words.length; i++)
+                recSetModel.append(words[i])
+            if (topTextField.text.trim() === "")
+                topTextField.text = aiThemeField.text.trim()
+            page.selectedCardIndex = Math.max(0, recSetModel.count - 1)
+            page.aiError = ""
+            aiGeneratorPopup.close()
+        }
+        function onGenerationFailed(error) {
+            page.aiError = error
         }
     }
 
@@ -245,12 +277,18 @@ Page {
                                 }
                             }
                             onClicked: {
-                                var cardIdx = page.langPickerCardIndex
-                                if (cardIdx >= 0) {
-                                    if (page.langPickerIsFrom)
-                                        recSetModel.set(cardIdx, { languageFrom: modelData.id })
-                                    else
-                                        recSetModel.set(cardIdx, { languageTo: modelData.id })
+                                if (page.langPickerTarget === "aiFrom") {
+                                    page.aiFromLanguageId = modelData.id
+                                } else if (page.langPickerTarget === "aiTo") {
+                                    page.aiToLanguageId = modelData.id
+                                } else {
+                                    var cardIdx = page.langPickerCardIndex
+                                    if (cardIdx >= 0) {
+                                        if (page.langPickerIsFrom)
+                                            recSetModel.set(cardIdx, { languageFrom: modelData.id })
+                                        else
+                                            recSetModel.set(cardIdx, { languageTo: modelData.id })
+                                    }
                                 }
                                 languagePickerPopup.close()
                             }
@@ -275,6 +313,385 @@ Page {
         }
     }
 
+    // ── AI generator popup ───────────────────────────────────────────────────
+    Popup {
+        id: aiGeneratorPopup
+        // Keep the popup within whatever room the on-screen keyboard leaves —
+        // anchors.centerIn: Overlay.overlay ignored the keyboard entirely, so once
+        // it opened (e.g. typing the theme), everything below the focused field
+        // ended up hidden underneath it with no way to reach it.
+        //
+        // Qt.inputMethod.keyboardRectangle isn't reliably in the same coordinate
+        // space as the QML scene across platforms (notably Android, where it can
+        // come back in device pixels while the scene is in logical pixels), so
+        // subtracting it directly produced a wildly wrong, tiny popup. Instead,
+        // only trust the boolean Qt.inputMethod.visible and claim a generous fixed
+        // share of the screen while it's up; the ScrollView below is the real
+        // safety net for anything that still doesn't fit.
+        readonly property bool keyboardUp: Qt.inputMethod.visible
+        readonly property real overlayHeight: Overlay.overlay ? Overlay.overlay.height : 640
+        readonly property real visibleAreaHeight: keyboardUp ? overlayHeight * 0.55 : overlayHeight * 0.92
+
+        x: Overlay.overlay ? (Overlay.overlay.width - width) / 2 : 0
+        y: keyboardUp ? 16 : Math.max(20, (overlayHeight - height) / 2)
+        width: Math.min(parent.width - 32, 380)
+        height: Math.min(implicitHeight, visibleAreaHeight)
+        padding: 0
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        // Closing while a request is in flight (Cancel, tap outside, Escape,
+        // the Android back gesture) must abort it — otherwise the dialog just
+        // disappears while Gemini keeps "generating" forever in the background,
+        // and reopening it shows a stuck, unresponsive Generate button.
+        onClosed: if (page.aiGenerating) GeminiHelper.cancelGeneration()
+
+        background: Rectangle {
+            radius: 18
+            color: "white"
+            layer.enabled: true
+            border.color: "#e7d5ef"
+            border.width: 1
+        }
+
+        // A ScrollView so that whenever the full dialog doesn't fit the space
+        // left by the keyboard, every field and both footer buttons stay
+        // reachable by scrolling instead of being clipped off underneath it.
+        contentItem: ScrollView {
+            id: aiPopupScrollView
+            clip: true
+            contentWidth: availableWidth
+
+            Column {
+            width: aiPopupScrollView.availableWidth
+
+            // ── Gradient header ──────────────────────────────────────────────
+            Rectangle {
+                width: parent.width
+                height: 68
+                radius: 18
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#a55cc2" }
+                    GradientStop { position: 1.0; color: "#8e44ad" }
+                }
+                Rectangle {
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                    height: 18; color: "#8e44ad"
+                }
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 2
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: qsTr("✨ AI Word Set Generator")
+                        font.pixelSize: 17; font.bold: true; color: "white"
+                    }
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: qsTr("Powered by Gemini")
+                        font.pixelSize: 10; color: "#f3e5f9"
+                    }
+                }
+            }
+
+            Item {
+                width: parent.width
+                implicitHeight: formColumn.implicitHeight + 36
+                height: implicitHeight
+
+                Column {
+                    id: formColumn
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 18 }
+                    spacing: 12
+
+                    RowLayout {
+                        width: parent.width
+                        visible: !page.aiEditingKey
+                        spacing: 8
+                        Label {
+                            text: qsTr("🔑 Gemini API key saved")
+                            font.pixelSize: 11
+                            color: "#27ae60"
+                            Layout.fillWidth: true
+                        }
+                        Label {
+                            text: qsTr("Change")
+                            font.pixelSize: 11
+                            font.underline: true
+                            font.bold: true
+                            color: "#9b59b6"
+                            MouseArea { anchors.fill: parent; onClicked: page.aiEditingKey = true }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        visible: page.aiEditingKey
+                        spacing: 5
+                        Label {
+                            width: parent.width
+                            text: qsTr("🔑 Gemini API key (free — get one at aistudio.google.com/apikey). Stored on this device only, for now.")
+                            font.pixelSize: 11
+                            color: "#7f8c8d"
+                            wrapMode: Text.WordWrap
+                        }
+                        TextField {
+                            id: aiKeyField
+                            width: parent.width
+                            echoMode: TextInput.Password
+                            placeholderText: qsTr("Paste API key…")
+                            font.pixelSize: 13
+                            background: Rectangle {
+                                radius: 8; color: "#faf6fc"
+                                border.color: aiKeyField.activeFocus ? "#9b59b6" : "#e7d5ef"
+                                border.width: aiKeyField.activeFocus ? 2 : 1
+                            }
+                            leftPadding: 10
+                            onEditingFinished: {
+                                if (text.trim() !== "") {
+                                    GeminiHelper.apiKey = text.trim()
+                                    text = ""
+                                    page.aiEditingKey = false
+                                }
+                            }
+                        }
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: qsTr("🎯 Theme")
+                        font.pixelSize: 12; font.bold: true; color: "#2c3e50"
+                    }
+                    Rectangle {
+                        width: parent.width
+                        height: 88
+                        radius: 10
+                        color: "#faf6fc"
+                        border.color: aiThemeField.activeFocus ? "#9b59b6" : "#e7d5ef"
+                        border.width: aiThemeField.activeFocus ? 2 : 1
+
+                        ScrollView {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            clip: true
+                            TextArea {
+                                id: aiThemeField
+                                placeholderText: qsTr("Describe the set you want — e.g. \"kitchen items you'd find in a French household\" or \"business travel phrases for a conference\"…")
+                                font.pixelSize: 14
+                                color: "#2c3e50"
+                                wrapMode: TextArea.Wrap
+                                selectByMouse: true
+                                background: null
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        width: parent.width
+                        spacing: 10
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+                            Label { text: qsTr("🗣 Word language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 34
+                                radius: 8
+                                color: "#faf6fc"
+                                border.color: "#e7d5ef"; border.width: 1
+                                RowLayout {
+                                    anchors { fill: parent; leftMargin: 10; rightMargin: 8 }
+                                    spacing: 2
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: LanguageHelper.languageNames()[page.aiFromLanguageId]
+                                        font.pixelSize: 13; color: "#2c3e50"
+                                        elide: Text.ElideRight
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    // Label { text: "▾"; font.pixelSize: 10; color: "#9b59b6" }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        page.langPickerTarget = "aiFrom"
+                                        page.langPickerIsFrom = true
+                                        page.langPickerCurrentId = page.aiFromLanguageId
+                                        languagePickerPopup.open()
+                                    }
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+                            Label { text: qsTr("💡 Hint language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 34
+                                radius: 8
+                                color: "#faf6fc"
+                                border.color: "#e7d5ef"; border.width: 1
+                                RowLayout {
+                                    anchors { fill: parent; leftMargin: 10; rightMargin: 8 }
+                                    spacing: 2
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: LanguageHelper.languageNames()[page.aiToLanguageId]
+                                        font.pixelSize: 13; color: "#2c3e50"
+                                        elide: Text.ElideRight
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    // Label { text: "▾"; font.pixelSize: 10; color: "#9b59b6" }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        page.langPickerTarget = "aiTo"
+                                        page.langPickerIsFrom = false
+                                        page.langPickerCurrentId = page.aiToLanguageId
+                                        languagePickerPopup.open()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        width: parent.width
+                        spacing: 10
+                        Label {
+                            text: qsTr("🔢 Number of words")
+                            font.pixelSize: 12; color: "#2c3e50"
+                            Layout.fillWidth: true
+                        }
+                        SpinBox {
+                            id: aiCountSpin
+                            from: 1; to: 30; value: 10
+                            editable: true
+                            font.pixelSize: 14
+                            implicitWidth: 140
+                            implicitHeight: 40
+
+                            contentItem: TextInput {
+                                anchors {
+                                    left: parent.left; leftMargin: 36
+                                    right: parent.right; rightMargin: 36
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                text: aiCountSpin.textFromValue(aiCountSpin.value, aiCountSpin.locale)
+                                font: aiCountSpin.font
+                                color: "#2c3e50"
+                                horizontalAlignment: Qt.AlignHCenter
+                                verticalAlignment: Qt.AlignVCenter
+                                readOnly: !aiCountSpin.editable
+                                validator: aiCountSpin.validator
+                                inputMethodHints: Qt.ImhDigitsOnly
+                            }
+                            up.indicator: Rectangle {
+                                x: aiCountSpin.width - width
+                                width: 36
+                                height: aiCountSpin.height
+                                radius: 8
+                                color: aiCountSpin.up.pressed ? "#7d3c98" : "#9b59b6"
+                                Text { text: "+"; anchors.centerIn: parent; color: "white"; font.pixelSize: 16; font.bold: true }
+                            }
+                            down.indicator: Rectangle {
+                                x: 0
+                                width: 36
+                                height: aiCountSpin.height
+                                radius: 8
+                                color: aiCountSpin.down.pressed ? "#7d3c98" : "#9b59b6"
+                                Text { text: "−"; anchors.centerIn: parent; color: "white"; font.pixelSize: 16; font.bold: true }
+                            }
+                            background: Rectangle {
+                                radius: 8
+                                color: "#faf6fc"
+                                border.color: "#e7d5ef"
+                            }
+                        }
+                    }
+
+                    Label {
+                        width: parent.width
+                        visible: page.aiError !== ""
+                        text: "⚠ " + page.aiError
+                        color: "#e74c3c"
+                        font.pixelSize: 11
+                        wrapMode: Text.WordWrap
+                    }
+
+                    RowLayout {
+                        width: parent.width
+                        visible: page.aiGenerating
+                        spacing: 8
+                        BusyIndicator {
+                            running: page.aiGenerating
+                            implicitWidth: 22; implicitHeight: 22
+                            Material.accent: "#9b59b6"
+                        }
+                        Label { text: qsTr("Asking Gemini…"); font.pixelSize: 12; color: "#7f8c8d" }
+                    }
+                }
+            }
+
+            Rectangle { width: parent.width; height: 1; color: "#ececec" }
+
+            Row {
+                width: parent.width
+                ItemDelegate {
+                    width: parent.width / 2
+                    height: 52
+                    background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white"; radius: 18 }
+                    contentItem: Text {
+                        text: page.aiGenerating ? qsTr("Cancel request") : qsTr("Cancel")
+                        color: "#e74c3c"
+                        font.pixelSize: 15; font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    // aiGeneratorPopup.onClosed aborts the in-flight request, if any.
+                    onClicked: aiGeneratorPopup.close()
+                }
+                ItemDelegate {
+                    id: generateButton
+                    width: parent.width / 2
+                    height: 52
+                    enabled: !page.aiGenerating && aiThemeField.text.trim() !== "" && GeminiHelper.apiKey !== ""
+                    background: Item {
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 18
+                            visible: generateButton.enabled
+                            opacity: generateButton.pressed ? 0.85 : 1.0
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#a55cc2" }
+                                GradientStop { position: 1.0; color: "#8e44ad" }
+                            }
+                        }
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 18
+                            color: "#bbb"
+                            visible: !generateButton.enabled
+                        }
+                    }
+                    contentItem: Text {
+                        text: qsTr("✨ Generate"); color: "white"
+                        font.pixelSize: 15; font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        page.aiError = ""
+                        GeminiHelper.generateWordSet(aiThemeField.text.trim(), page.aiFromLanguageId,
+                                                      page.aiToLanguageId, aiCountSpin.value)
+                    }
+                }
+            }
+            }
+        }
+    }
+
     // ── Header ────────────────────────────────────────────────────────────────
     header: ToolBar {
         height: 56 + SafeArea.margins.top
@@ -288,7 +705,27 @@ Page {
             height: 56
             spacing: 4
 
-            Item { implicitWidth: 76 }
+            Button {
+                implicitWidth: 76
+                implicitHeight: 36
+                text: qsTr("✨ AI")
+                background: Rectangle {
+                    radius: 8
+                    color: parent.pressed ? "#7d3c98" : "#9b59b6"
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: "white"
+                    font.pixelSize: 13
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: {
+                    page.aiError = ""
+                    aiGeneratorPopup.open()
+                }
+            }
 
             Label {
                 Layout.fillWidth: true
@@ -479,6 +916,7 @@ Page {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
+                                            page.langPickerTarget = "card"
                                             page.langPickerCardIndex = index
                                             page.langPickerIsFrom = true
                                             page.langPickerCurrentId = languageFrom
@@ -538,6 +976,7 @@ Page {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
+                                            page.langPickerTarget = "card"
                                             page.langPickerCardIndex = index
                                             page.langPickerIsFrom = false
                                             page.langPickerCurrentId = languageTo
