@@ -3,6 +3,17 @@ cmake_minimum_required(VERSION 3.28)
 project(Passepartout VERSION 1.0.4 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
+# FREE vs PRO are separate Play Store listings built from this same source
+# tree (see the "Lite + Pro" discussion) — the only difference is which
+# Cloud Function URL gets compiled into FirebaseAiHelper, which in turn is
+# the only thing that determines the monthly AI-generation quota. Build the
+# Pro variant with -DPASSEPARTOUT_TIER=PRO.
+set(PASSEPARTOUT_TIER "FREE" CACHE STRING "Which Play Store listing this build is for: FREE or PRO")
+set_property(CACHE PASSEPARTOUT_TIER PROPERTY STRINGS FREE PRO)
+if(NOT PASSEPARTOUT_TIER STREQUAL "FREE" AND NOT PASSEPARTOUT_TIER STREQUAL "PRO")
+    message(FATAL_ERROR "PASSEPARTOUT_TIER must be FREE or PRO, got: ${PASSEPARTOUT_TIER}")
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 # QT_QML_DEBUG only for Debug builds — globally defining it causes the app to
 # hang on Android when Qt Creator's QML debugger port-forward fails.
@@ -191,6 +202,18 @@ target_include_directories(MediaHelper
 
 target_link_libraries(MediaHelper PRIVATE Qt6::Core Qt6::Gui Qt6::Network Qt6::TextToSpeech)
 
+# Prompt/schema/response-parsing shared by GeminiHelper (direct Gemini calls,
+# used for desktop/local testing) and FirebaseAiHelper (Firebase AI Logic,
+# Android only) so both backends agree on what a generated word set is.
+add_library(AiWordSetShared STATIC
+    ${CMAKE_SOURCE_DIR}/include/aiWordSetShared.h
+    ${CMAKE_SOURCE_DIR}/src/aiWordSetShared.cpp
+)
+target_include_directories(AiWordSetShared
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+target_link_libraries(AiWordSetShared PRIVATE Qt6::Core)
+
 qt_add_qml_module(GeminiHelper
     URI GeminiHelper
     VERSION 1.0
@@ -206,7 +229,25 @@ target_include_directories(GeminiHelper
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 
-target_link_libraries(GeminiHelper PRIVATE Qt6::Core Qt6::Network)
+target_link_libraries(GeminiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared)
+
+qt_add_qml_module(FirebaseAiHelper
+    URI FirebaseAiHelper
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/firebaseAiHelper.h
+    ${CMAKE_SOURCE_DIR}/src/firebaseAiHelper.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/FirebaseAiHelper"
+)
+
+target_include_directories(FirebaseAiHelper
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(FirebaseAiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared)
+target_compile_definitions(FirebaseAiHelper PRIVATE PASSEPARTOUT_TIER_${PASSEPARTOUT_TIER}=1)
 
 qt_add_qml_module(AppController
     URI AppController

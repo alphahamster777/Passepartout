@@ -1,6 +1,6 @@
 #include "geminiHelper.h"
 
-#include "languageHelper.h"
+#include "aiWordSetShared.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -12,9 +12,6 @@
 #include <QUrlQuery>
 
 namespace {
-// Free-tier Gemini model as of this writing. Change here if Google renames
-// or retires it — nothing else in this file needs to know the model name.
-constexpr auto kModel = "gemini-3.6-flash";
 constexpr auto kApiKeySettingsKey = "Gemini/apiKey";
 }
 
@@ -58,53 +55,23 @@ void GeminiHelper::generateWordSet(const QString& theme, int fromLanguageId,
         return;
     }
 
-    const QString fromLang = LanguageHelper::displayName(static_cast<LanguageHelper::Language>(fromLanguageId));
-    const QString toLang   = LanguageHelper::displayName(static_cast<LanguageHelper::Language>(toLanguageId));
-    const int count = qBound(1, wordCount, 30);
-
-    const QString prompt = QStringLiteral(
-        "Generate exactly %1 vocabulary flashcards for a language learner on the theme \"%2\".\n"
-        "\"expression\" must be a single word or short phrase in %3.\n"
-        "\"hint\" must be its translation or definition in %4.\n"
-        "\"exampleUsage\" must be one short example sentence in %3 that uses the expression.\n"
-        "Do not repeat words. Keep entries concise.")
-        .arg(count).arg(theme.trimmed(), fromLang, toLang);
-
-    const QJsonObject schemaItem{
-        {QStringLiteral("type"), QStringLiteral("OBJECT")},
-        {QStringLiteral("properties"), QJsonObject{
-            {QStringLiteral("expression"),   QJsonObject{{QStringLiteral("type"), QStringLiteral("STRING")}}},
-            {QStringLiteral("hint"),         QJsonObject{{QStringLiteral("type"), QStringLiteral("STRING")}}},
-            {QStringLiteral("exampleUsage"), QJsonObject{{QStringLiteral("type"), QStringLiteral("STRING")}}}
-        }},
-        {QStringLiteral("required"), QJsonArray{QStringLiteral("expression"), QStringLiteral("hint"), QStringLiteral("exampleUsage")}}
-    };
-    const QJsonObject schema{
-        {QStringLiteral("type"), QStringLiteral("OBJECT")},
-        {QStringLiteral("properties"), QJsonObject{
-            {QStringLiteral("words"), QJsonObject{
-                {QStringLiteral("type"), QStringLiteral("ARRAY")},
-                {QStringLiteral("items"), schemaItem}
-            }}
-        }},
-        {QStringLiteral("required"), QJsonArray{QStringLiteral("words")}}
-    };
-
     const QJsonObject body{
         {QStringLiteral("contents"), QJsonArray{
             QJsonObject{
                 {QStringLiteral("role"), QStringLiteral("user")},
-                {QStringLiteral("parts"), QJsonArray{QJsonObject{{QStringLiteral("text"), prompt}}}}
+                {QStringLiteral("parts"), QJsonArray{QJsonObject{
+                    {QStringLiteral("text"), AiWordSetShared::buildPrompt(theme, fromLanguageId, toLanguageId, wordCount)}
+                }}}
             }
         }},
         {QStringLiteral("generationConfig"), QJsonObject{
             {QStringLiteral("responseMimeType"), QStringLiteral("application/json")},
-            {QStringLiteral("responseSchema"), schema}
+            {QStringLiteral("responseSchema"), AiWordSetShared::buildResponseSchema()}
         }}
     };
 
     QUrl url(QStringLiteral("https://generativelanguage.googleapis.com/v1beta/models/%1:generateContent")
-                 .arg(QLatin1String(kModel)));
+                 .arg(QLatin1String(AiWordSetShared::kModelName)));
     QUrlQuery query;
     query.addQueryItem(QStringLiteral("key"), m_apiKey);
     url.setQuery(query);
@@ -149,26 +116,10 @@ void GeminiHelper::generateWordSet(const QString& theme, int fromLanguageId,
             return;
         }
         const QString text = parts.first().toObject()[QStringLiteral("text")].toString();
-        const auto payload = QJsonDocument::fromJson(text.toUtf8()).object();
-        const auto words = payload[QStringLiteral("words")].toArray();
-        if (words.isEmpty()) {
+        const QVariantList result = AiWordSetShared::parseWords(text, fromLanguageId, toLanguageId);
+        if (result.isEmpty()) {
             emit generationFailed(tr("Gemini returned no words."));
             return;
-        }
-
-        QVariantList result;
-        result.reserve(words.size());
-        for (const auto& w : words) {
-            const auto obj = w.toObject();
-            QVariantMap rec;
-            rec[QStringLiteral("languageFrom")] = fromLanguageId;
-            rec[QStringLiteral("languageTo")]   = toLanguageId;
-            rec[QStringLiteral("expression")]   = obj[QStringLiteral("expression")].toString();
-            rec[QStringLiteral("hint")]         = obj[QStringLiteral("hint")].toString();
-            rec[QStringLiteral("exampleUsage")] = obj[QStringLiteral("exampleUsage")].toString();
-            rec[QStringLiteral("audioPath")]    = QString();
-            rec[QStringLiteral("imagePath")]    = QString();
-            result.append(rec);
         }
         emit wordSetGenerated(result);
     });

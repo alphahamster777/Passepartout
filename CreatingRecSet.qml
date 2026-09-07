@@ -7,7 +7,7 @@ import QtMultimedia
 import LanguageHelper
 import AppController
 import MediaHelper
-import GeminiHelper
+import FirebaseAiHelper
 
 Page {
     id: page
@@ -31,8 +31,24 @@ Page {
     property bool titleError: false
     property string titleErrorMessage: ""
     property string aiError: ""
-    property bool aiEditingKey: GeminiHelper.apiKey === ""
-    readonly property bool aiGenerating: GeminiHelper.generating
+    readonly property QtObject aiBackend: FirebaseAiHelper
+    readonly property bool aiGenerating: page.aiBackend.generating
+
+    // "in 12d 4h" / "in 3h 20m" / "in 45m" / "soon" from an ISO 8601 UTC
+    // instant — the quota now resets monthly, so this needs to read
+    // sensibly across day-scale gaps too, not just hours/minutes.
+    function formatResetTime(isoString) {
+        if (!isoString) return ""
+        var resetDate = new Date(isoString)
+        if (isNaN(resetDate.getTime())) return ""
+        var diffMs = resetDate.getTime() - Date.now()
+        if (diffMs <= 0) return qsTr("soon")
+        var days = Math.floor(diffMs / 86400000)
+        var hours = Math.floor((diffMs % 86400000) / 3600000)
+        var mins = Math.floor((diffMs % 3600000) / 60000)
+        if (days > 0) return qsTr("in %1d %2h").arg(days).arg(hours)
+        return hours > 0 ? qsTr("in %1h %2m").arg(hours).arg(mins) : qsTr("in %1m").arg(mins)
+    }
     // "card" = languagePickerPopup edits recSetModel[langPickerCardIndex]; "aiFrom"/"aiTo" = it edits the AI dialog's own selection instead.
     property string langPickerTarget: "card"
     property int aiFromLanguageId: LanguageHelper.English
@@ -125,9 +141,9 @@ Page {
         }
     }
 
-    // ── GeminiHelper signal handlers ──────────────────────────────────────────
+    // ── AI backend signal handlers ─────────────────────────────────────────────
     Connections {
-        target: GeminiHelper
+        target: page.aiBackend
         function onWordSetGenerated(words) {
             // Replace the single blank starter card, if nothing else was typed.
             if (recSetModel.count === 1) {
@@ -356,7 +372,8 @@ Page {
         // the Android back gesture) must abort it — otherwise the dialog just
         // disappears while Gemini keeps "generating" forever in the background,
         // and reopening it shows a stuck, unresponsive Generate button.
-        onClosed: if (page.aiGenerating) GeminiHelper.cancelGeneration()
+        onClosed: if (page.aiGenerating) page.aiBackend.cancelGeneration()
+        onOpened: FirebaseAiHelper.refreshQuota()
 
         background: Rectangle {
             radius: 18
@@ -416,57 +433,16 @@ Page {
                     anchors { left: parent.left; right: parent.right; top: parent.top; margins: 18 }
                     spacing: 12
 
-                    RowLayout {
+                    Label {
                         width: parent.width
-                        visible: !page.aiEditingKey
-                        spacing: 8
-                        Label {
-                            text: qsTr("🔑 Gemini API key saved")
-                            font.pixelSize: 11
-                            color: "#27ae60"
-                            Layout.fillWidth: true
-                        }
-                        Label {
-                            text: qsTr("Change")
-                            font.pixelSize: 11
-                            font.underline: true
-                            font.bold: true
-                            color: "#9b59b6"
-                            MouseArea { anchors.fill: parent; onClicked: page.aiEditingKey = true }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        visible: page.aiEditingKey
-                        spacing: 5
-                        Label {
-                            width: parent.width
-                            text: qsTr("🔑 Gemini API key (free — get one at aistudio.google.com/apikey). Stored on this device only, for now.")
-                            font.pixelSize: 11
-                            color: "#7f8c8d"
-                            wrapMode: Text.WordWrap
-                        }
-                        TextField {
-                            id: aiKeyField
-                            width: parent.width
-                            echoMode: TextInput.Password
-                            placeholderText: qsTr("Paste API key…")
-                            font.pixelSize: 13
-                            background: Rectangle {
-                                radius: 8; color: "#faf6fc"
-                                border.color: aiKeyField.activeFocus ? "#9b59b6" : "#e7d5ef"
-                                border.width: aiKeyField.activeFocus ? 2 : 1
-                            }
-                            leftPadding: 10
-                            onEditingFinished: {
-                                if (text.trim() !== "") {
-                                    GeminiHelper.apiKey = text.trim()
-                                    text = ""
-                                    page.aiEditingKey = false
-                                }
-                            }
-                        }
+                        visible: FirebaseAiHelper.remaining >= 0
+                        text: qsTr("🎟 %1 of %2 generations left this month — resets %3")
+                              .arg(FirebaseAiHelper.remaining)
+                              .arg(FirebaseAiHelper.monthlyLimit)
+                              .arg(page.formatResetTime(FirebaseAiHelper.resetAt))
+                        font.pixelSize: 11
+                        color: "#7f8c8d"
+                        wrapMode: Text.WordWrap
                     }
 
                     Label {
@@ -488,14 +464,27 @@ Page {
                             clip: true
                             TextArea {
                                 id: aiThemeField
+                                // TextArea has no maximumLength property (unlike
+                                // TextField) — enforce the cap manually. This is a
+                                // UX nicety only; the Cloud Function is what
+                                // actually enforces it (MAX_THEME_LENGTH).
+                                readonly property int maxLength: 200
                                 placeholderText: qsTr("Describe the set you want — e.g. \"kitchen items you'd find in a French household\" or \"business travel phrases for a conference\"…")
                                 font.pixelSize: 14
                                 color: "#2c3e50"
                                 wrapMode: TextArea.Wrap
                                 selectByMouse: true
                                 background: null
+                                onTextChanged: if (text.length > maxLength) text = text.substring(0, maxLength)
                             }
                         }
+                    }
+                    Label {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignRight
+                        text: qsTr("%1/%2").arg(aiThemeField.text.length).arg(aiThemeField.maxLength)
+                        font.pixelSize: 10
+                        color: aiThemeField.text.length >= aiThemeField.maxLength ? "#e74c3c" : "#b8a9c2"
                     }
 
                     RowLayout {
@@ -579,7 +568,7 @@ Page {
                         }
                         SpinBox {
                             id: aiCountSpin
-                            from: 1; to: 30; value: 10
+                            from: 1; to: 20; value: 10
                             editable: true
                             font.pixelSize: 14
                             implicitWidth: 140
@@ -669,7 +658,7 @@ Page {
                     id: generateButton
                     width: parent.width / 2
                     height: 52
-                    enabled: !page.aiGenerating && aiThemeField.text.trim() !== "" && GeminiHelper.apiKey !== ""
+                    enabled: !page.aiGenerating && aiThemeField.text.trim() !== ""
                     background: Item {
                         Rectangle {
                             anchors.fill: parent
@@ -696,8 +685,8 @@ Page {
                     }
                     onClicked: {
                         page.aiError = ""
-                        GeminiHelper.generateWordSet(aiThemeField.text.trim(), page.aiFromLanguageId,
-                                                      page.aiToLanguageId, aiCountSpin.value)
+                        page.aiBackend.generateWordSet(aiThemeField.text.trim(), page.aiFromLanguageId,
+                                                        page.aiToLanguageId, aiCountSpin.value)
                     }
                 }
             }

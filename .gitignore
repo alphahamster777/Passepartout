@@ -1,0 +1,3 @@
+# Firebase config — project-specific, downloaded per-developer from the
+# Firebase Console. Must never be committed (see android/build.gradle).
+android/google-services.json
