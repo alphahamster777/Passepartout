@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Legacy backup rules for API 26-30 (below Android 12's dataExtractionRules,
+    but still within this app's QT_ANDROID_MIN_SDK_VERSION). See
+    data_extraction_rules.xml for why this exclusion exists.
+-->
+<full-backup-content>
+    <exclude domain="file" path="files/.config/Passepartout"/>
+</full-backup-content>
