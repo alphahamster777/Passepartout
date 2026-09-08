@@ -26,6 +26,7 @@ constexpr auto kFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunc
 constexpr auto kIdTokenSettingsKey = "Firebase/idToken";
 constexpr auto kRefreshTokenSettingsKey = "Firebase/refreshToken";
 constexpr auto kIdTokenExpirySettingsKey = "Firebase/idTokenExpiryEpochMs";
+constexpr auto kMigratedToGoogleSignInKey = "Firebase/migratedToMandatoryGoogleSignIn";
 
 // Refresh a bit before actual expiry so a request never starts with a token
 // that expires mid-flight.
@@ -37,6 +38,23 @@ FirebaseAiHelper::FirebaseAiHelper(QObject* parent)
     , m_nam(new QNetworkAccessManager(this))
 {
     QSettings s;
+
+    // One-time migration: isSignedIn() only checks "is some refresh token
+    // cached" — it can't tell an old anonymous session (this app used to
+    // sign in anonymously, invisibly, before Google sign-in became
+    // mandatory) from a real Google one. Anything already stored here
+    // predates that change and can only be a leftover anonymous account,
+    // so discard it once rather than let it silently keep satisfying
+    // isSignedIn() — otherwise an upgrading user never sees the sign-in
+    // prompt at all and stays stuck on their old, unrelated (and possibly
+    // already quota-exhausted) anonymous identity.
+    if (!s.value(QLatin1String(kMigratedToGoogleSignInKey), false).toBool()) {
+        s.remove(QLatin1String(kIdTokenSettingsKey));
+        s.remove(QLatin1String(kRefreshTokenSettingsKey));
+        s.remove(QLatin1String(kIdTokenExpirySettingsKey));
+        s.setValue(QLatin1String(kMigratedToGoogleSignInKey), true);
+    }
+
     m_idToken = s.value(QLatin1String(kIdTokenSettingsKey)).toString();
     m_refreshToken = s.value(QLatin1String(kRefreshTokenSettingsKey)).toString();
     m_idTokenExpiryEpochMs = s.value(QLatin1String(kIdTokenExpirySettingsKey), 0).toLongLong();
