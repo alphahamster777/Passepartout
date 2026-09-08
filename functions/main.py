@@ -23,6 +23,7 @@ port of the same wording/shape.
 
 import json
 import os
+import time
 from datetime import datetime, timezone
 
 import requests
@@ -88,8 +89,20 @@ def call_gemini(prompt: str, schema: dict, api_key: str) -> list:
             "responseSchema": schema,
         },
     }
-    resp = requests.post(url, params={"key": api_key}, json=body, timeout=25)
-    resp.raise_for_status()
+    # Gemini occasionally returns a transient 503 under load even when the
+    # shared key isn't actually rate-limited — one short-backoff retry
+    # clears most of those before they ever reach the user as an error.
+    try:
+        resp = requests.post(url, params={"key": api_key}, json=body, timeout=25)
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status not in (500, 503):
+            raise
+        print(f"Gemini call returned {status}, retrying once after backoff")
+        time.sleep(1.5)
+        resp = requests.post(url, params={"key": api_key}, json=body, timeout=25)
+        resp.raise_for_status()
     data = resp.json()
 
     candidates = data.get("candidates") or []
@@ -194,17 +207,24 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
             os.environ["GEMINI_API_KEY"],
         )
     except requests.exceptions.HTTPError as exc:
-        # 429 here means the *shared* Gemini key hit its own rate limit —
-        # distinct from the per-user Firestore cap above, since it affects
-        # every user at once. 503 flags that distinction to the client.
+        # requests' HTTPError stringifies to the full request URL, which
+        # includes the API key as a query param (?key=...) — log the detail
+        # server-side (Cloud Functions captures stdout to Cloud Logging) and
+        # never let {exc} itself reach the client.
         status = exc.response.status_code if exc.response is not None else 502
-        if status == 429:
+        print(f"Gemini call failed with status {status}: {exc}")
+        if status in (429, 503):
+            # Gemini's own rate limit or transient unavailability — distinct
+            # from the per-user Firestore cap above, since it affects every
+            # user at once, not just this one.
             return _json_response(
-                {"error": f"Shared Gemini API key is rate-limited: {exc}"}, 503
+                {"error": "The shared AI service is temporarily busy — please try again in a moment."},
+                503,
             )
-        return _json_response({"error": f"Gemini call failed: {exc}"}, 502)
-    except Exception as exc:  # noqa: BLE001 — surfaced to the client as-is
-        return _json_response({"error": f"Gemini call failed: {exc}"}, 502)
+        return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
+    except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
+        print(f"Gemini call failed unexpectedly: {exc}")
+        return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
 
     if not words:
         return _json_response({"error": "Gemini returned no words"}, 502)

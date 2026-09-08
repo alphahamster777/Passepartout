@@ -269,9 +269,10 @@ void FirebaseAiHelper::postGenerate(const QString& idToken, const QString& theme
             else if (status == 401)
                 message = tr("Not signed in — try again. (%1)").arg(message);
             else if (status == 503)
-                // The *shared* Gemini key hit its own rate limit — distinct from
-                // the per-user cap above, affects every user, not just this one.
-                message = tr("⚠ DEBUG: shared Gemini key is rate-limited (%1)").arg(message);
+                // Gemini itself is rate-limited or transiently unavailable —
+                // distinct from the per-user cap above, affects every user,
+                // not just this one.
+                message = tr("⚠ DEBUG: shared AI service is temporarily unavailable (%1)").arg(message);
             emit generationFailed(message);
             return;
         }
