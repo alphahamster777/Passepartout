@@ -43,7 +43,7 @@
         android:enableOnBackInvokedCallback="false">
 
         <activity
-            android:name="org.qtproject.qt.android.bindings.QtActivity"
+            android:name="com.alphahamster.passepartout.PassepartoutActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
             android:launchMode="singleTop"
@@ -78,6 +78,17 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="file" android:host="*" android:pathPattern=".*\\.ppset"/>
                 <data android:mimeType="*/*"/>
+            </intent-filter>
+            <!-- Google Sign-In OAuth redirect (see GoogleSignInHelper) — the
+                 "iOS"-type client's documented reversed-client-ID scheme.
+                 launchMode="singleTop" above means this arrives via
+                 onNewIntent() rather than a fresh Activity instance. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="com.googleusercontent.apps.675677561526-ggr3uedrnqv9u0a8kaduk14hhu52esf1"
+                      android:path="/oauth2redirect"/>
             </intent-filter>
             <meta-data
                 android:name="android.app.lib_name"

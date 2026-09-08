@@ -15,6 +15,13 @@
 // user, unlike GeminiHelper's direct-call path (kept around for offline/
 // no-deployment-needed local testing).
 //
+// Sign-in is mandatory and handled entirely by GoogleSignInHelper (Apple
+// later) — this class no longer creates anonymous accounts itself. It just
+// persists whatever session GoogleSignInHelper hands it (adoptSignIn()) and
+// refreshes that session's token as needed; if there's no session yet,
+// generateWordSet()/refreshQuota() fail with "not signed in" instead of
+// silently signing someone in.
+//
 // Which of two quotas applies (functions/main.py's FREE_MONTHLY_LIMIT vs
 // PRO_MONTHLY_LIMIT) is decided entirely by which Cloud Function URL this
 // build was compiled with — see PASSEPARTOUT_TIER in CMakeLists.txt and the
@@ -44,6 +51,9 @@ class FirebaseAiHelper : public QObject {
     Q_PROPERTY(int remaining READ remaining NOTIFY quotaChanged)
     Q_PROPERTY(int monthlyLimit READ monthlyLimit NOTIFY quotaChanged)
     Q_PROPERTY(QString resetAt READ resetAt NOTIFY quotaChanged)
+    // True once a session from GoogleSignInHelper has been adopted. QML uses
+    // this to decide whether to show the AI dialog or a sign-in prompt.
+    Q_PROPERTY(bool signedIn READ isSignedIn NOTIFY signedInChanged)
 
 public:
     explicit FirebaseAiHelper(QObject* parent = nullptr);
@@ -52,6 +62,7 @@ public:
     int remaining() const { return m_remaining; }
     int monthlyLimit() const { return m_monthlyLimit; }
     QString resetAt() const { return m_resetAt; }
+    bool isSignedIn() const { return !m_refreshToken.isEmpty(); }
 
     Q_INVOKABLE void generateWordSet(const QString& theme, int fromLanguageId,
                                       int toLanguageId, int wordCount);
@@ -63,22 +74,33 @@ public:
     // emission) since it's a background convenience, not a user action.
     Q_INVOKABLE void refreshQuota();
 
+    // Persists a session obtained elsewhere (GoogleSignInHelper's OAuth
+    // flow) — wired via a QML Connections block to that class's
+    // signInSucceeded signal, keeping the two singletons decoupled in C++.
+    Q_INVOKABLE void adoptSignIn(const QString& idToken, const QString& refreshToken,
+                                  int expiresInSeconds);
+
+    // Clears the local session. Does not revoke it server-side (Identity
+    // Toolkit has no simple REST "log out" — the refresh token just stops
+    // being used); good enough for "switch accounts" on this device.
+    Q_INVOKABLE void signOut();
+
     static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new FirebaseAiHelper(); }
 
 signals:
     void generatingChanged();
     void quotaChanged();
+    void signedInChanged();
     void wordSetGenerated(const QVariantList& words);
     void generationFailed(const QString& error);
 
 private:
     void setGenerating(bool value);
 
-    // Reuses a still-valid ID token, refreshes an expired one, or signs in a
-    // new anonymous user if there's no refresh token yet — then calls
-    // `onReady` with either (true, idToken) or (false, errorString).
+    // Reuses a still-valid ID token, or refreshes an expired one — calls
+    // `onReady` with (true, idToken), or (false, "not signed in"/an error)
+    // if there's no session at all or the refresh fails.
     void ensureSignedIn(std::function<void(bool ok, const QString& idTokenOrError)> onReady);
-    void signInAnonymously(std::function<void(bool ok, const QString& idTokenOrError)> onReady);
     void refreshIdToken(std::function<void(bool ok, const QString& idTokenOrError)> onReady);
     void storeAuthResponse(const QJsonObject& obj, bool isRefreshResponse);
     void applyQuota(const QJsonObject& payload);

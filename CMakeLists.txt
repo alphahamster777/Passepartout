@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 2.0.1 LANGUAGES CXX)
+project(Passepartout VERSION 2.0.2 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # FREE vs PRO are separate Play Store listings built from this same source
@@ -249,6 +249,23 @@ target_include_directories(FirebaseAiHelper
 target_link_libraries(FirebaseAiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared)
 target_compile_definitions(FirebaseAiHelper PRIVATE PASSEPARTOUT_TIER_${PASSEPARTOUT_TIER}=1)
 
+qt_add_qml_module(GoogleSignInHelper
+    URI GoogleSignInHelper
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/googleSignInHelper.h
+    ${CMAKE_SOURCE_DIR}/src/googleSignInHelper.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/GoogleSignInHelper"
+)
+
+target_include_directories(GoogleSignInHelper
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(GoogleSignInHelper PRIVATE Qt6::Core Qt6::Gui Qt6::Network)
+
 qt_add_qml_module(AppController
     URI AppController
     VERSION 1.0
@@ -305,7 +322,7 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "10"
+        QT_ANDROID_VERSION_CODE "11"
         # Human-readable app version
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 

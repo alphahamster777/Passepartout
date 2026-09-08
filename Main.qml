@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Window
 
 import AppController
@@ -9,6 +10,8 @@ import LeitnerTestController
 import FlashCardController
 import RecSetManager
 import ShareHelper
+import GoogleSignInHelper
+import FirebaseAiHelper
 
 ApplicationWindow {
     id: mainWindow
@@ -29,6 +32,8 @@ ApplicationWindow {
         anchors.fill: parent
         focus: true
 
+        property string signInError: ""
+
         // Pops the current test page and returns to the Choose Test Type popup
         // on Review Expressions (reopening it also refreshes its "remaining"
         // counts, since that's wired to popupRefresh via testTypePopup.onAboutToShow).
@@ -41,6 +46,11 @@ ApplicationWindow {
         }
 
         Keys.onReleased: function(event) {
+            // Nothing to navigate behind the sign-in screen — let the OS
+            // handle back as usual (e.g. minimize on Android) instead of
+            // popping/quitting a stack the user can't see or reach.
+            if (!FirebaseAiHelper.signedIn) return
+
             const androidBackPressed =
                 Qt.platform.os === "android" && event.key === Qt.Key_Back
 
@@ -109,6 +119,94 @@ ApplicationWindow {
             id: stackView
             anchors.fill: parent
             initialItem: setDirMenu
+        }
+
+        // Sign-in is mandatory for the whole app (Google first, Apple later)
+        // — this sits above everything else and blocks it until
+        // FirebaseAiHelper.signedIn is true. Kept as an always-present
+        // overlay rather than a StackView page so there's nothing to pop
+        // back behind and no page transition to fight with on sign-out.
+        Rectangle {
+            id: signInScreen
+            anchors.fill: parent
+            visible: !FirebaseAiHelper.signedIn
+            z: 100
+            color: "#2c3e50"
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                width: Math.min(parent.width - 64, 320)
+                spacing: 24
+
+                Label {
+                    Layout.fillWidth: true
+                    text: qsTr("Passepartout")
+                    font.pixelSize: 28
+                    font.bold: true
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    text: qsTr("Sign in to continue")
+                    font.pixelSize: 14
+                    color: "#bdc3c7"
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    visible: rootScope.signInError !== ""
+                    text: "⚠ " + rootScope.signInError
+                    color: "#e74c3c"
+                    font.pixelSize: 12
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                ItemDelegate {
+                    id: googleSignInButton
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    enabled: !GoogleSignInHelper.signingIn
+                    background: Rectangle {
+                        radius: 10
+                        color: googleSignInButton.pressed ? "#f0f0f0" : "white"
+                    }
+                    contentItem: RowLayout {
+                        spacing: 10
+                        Item { Layout.fillWidth: true }
+                        BusyIndicator {
+                            visible: GoogleSignInHelper.signingIn
+                            running: GoogleSignInHelper.signingIn
+                            implicitWidth: 20; implicitHeight: 20
+                        }
+                        Text {
+                            text: GoogleSignInHelper.signingIn ? qsTr("Opening browser…") : qsTr("Sign in with Google")
+                            color: "#3c4043"
+                            font.pixelSize: 15; font.bold: true
+                        }
+                        Item { Layout.fillWidth: true }
+                    }
+                    onClicked: {
+                        rootScope.signInError = ""
+                        GoogleSignInHelper.beginSignIn()
+                    }
+                }
+            }
+        }
+
+        Connections {
+            target: GoogleSignInHelper
+            function onSignInSucceeded(idToken, refreshToken, expiresInSeconds) {
+                rootScope.signInError = ""
+                FirebaseAiHelper.adoptSignIn(idToken, refreshToken, expiresInSeconds)
+            }
+            function onSignInFailed(error) {
+                rootScope.signInError = error
+            }
         }
 
         // Saved reference to the CreatingRecSet page so the camera result can update it
@@ -400,6 +498,14 @@ ApplicationWindow {
                     !spellingTestController.isTestComplete()) {
                     spellingTestController.saveProgress()
                 }
+            }
+            // Google's consent screen hands control back to this already-
+            // running app via a new Intent, but nothing pushes that into QML
+            // (see GoogleSignInHelper::checkForPendingRedirect's comment) —
+            // so poll for it every time the app becomes active again.
+            function onStateChanged() {
+                if (Qt.application.state === Qt.ApplicationActive)
+                    GoogleSignInHelper.checkForPendingRedirect()
             }
         }
     }

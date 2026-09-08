@@ -1,6 +1,7 @@
 #include "firebaseAiHelper.h"
 
 #include "aiWordSetShared.h"
+#include "firebaseConfig.h"
 #include "languageHelper.h"
 
 #include <QDateTime>
@@ -12,9 +13,6 @@
 #include <QUrlQuery>
 
 namespace {
-// Neither of these is a secret — see the class comment in the header.
-constexpr auto kWebApiKey = "AIzaSyARe8ltAjSskJrWRz_uthAgdP-prq7uQTY";
-
 // Which Cloud Function (and therefore which monthly quota — see
 // functions/main.py's FREE_MONTHLY_LIMIT / PRO_MONTHLY_LIMIT) this build
 // talks to. Set by CMake's PASSEPARTOUT_TIER option; the Free build never
@@ -81,6 +79,7 @@ void FirebaseAiHelper::storeAuthResponse(const QJsonObject& obj, bool isRefreshR
                                                     : obj[QStringLiteral("expiresIn")].toString();
     const qint64 expiresInSecs = expiresInStr.toLongLong();
 
+    const bool wasSignedIn = isSignedIn();
     m_idToken = idToken;
     m_refreshToken = refreshToken;
     m_idTokenExpiryEpochMs = QDateTime::currentMSecsSinceEpoch() + expiresInSecs * 1000;
@@ -89,6 +88,33 @@ void FirebaseAiHelper::storeAuthResponse(const QJsonObject& obj, bool isRefreshR
     s.setValue(QLatin1String(kIdTokenSettingsKey), m_idToken);
     s.setValue(QLatin1String(kRefreshTokenSettingsKey), m_refreshToken);
     s.setValue(QLatin1String(kIdTokenExpirySettingsKey), m_idTokenExpiryEpochMs);
+    if (wasSignedIn != isSignedIn())
+        emit signedInChanged();
+}
+
+void FirebaseAiHelper::adoptSignIn(const QString& idToken, const QString& refreshToken, int expiresInSeconds) {
+    // Same shape accounts:signUp's response takes in storeAuthResponse's
+    // camelCase branch — reuse it rather than duplicating the QSettings writes.
+    const QJsonObject asIfSignUpResponse{
+        {QStringLiteral("idToken"), idToken},
+        {QStringLiteral("refreshToken"), refreshToken},
+        {QStringLiteral("expiresIn"), QString::number(expiresInSeconds)}
+    };
+    storeAuthResponse(asIfSignUpResponse, /*isRefreshResponse=*/false);
+}
+
+void FirebaseAiHelper::signOut() {
+    const bool wasSignedIn = isSignedIn();
+    m_idToken.clear();
+    m_refreshToken.clear();
+    m_idTokenExpiryEpochMs = 0;
+
+    QSettings s;
+    s.remove(QLatin1String(kIdTokenSettingsKey));
+    s.remove(QLatin1String(kRefreshTokenSettingsKey));
+    s.remove(QLatin1String(kIdTokenExpirySettingsKey));
+    if (wasSignedIn)
+        emit signedInChanged();
 }
 
 void FirebaseAiHelper::ensureSignedIn(std::function<void(bool, const QString&)> onReady) {
@@ -101,49 +127,13 @@ void FirebaseAiHelper::ensureSignedIn(std::function<void(bool, const QString&)> 
         refreshIdToken(std::move(onReady));
         return;
     }
-    signInAnonymously(std::move(onReady));
-}
-
-void FirebaseAiHelper::signInAnonymously(std::function<void(bool, const QString&)> onReady) {
-    QUrl url(QStringLiteral("https://identitytoolkit.googleapis.com/v1/accounts:signUp"));
-    QUrlQuery query;
-    query.addQueryItem(QStringLiteral("key"), QLatin1String(kWebApiKey));
-    url.setQuery(query);
-
-    QNetworkRequest req(url);
-    req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
-    req.setTransferTimeout(15000);
-
-    const QJsonObject body{{QStringLiteral("returnSecureToken"), true}};
-    auto* reply = m_nam->post(req, QJsonDocument(body).toJson(QJsonDocument::Compact));
-    connect(reply, &QNetworkReply::finished, this, [this, reply, onReady = std::move(onReady)]() mutable {
-        reply->deleteLater();
-        const QByteArray raw = reply->readAll();
-        if (reply->error() != QNetworkReply::NoError) {
-            // reply->errorString() alone is just "server replied with status code
-            // 400" — the actually useful reason (e.g. OPERATION_NOT_ALLOWED when
-            // Anonymous sign-in isn't enabled) is in the response body.
-            const auto errObj = QJsonDocument::fromJson(raw).object()[QStringLiteral("error")].toObject();
-            const QString reason = errObj[QStringLiteral("message")].toString();
-            onReady(false, reason.isEmpty()
-                ? tr("Couldn't sign in: %1").arg(reply->errorString())
-                : tr("Couldn't sign in: %1").arg(reason));
-            return;
-        }
-        const auto obj = QJsonDocument::fromJson(raw).object();
-        storeAuthResponse(obj, /*isRefreshResponse=*/false);
-        if (m_idToken.isEmpty()) {
-            onReady(false, tr("Sign-in response had no token."));
-            return;
-        }
-        onReady(true, m_idToken);
-    });
+    onReady(false, tr("Not signed in."));
 }
 
 void FirebaseAiHelper::refreshIdToken(std::function<void(bool, const QString&)> onReady) {
     QUrl url(QStringLiteral("https://securetoken.googleapis.com/v1/token"));
     QUrlQuery query;
-    query.addQueryItem(QStringLiteral("key"), QLatin1String(kWebApiKey));
+    query.addQueryItem(QStringLiteral("key"), QLatin1String(FirebaseConfig::kWebApiKey));
     url.setQuery(query);
 
     QNetworkRequest req(url);
@@ -159,9 +149,10 @@ void FirebaseAiHelper::refreshIdToken(std::function<void(bool, const QString&)> 
         reply->deleteLater();
         if (reply->error() != QNetworkReply::NoError) {
             // The stored refresh token itself may have been revoked/expired —
-            // fall back to a fresh anonymous sign-in rather than failing outright.
-            m_refreshToken.clear();
-            signInAnonymously(std::move(onReady));
+            // there's no anonymous fallback anymore, so this just means the
+            // user needs to sign in again.
+            signOut();
+            onReady(false, tr("Your session expired — please sign in again."));
             return;
         }
         const auto obj = QJsonDocument::fromJson(reply->readAll()).object();
