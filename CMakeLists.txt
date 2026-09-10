@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 2.1.0 LANGUAGES CXX)
+project(Passepartout VERSION 2.1.1 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # FREE vs PRO are separate Play Store listings built from this same source
@@ -184,6 +184,23 @@ target_include_directories(ShareHelper
 )
 
 target_link_libraries(ShareHelper PRIVATE Qt6::Core)
+
+qt_add_qml_module(AppLifecycleBridge
+    URI AppLifecycleBridge
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/appLifecycleBridge.h
+    ${CMAKE_SOURCE_DIR}/src/appLifecycleBridge.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/AppLifecycleBridge"
+)
+
+target_include_directories(AppLifecycleBridge
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(AppLifecycleBridge PRIVATE Qt6::Core)
 
 qt_add_qml_module(MediaHelper
     URI MediaHelper

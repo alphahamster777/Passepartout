@@ -12,6 +12,7 @@ import RecSetManager
 import ShareHelper
 import GoogleSignInHelper
 import FirebaseAiHelper
+import AppLifecycleBridge
 
 ApplicationWindow {
     id: mainWindow
@@ -33,6 +34,7 @@ ApplicationWindow {
         focus: true
 
         property string signInError: ""
+        property string shareErrorMessage: ""
 
         // Pops the current test page and returns to the Choose Test Type popup
         // on Review Expressions (reopening it also refreshes its "remaining"
@@ -481,12 +483,66 @@ ApplicationWindow {
             }
         }
 
-        // If the app was opened by tapping a .ppset file, import it immediately.
-        Component.onCompleted: {
-            var incoming = ShareHelper.incomingFilePath()
-            if (incoming === "") return
-            var page = stackView.push(creatingRecSetMenu)
-            Qt.callLater(function() { page.importFromPath(incoming) })
+        // Handles the app being opened (cold start) or brought back to the
+        // foreground (already running) by tapping a .ppset file — Android
+        // delivers a warm resume via onNewIntent() rather than a fresh
+        // Component.onCompleted, so this needs checking on both, not just
+        // cold start (that gap meant a .ppset opened while the app was
+        // already alive in memory silently did nothing until the app was
+        // eventually killed and relaunched fresh). checkIncomingFile()
+        // itself is async — see incomingFileReady/incomingFileFailed below
+        // — since reading a shared file can block on the sending app.
+        Component.onCompleted: ShareHelper.checkIncomingFile()
+
+        // Belt-and-suspenders on top of the belt-and-suspenders below: two
+        // different event-driven ways of noticing "a new intent might be
+        // waiting" (onNewIntentReceived, Qt.application.onStateChanged)
+        // have each individually failed to fire reliably in the field, for
+        // reasons not fully pinned down without device logs. This doesn't
+        // depend on any lifecycle callback at all — both checks are cheap,
+        // safe to call redundantly, and no-ops when nothing is pending — so
+        // worst case this guarantees detection within ~1.5s regardless of
+        // whatever the deeper issue turns out to be.
+        Timer {
+            interval: 1500
+            running: true
+            repeat: true
+            onTriggered: {
+                GoogleSignInHelper.checkForPendingRedirect()
+                ShareHelper.checkIncomingFile()
+            }
+        }
+
+        Connections {
+            target: ShareHelper
+            function onIncomingFileReady(localPath) {
+                // Each fresh tap of a shared file is a new intent, so
+                // without this, re-opening (the same or another) file while
+                // an earlier import page is still on the stack piles up a
+                // duplicate page on top of it instead of replacing it.
+                // Return to the root first, same as any normal "open with" flow.
+                stackView.pop(null)
+                var page = stackView.push(creatingRecSetMenu)
+                Qt.callLater(function() { page.importFromPath(localPath) })
+            }
+            function onIncomingFileFailed(error) {
+                console.warn("Couldn't open shared file:", error)
+                rootScope.shareErrorMessage = error
+                shareErrorClearTimer.restart()
+            }
+        }
+
+        // The reliable path: Android calls Activity.onNewIntent()
+        // unconditionally whenever a new Intent reaches this already-running
+        // app (see AppLifecycleBridge's doc comment for why the
+        // Qt.application.state-based Connections block below turned out to
+        // miss some of these).
+        Connections {
+            target: AppLifecycleBridge
+            function onNewIntentReceived() {
+                GoogleSignInHelper.checkForPendingRedirect()
+                ShareHelper.checkIncomingFile()
+            }
         }
 
         Connections {
@@ -499,13 +555,46 @@ ApplicationWindow {
                     spellingTestController.saveProgress()
                 }
             }
-            // Google's consent screen hands control back to this already-
-            // running app via a new Intent, but nothing pushes that into QML
-            // (see GoogleSignInHelper::checkForPendingRedirect's comment) —
-            // so poll for it every time the app becomes active again.
+            // Belt-and-suspenders fallback alongside AppLifecycleBridge
+            // above, in case some resume path doesn't go through
+            // onNewIntent() — both checks are safe to call redundantly.
             function onStateChanged() {
-                if (Qt.application.state === Qt.ApplicationActive)
+                if (Qt.application.state === Qt.ApplicationActive) {
                     GoogleSignInHelper.checkForPendingRedirect()
+                    ShareHelper.checkIncomingFile()
+                }
+            }
+        }
+
+        Timer {
+            id: shareErrorClearTimer
+            interval: 5000
+            onTriggered: rootScope.shareErrorMessage = ""
+        }
+
+        // Brief top banner for ShareHelper.incomingFileFailed — previously
+        // only logged to console.warn, so a failed shared-file read (e.g. a
+        // sending app's content:// provider rejecting the read) looked
+        // exactly like nothing happening at all, with no way to tell
+        // detection-failed from read-failed.
+        Rectangle {
+            id: shareErrorBanner
+            anchors { top: parent.top; left: parent.left; right: parent.right; topMargin: SafeArea.margins.top }
+            height: rootScope.shareErrorMessage !== "" ? shareErrorLabel.implicitHeight + 20 : 0
+            visible: height > 0
+            clip: true
+            color: "#e74c3c"
+            z: 200
+
+            Behavior on height { NumberAnimation { duration: 150 } }
+
+            Label {
+                id: shareErrorLabel
+                anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 16 }
+                text: "⚠ " + rootScope.shareErrorMessage
+                color: "white"
+                font.pixelSize: 13
+                wrapMode: Text.WordWrap
             }
         }
     }

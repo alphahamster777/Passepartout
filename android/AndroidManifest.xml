@@ -42,11 +42,22 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="false">
 
+        <!-- launchMode="singleTask" makes a cross-app VIEW intent (e.g.
+             tapping a .ppset in Telegram) route to the existing instance via
+             onNewIntent() instead of a fresh Activity, which onNewIntent()
+             relies on to see the new intent at all.
+             taskAffinity="" was tried on top of this to stop Android from
+             also visually nesting a second entry under the calling app's own
+             task in Recents — but that combination is a known, documented
+             Android gotcha: it breaks the launcher icon's own task-affinity
+             matching, causing the app to hang on relaunch after being opened
+             via a deep link. Reverted; the Recents double-entry is cosmetic
+             and not worth that trade. -->
         <activity
             android:name="com.alphahamster.passepartout.PassepartoutActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="unspecified"
             android:exported="true">
             <intent-filter>
@@ -81,7 +92,7 @@
             </intent-filter>
             <!-- Google Sign-In OAuth redirect (see GoogleSignInHelper) — the
                  "iOS"-type client's documented reversed-client-ID scheme.
-                 launchMode="singleTop" above means this arrives via
+                 launchMode="singleTask" above means this arrives via
                  onNewIntent() rather than a fresh Activity instance. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>

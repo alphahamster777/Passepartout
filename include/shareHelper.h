@@ -13,9 +13,20 @@ class ShareHelper : public QObject {
 public:
     explicit ShareHelper(QObject *parent = nullptr);
 
-    // Returns the local file:// path of a .ppset file the app was asked to open
-    // (ACTION_VIEW intent on Android). Empty string if the app was not opened via file.
-    Q_INVOKABLE QString incomingFilePath() const;
+    // Checks whether the app was asked to open a .ppset file (ACTION_VIEW
+    // intent on Android) and, if so, emits incomingFileReady(localPath) or
+    // incomingFileFailed(error). No-op (no signal at all) if there's
+    // nothing pending. Safe to call on every app resume, not just cold
+    // start — the pending intent is consumed immediately so a later,
+    // unrelated resume won't re-detect and re-import the same file.
+    //
+    // Deliberately asynchronous: a content:// URI (as opposed to file://)
+    // is served by whatever app shared the file, over cross-process IPC —
+    // reading it can block for as long as that other app takes to respond,
+    // including indefinitely if it's busy or hung. This is invoked directly
+    // from QML on the UI thread, so that read must never happen inline here;
+    // it runs on a worker thread instead.
+    Q_INVOKABLE void checkIncomingFile();
 
     // Share plain text (existing)
     Q_INVOKABLE void shareText(const QString& text, const QString& title);
@@ -29,4 +40,12 @@ public:
     Q_INVOKABLE void shareFile(const QString& filePath, const QString& title);
 
     static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new ShareHelper(); }
+
+signals:
+    void incomingFileReady(const QString& localPath);
+    void incomingFileFailed(const QString& error);
+
+private:
+    bool m_incomingFileCheckInFlight = false;
+    int m_incomingFileGeneration = 0;
 };
