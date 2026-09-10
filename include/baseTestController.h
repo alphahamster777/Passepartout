@@ -27,6 +27,22 @@ public:
     };
     Q_ENUM(TestType)
 
+    // How forgiving checkTypedAnswer() is when comparing a typed answer to
+    // the expected word/hint. Read fresh from QSettings on every check
+    // (see kStrictnessSettingsKey) rather than passed through initialize(),
+    // so it applies uniformly no matter which controller instance/testType
+    // is active, and changing it mid-session takes effect immediately.
+    enum SpellingStrictness {
+        Strict  = 0, // exact, case-sensitive match
+        Normal  = 1, // case-insensitive, trimmed — today's original behavior
+        Lenient = 2  // + accent-insensitive, tolerates a single-character typo
+    };
+    Q_ENUM(SpellingStrictness)
+
+    // Shared with AppController::spellingStrictness so both classes agree on
+    // exactly which QSettings key stores the user's chosen level.
+    static constexpr auto kStrictnessSettingsKey = "Testing/spellingStrictness";
+
     Q_PROPERTY(int testType          READ testType          NOTIFY testTypeChanged)
     Q_PROPERTY(int totalQuestions    READ totalQuestions    NOTIFY totalQuestionsChanged)
     Q_PROPERTY(int correctAnswers    READ correctAnswers    NOTIFY correctAnswersChanged)

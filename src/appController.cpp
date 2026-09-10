@@ -1,5 +1,7 @@
 #include "appController.h"
 
+#include <QSettings>
+
 AppController::AppController(QObject *parent) {
     loadData();
 }
@@ -24,4 +26,16 @@ void AppController::saveData() {
 
 bool AppController::loadData() {
     return m_recSetManager.loadFromJson(dataFilePath());
+}
+
+int AppController::spellingStrictness() const {
+    return QSettings().value(QLatin1String(BaseTestController::kStrictnessSettingsKey),
+                              BaseTestController::Normal).toInt();
+}
+
+void AppController::setSpellingStrictness(int value) {
+    if (value == spellingStrictness())
+        return;
+    QSettings().setValue(QLatin1String(BaseTestController::kStrictnessSettingsKey), value);
+    emit spellingStrictnessChanged();
 }

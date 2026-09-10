@@ -7,7 +7,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRegularExpression>
+#include <QSettings>
 #include <QStandardPaths>
+#include <QVector>
 
 #include <algorithm>
 #include <random>
@@ -15,6 +17,38 @@
 static std::mt19937& rng() {
     static std::mt19937 g{ std::random_device{}() };
     return g;
+}
+
+namespace {
+// NFD-decomposes and drops combining marks, so e.g. "café"/"cafe" compare
+// equal — QString has no built-in accent-stripping.
+QString stripDiacritics(const QString& s) {
+    const QString decomposed = s.normalized(QString::NormalizationForm_D);
+    QString result;
+    result.reserve(decomposed.size());
+    for (const QChar& c : decomposed) {
+        if (c.category() != QChar::Mark_NonSpacing)
+            result.append(c);
+    }
+    return result;
+}
+
+// Classic O(n*m) edit distance, single-row DP — good enough for the short
+// word/expression strings this compares.
+int levenshteinDistance(const QString& a, const QString& b) {
+    const int n = a.size(), m = b.size();
+    QVector<int> prev(m + 1), cur(m + 1);
+    for (int j = 0; j <= m; ++j) prev[j] = j;
+    for (int i = 1; i <= n; ++i) {
+        cur[0] = i;
+        for (int j = 1; j <= m; ++j) {
+            const int cost = (a[i - 1] == b[j - 1]) ? 0 : 1;
+            cur[j] = std::min({ prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost });
+        }
+        std::swap(prev, cur);
+    }
+    return prev[m];
+}
 }
 
 BaseTestController::BaseTestController(QObject* parent) : QObject(parent) {}
@@ -109,7 +143,24 @@ bool BaseTestController::checkTypedAnswer(const QString& answer) {
         ? m_currentHint
         : m_currentWord;
 
-    const bool correct = answer.trimmed().compare(expected.trimmed(), Qt::CaseInsensitive) == 0;
+    const int strictness = QSettings().value(QLatin1String(kStrictnessSettingsKey), Normal).toInt();
+
+    QString a = answer.trimmed();
+    QString e = expected.trimmed();
+    bool correct;
+    if (strictness == Strict) {
+        correct = a.compare(e, Qt::CaseSensitive) == 0;
+    } else {
+        if (strictness == Lenient) {
+            a = stripDiacritics(a);
+            e = stripDiacritics(e);
+        }
+        correct = a.compare(e, Qt::CaseInsensitive) == 0;
+        // Only forgive a typo on words long enough that one edit isn't most
+        // of the word — otherwise very short words become trivial to "pass".
+        if (!correct && strictness == Lenient && e.size() > 4)
+            correct = levenshteinDistance(a.toLower(), e.toLower()) <= 1;
+    }
 
     m_isAnswered        = true;
     m_lastAnswerCorrect = correct;

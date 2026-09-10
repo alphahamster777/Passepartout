@@ -82,9 +82,10 @@ Page {
             Flickable {
                 id: listFlick
                 width: testTypePopup.availableWidth
-                // Limit to 80 % of overlay height minus title + cancel rows
+                // Limit to 80 % of overlay height minus title, strictness row and cancel rows
                 height: Math.min(typeCol.implicitHeight,
-                                 (Overlay.overlay ? Overlay.overlay.height * 0.8 : 480) - 52 - 52)
+                                 (Overlay.overlay ? Overlay.overlay.height * 0.8 : 480)
+                                 - 52 - 52 - strictnessBlock.height - 1)
                 contentHeight: typeCol.implicitHeight
                 clip: true
 
@@ -213,6 +214,57 @@ Page {
                                 }
                                 testTypePopup.close()
                                 page.navigateToTest(swipeRow.modelData.type)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Separator + spelling strictness
+            Rectangle { width: testTypePopup.availableWidth; height: 1; color: "#ececec" }
+            Item {
+                id: strictnessBlock
+                width: testTypePopup.availableWidth
+                implicitHeight: strictnessColumn.implicitHeight + 32
+                height: implicitHeight
+
+                Column {
+                    id: strictnessColumn
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 16 }
+                    spacing: 8
+
+                    Label {
+                        text: qsTr("✍️ Spelling strictness")
+                        font.pixelSize: 12; font.bold: true; color: "#2c3e50"
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: 6
+
+                        Repeater {
+                            model: [
+                                { value: 0, label: qsTr("Strict") },
+                                { value: 1, label: qsTr("Normal") },
+                                { value: 2, label: qsTr("Lenient") }
+                            ]
+                            delegate: ItemDelegate {
+                                width: (strictnessColumn.width - 12) / 3
+                                height: 32
+                                readonly property bool selected: AppController.spellingStrictness === modelData.value
+                                background: Rectangle {
+                                    radius: 8
+                                    color: selected ? "#3498db" : "#f0f4f8"
+                                }
+                                contentItem: Text {
+                                    text: modelData.label
+                                    color: selected ? "white" : "#2c3e50"
+                                    font.pixelSize: 12
+                                    font.bold: selected
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: AppController.spellingStrictness = modelData.value
                             }
                         }
                     }
