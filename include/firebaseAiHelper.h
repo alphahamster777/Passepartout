@@ -85,7 +85,10 @@ public:
     // being used); good enough for "switch accounts" on this device.
     Q_INVOKABLE void signOut();
 
-    static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new FirebaseAiHelper(); }
+    // Must be named "create" — that's the only name Qt's QML_SINGLETON
+    // machinery recognizes as a custom factory; anything else is silently
+    // ignored in favor of default-constructing the singleton instead.
+    static QObject* create(QQmlEngine*, QJSEngine*) { return new FirebaseAiHelper(); }
 
 signals:
     void generatingChanged();

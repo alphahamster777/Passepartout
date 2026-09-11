@@ -39,7 +39,10 @@ public:
     // On Android uses FileProvider + ACTION_SEND; no-op on desktop.
     Q_INVOKABLE void shareFile(const QString& filePath, const QString& title);
 
-    static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new ShareHelper(); }
+    // Must be named "create" — that's the only name Qt's QML_SINGLETON
+    // machinery recognizes as a custom factory; anything else is silently
+    // ignored in favor of default-constructing the singleton instead.
+    static QObject* create(QQmlEngine*, QJSEngine*) { return new ShareHelper(); }
 
 signals:
     void incomingFileReady(const QString& localPath);

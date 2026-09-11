@@ -5,6 +5,8 @@
 #include <QLoggingCategory>
 #include <QCoreApplication>
 
+#include "appController.h"
+
 int main(int argc, char *argv[])
 {
     qputenv("QML_XHR_ALLOW_FILE_READ", "1");
@@ -13,6 +15,13 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Passepartout");
     app.setApplicationName("Passepartout");
     app.setApplicationVersion(APP_VERSION);
+
+    // Installed before any QML loads, so every qsTr() binding evaluates
+    // against the right language from its very first read — AppController
+    // (a QML_SINGLETON) doing this itself in its own constructor would race
+    // against whichever QML binding happens to be created first.
+    AppController::applyInterfaceLanguage(AppController::resolveInterfaceLanguage());
+
     QQmlApplicationEngine engine;
     QQuickStyle::setStyle("Material");
 

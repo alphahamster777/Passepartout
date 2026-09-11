@@ -50,7 +50,10 @@ public:
     // matching pending intent.
     Q_INVOKABLE void checkForPendingRedirect();
 
-    static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new GoogleSignInHelper(); }
+    // Must be named "create" — that's the only name Qt's QML_SINGLETON
+    // machinery recognizes as a custom factory; anything else is silently
+    // ignored in favor of default-constructing the singleton instead.
+    static QObject* create(QQmlEngine*, QJSEngine*) { return new GoogleSignInHelper(); }
 
 signals:
     void signingInChanged();

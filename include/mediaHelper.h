@@ -39,7 +39,10 @@ public:
     // Returns a unique, writable output path for a camera photo.
     Q_INVOKABLE QString newPhotoPath() const;
 
-    static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new MediaHelper(); }
+    // Must be named "create" — that's the only name Qt's QML_SINGLETON
+    // machinery recognizes as a custom factory; anything else is silently
+    // ignored in favor of default-constructing the singleton instead.
+    static QObject* create(QQmlEngine*, QJSEngine*) { return new MediaHelper(); }
 
 signals:
     void imageFetched(int cardIndex, const QString& url);

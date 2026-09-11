@@ -9,8 +9,15 @@ QVariantList LanguageHelper::sortedLanguageEntries()
     QVariantList entries;
     entries.reserve(names.size());
 
-    for (int i = 0; i < names.size(); ++i)
-        entries.append(QVariantMap{{"name", names[i]}, {"id", i}});
+    for (int i = 0; i < names.size(); ++i) {
+        const auto lang = static_cast<Language>(i);
+        entries.append(QVariantMap{
+            {"name", names[i]},
+            {"id",   i},
+            {"code", localeCode(lang)},
+            {"flag", flagEmoji(lang)}
+        });
+    }
 
     std::sort(entries.begin(), entries.end(), [](const QVariant& a, const QVariant& b) {
         return a.toMap().value(QStringLiteral("name")).toString()
@@ -19,7 +26,9 @@ QVariantList LanguageHelper::sortedLanguageEntries()
 
     entries.append(QVariantMap{
         {"name", QStringLiteral("Not selected")},
-        {"id",   static_cast<int>(NotSelected)}
+        {"id",   static_cast<int>(NotSelected)},
+        {"code", QStringLiteral("")},
+        {"flag", QStringLiteral("")}
     });
 
     return entries;

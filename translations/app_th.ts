@@ -1,0 +1,829 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="th">
+<context>
+    <name>AboutOpenSourcePage</name>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="7"/>
+        <location filename="../AboutOpenSourcePage.qml" line="24"/>
+        <source>About</source>
+        <translation>เกี่ยวกับ</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="44"/>
+        <source>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color=&apos;#1e88e5&apos;&gt; v%1&lt;/font&gt;</source>
+        <translation>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color='#1e88e5'&gt; v%1&lt;/font&gt;</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="54"/>
+        <source>Vocabulary trainer for memorizing word sets.</source>
+        <translation>โปรแกรมฝึกคำศัพท์สำหรับจดจำชุดคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="68"/>
+        <source>Open Source Licenses</source>
+        <translation>สัญญาอนุญาตโอเพนซอร์ส</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="75"/>
+        <source>This application uses Qt under the GNU Lesser General Public License version 3.</source>
+        <translation>แอปพลิเคชันนี้ใช้ Qt ภายใต้สัญญาอนุญาต GNU Lesser General Public License เวอร์ชัน 3</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="81"/>
+        <source>Qt notice</source>
+        <translation>ประกาศเกี่ยวกับ Qt</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="83"/>
+        <source>Qt Notice</source>
+        <translation>ประกาศเกี่ยวกับ Qt</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="87"/>
+        <location filename="../AboutOpenSourcePage.qml" line="89"/>
+        <source>GNU LGPL v3</source>
+        <translation>GNU LGPL v3</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="93"/>
+        <location filename="../AboutOpenSourcePage.qml" line="95"/>
+        <source>GNU GPL v3</source>
+        <translation>GNU GPL v3</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <source>Qt source code</source>
+        <translation>ซอร์สโค้ดของ Qt</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="105"/>
+        <source>Qt project website</source>
+        <translation>เว็บไซต์โครงการ Qt</translation>
+    </message>
+</context>
+<context>
+    <name>CameraCapture</name>
+    <message>
+        <location filename="../CameraCapture.qml" line="55"/>
+        <source>Take Photo</source>
+        <translation>ถ่ายภาพ</translation>
+    </message>
+    <message>
+        <location filename="../CameraCapture.qml" line="78"/>
+        <source>Cancel</source>
+        <translation>ยกเลิก</translation>
+    </message>
+</context>
+<context>
+    <name>CreatingRecSet</name>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="45"/>
+        <source>soon</source>
+        <translation>เร็ว ๆ นี้</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="49"/>
+        <source>in %1d %2h</source>
+        <translation>ใน %1 วัน %2 ชม.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="50"/>
+        <source>in %1h %2m</source>
+        <translation>ใน %1 ชม. %2 นาที</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="50"/>
+        <source>in %1m</source>
+        <translation>ใน %1 นาที</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="172"/>
+        <source>Select Image</source>
+        <translation>เลือกรูปภาพ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="182"/>
+        <source>Select Audio</source>
+        <translation>เลือกเสียง</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="192"/>
+        <source>Import Word Set</source>
+        <translation>นำเข้าชุดคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="253"/>
+        <source>Word Language</source>
+        <translation>ภาษาของคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="253"/>
+        <source>Hint Language</source>
+        <translation>ภาษาของคำใบ้</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="342"/>
+        <location filename="../CreatingRecSet.qml" line="655"/>
+        <location filename="../CreatingRecSet.qml" line="1470"/>
+        <source>Cancel</source>
+        <translation>ยกเลิก</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="422"/>
+        <source>✨ AI Word Set Generator</source>
+        <translation>✨ ตัวสร้างชุดคำศัพท์ด้วย AI</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="427"/>
+        <source>Powered by Gemini</source>
+        <translation>ขับเคลื่อนด้วย Gemini</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="457"/>
+        <source>🎯 Theme</source>
+        <translation>🎯 หัวข้อ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="479"/>
+        <source>Describe the set you want — e.g. &quot;kitchen items you&apos;d find in a French household&quot; or &quot;business travel phrases for a conference&quot;…</source>
+        <translation>อธิบายชุดคำศัพท์ที่คุณต้องการ — เช่น “ของใช้ในครัวที่พบได้ในบ้านฝรั่งเศส” หรือ “วลีสำหรับการเดินทางธุรกิจไปประชุม”…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="492"/>
+        <source>%1/%2</source>
+        <translation>%1/%2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="446"/>
+        <source>%1 of %2 generations left this month — resets %3</source>
+        <translation>เหลือ %1 จาก %2 ครั้งในเดือนนี้ — รีเซ็ตวันที่ %3</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="503"/>
+        <source>Word language</source>
+        <translation>ภาษาของคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="536"/>
+        <source>Hint language</source>
+        <translation>ภาษาของคำใบ้</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="572"/>
+        <source>🔢 Number of words</source>
+        <translation>🔢 จำนวนคำ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="641"/>
+        <source>Asking Gemini…</source>
+        <translation>กำลังสอบถาม Gemini…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="655"/>
+        <source>Cancel request</source>
+        <translation>ยกเลิกคำขอ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="688"/>
+        <source>✨ Generate</source>
+        <translation>✨ สร้าง</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="720"/>
+        <source>✨ AI</source>
+        <translation>✨ AI</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="741"/>
+        <source>New Word Set</source>
+        <translation>ชุดคำศัพท์ใหม่</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="741"/>
+        <source>Edit Word Set</source>
+        <translation>แก้ไขชุดคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="751"/>
+        <source>Import</source>
+        <translation>นำเข้า</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="779"/>
+        <source>Set title…</source>
+        <translation>ชื่อชุดคำศัพท์…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="813"/>
+        <source>Auto-fetch images</source>
+        <translation>ดึงรูปภาพอัตโนมัติ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="881"/>
+        <source>Word</source>
+        <translation>คำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="888"/>
+        <source>selected</source>
+        <translation>เลือกแล้ว</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="905"/>
+        <source>Word / Term</source>
+        <translation>คำศัพท์ / คำ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="922"/>
+        <location filename="../CreatingRecSet.qml" line="982"/>
+        <source>Not selected</source>
+        <translation>ยังไม่ได้เลือก</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="944"/>
+        <source>Enter word...</source>
+        <translation>ป้อนคำศัพท์...</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="965"/>
+        <source>Hint / meaning</source>
+        <translation>คำใบ้ / ความหมาย</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1004"/>
+        <source>Hint, definition...</source>
+        <translation>คำใบ้ คำจำกัดความ...</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1018"/>
+        <source>Example usage</source>
+        <translation>ตัวอย่างการใช้งาน</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1026"/>
+        <source>Example sentence using the word...</source>
+        <translation>ตัวอย่างประโยคที่ใช้คำนี้...</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1079"/>
+        <source>Change image</source>
+        <translation>เปลี่ยนรูปภาพ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1079"/>
+        <source>Add image</source>
+        <translation>เพิ่มรูปภาพ</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1095"/>
+        <source>Fetch</source>
+        <translation>ดึงข้อมูล</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1120"/>
+        <source>Camera</source>
+        <translation>กล้อง</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1193"/>
+        <source>Add audio</source>
+        <translation>เพิ่มเสียง</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1219"/>
+        <source>■ Stop</source>
+        <translation>■ หยุด</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1219"/>
+        <source>▶ Play</source>
+        <translation>▶ เล่น</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1266"/>
+        <source>■</source>
+        <translation>■</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1266"/>
+        <source>▶ TTS</source>
+        <translation>▶ อ่านออกเสียง</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1307"/>
+        <source>⬛ Stop</source>
+        <translation>⬛ หยุด</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1307"/>
+        <source>● Rec</source>
+        <translation>● อัดเสียง</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1388"/>
+        <source>+ Add word</source>
+        <translation>+ เพิ่มคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1413"/>
+        <source>Remove</source>
+        <translation>ลบออก</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1452"/>
+        <source>Save</source>
+        <translation>บันทึก</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRecSet.qml" line="1461"/>
+        <source>Title is required</source>
+        <translation>ต้องระบุชื่อ</translation>
+    </message>
+</context>
+<context>
+    <name>FlashCard</name>
+    <message>
+        <location filename="../FlashCard.qml" line="222"/>
+        <source>Tap to flip</source>
+        <translation>แตะเพื่อพลิก</translation>
+    </message>
+    <message>
+        <location filename="../FlashCard.qml" line="260"/>
+        <source>Tap to flip back</source>
+        <translation>แตะเพื่อพลิกกลับ</translation>
+    </message>
+    <message>
+        <location filename="../FlashCard.qml" line="282"/>
+        <source>KNOW</source>
+        <translation>รู้จัก</translation>
+    </message>
+    <message>
+        <location filename="../FlashCard.qml" line="291"/>
+        <source>SKIP</source>
+        <translation>ข้าม</translation>
+    </message>
+    <message>
+        <location filename="../FlashCard.qml" line="351"/>
+        <source>x  Don&apos;t know</source>
+        <translation>x  ไม่รู้จัก</translation>
+    </message>
+    <message>
+        <location filename="../FlashCard.qml" line="364"/>
+        <source>✓  Know</source>
+        <translation>✓  รู้จัก</translation>
+    </message>
+</context>
+<context>
+    <name>LicenseTextPage</name>
+    <message>
+        <location filename="../LicenseTextPage.qml" line="37"/>
+        <source>Could not load license text.</source>
+        <translation>ไม่สามารถโหลดข้อความสัญญาอนุญาตได้</translation>
+    </message>
+</context>
+<context>
+    <name>Main</name>
+    <message>
+        <location filename="../Main.qml" line="145"/>
+        <source>Passepartout</source>
+        <translation>Passepartout</translation>
+    </message>
+    <message>
+        <location filename="../Main.qml" line="154"/>
+        <source>Sign in to continue</source>
+        <translation>ลงชื่อเข้าใช้เพื่อดำเนินการต่อ</translation>
+    </message>
+    <message>
+        <location filename="../Main.qml" line="189"/>
+        <source>Opening browser…</source>
+        <translation>กำลังเปิดเบราว์เซอร์…</translation>
+    </message>
+    <message>
+        <location filename="../Main.qml" line="189"/>
+        <source>Sign in with Google</source>
+        <translation>ลงชื่อเข้าใช้ด้วย Google</translation>
+    </message>
+    <message>
+        <location filename="../Main.qml" line="423"/>
+        <location filename="../Main.qml" line="430"/>
+        <source>A library or set with this name already exists here.</source>
+        <translation>มีไลบรารีหรือชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+    </message>
+</context>
+<context>
+    <name>Results</name>
+    <message>
+        <location filename="../Results.qml" line="37"/>
+        <source>Results</source>
+        <translation>ผลลัพธ์</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="67"/>
+        <source>Well</source>
+        <translation>เยี่ยม</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="74"/>
+        <source>done</source>
+        <translation>มาก</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="74"/>
+        <source>out of %1</source>
+        <translation>จาก %1</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="86"/>
+        <location filename="../Results.qml" line="88"/>
+        <source>Excellent work! Keep it up!</source>
+        <translation>ทำได้ดีมาก! ทำต่อไปนะ!</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="89"/>
+        <source>Good effort! Keep practising.</source>
+        <translation>พยายามได้ดี! ฝึกฝนต่อไป</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="90"/>
+        <source>Don&apos;t give up – practice makes perfect!</source>
+        <translation>อย่ายอมแพ้ – การฝึกฝนทำให้สมบูรณ์แบบ!</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="112"/>
+        <source>This session</source>
+        <translation>เซสชันนี้</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="133"/>
+        <source>Don&apos;t know</source>
+        <translation>ไม่รู้จัก</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="148"/>
+        <source>Know</source>
+        <translation>รู้จัก</translation>
+    </message>
+    <message>
+        <location filename="../Results.qml" line="169"/>
+        <source>Practice Again</source>
+        <translation>ฝึกอีกครั้ง</translation>
+    </message>
+</context>
+<context>
+    <name>SetDirMenu</name>
+    <message>
+        <location filename="../SetDirMenu.qml" line="105"/>
+        <location filename="../SetDirMenu.qml" line="169"/>
+        <source>Overwrite word set?</source>
+        <translation>เขียนทับชุดคำศัพท์หรือไม่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="105"/>
+        <source>Merge libraries?</source>
+        <translation>รวมไลบรารีหรือไม่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="113"/>
+        <source>A word set named &quot;%1&quot; already exists here. Overwrite it with the moved set?</source>
+        <translation>มีชุดคำศัพท์ชื่อ “%1” อยู่แล้วที่นี่ ต้องการเขียนทับด้วยชุดที่ย้ายมาหรือไม่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="114"/>
+        <source>A library named &quot;%1&quot; already exists here. Merge its contents into it?</source>
+        <translation>มีไลบรารีชื่อ “%1” อยู่แล้วที่นี่ ต้องการรวมเนื้อหาเข้ากับไลบรารีนี้หรือไม่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="179"/>
+        <source>A word set named &quot;%1&quot; already exists in %2. Overwrite it with the version being merged in?</source>
+        <translation>มีชุดคำศัพท์ชื่อ “%1” อยู่แล้วใน %2 ต้องการเขียนทับด้วยเวอร์ชันที่รวมเข้าด้วยกันหรือไม่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="181"/>
+        <source>the destination library</source>
+        <translation>ไลบรารีปลายทาง</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="209"/>
+        <source>Export as .ppset</source>
+        <translation>ส่งออกเป็น .ppset</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="221"/>
+        <source>New Library</source>
+        <translation>ไลบรารีใหม่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="240"/>
+        <source>Library name:</source>
+        <translation>ชื่อไลบรารี:</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="244"/>
+        <source>e.g. Travel, Work, School…</source>
+        <translation>เช่น ท่องเที่ยว งาน โรงเรียน…</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="256"/>
+        <location filename="../SetDirMenu.qml" line="330"/>
+        <source>A library or set with this name already exists here.</source>
+        <translation>มีไลบรารีหรือชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="263"/>
+        <source>Create</source>
+        <translation>สร้าง</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="291"/>
+        <source>Rename Library</source>
+        <translation>เปลี่ยนชื่อไลบรารี</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="315"/>
+        <source>New name:</source>
+        <translation>ชื่อใหม่:</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="337"/>
+        <location filename="../SetDirMenu.qml" line="630"/>
+        <source>Rename</source>
+        <translation>เปลี่ยนชื่อ</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="385"/>
+        <source>Your word sets</source>
+        <translation>ชุดคำศัพท์ของคุณ</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="385"/>
+        <location filename="../SetDirMenu.qml" line="804"/>
+        <source>Library</source>
+        <translation>ไลบรารี</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="455"/>
+        <source>Move out of</source>
+        <translation>ย้ายออกจาก</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="585"/>
+        <source>Drop to move inside</source>
+        <translation>วางเพื่อย้ายเข้าไป</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="616"/>
+        <source>words</source>
+        <translation>คำ</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="640"/>
+        <source>Delete Library</source>
+        <translation>ลบไลบรารี</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="653"/>
+        <source>Edit</source>
+        <translation>แก้ไข</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="659"/>
+        <source>Delete</source>
+        <translation>ลบ</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="671"/>
+        <source>Share .ppset file</source>
+        <translation>แชร์ไฟล์ .ppset</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="682"/>
+        <source>Export .ppset (save to disk)</source>
+        <translation>ส่งออก .ppset (บันทึกลงดิสก์)</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="777"/>
+        <source>Nothing here yet.
+Tap + Create to add a word set or library.</source>
+        <translation>ยังไม่มีอะไรที่นี่
+แตะ + สร้าง เพื่อเพิ่มชุดคำศัพท์หรือไลบรารี</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="800"/>
+        <source>Word Set</source>
+        <translation>ชุดคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="823"/>
+        <source>+ Create</source>
+        <translation>+ สร้าง</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="877"/>
+        <source>Interface Language</source>
+        <translation>ภาษาส่วนติดต่อผู้ใช้</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="948"/>
+        <source>Cancel</source>
+        <translation>ยกเลิก</translation>
+    </message>
+</context>
+<context>
+    <name>SetPreviewMenu</name>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="76"/>
+        <source>Choose Test Type</source>
+        <translation>เลือกประเภทแบบทดสอบ</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="99"/>
+        <source>Flash Cards</source>
+        <translation>บัตรคำ</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="100"/>
+        <source>Flip to reveal — swipe right if you know it</source>
+        <translation>พลิกเพื่อดูคำตอบ — ปัดขวาถ้าคุณรู้จัก</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="102"/>
+        <source>Write the Word</source>
+        <translation>เขียนคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="103"/>
+        <source>See the hint — type the expression</source>
+        <translation>ดูคำใบ้ — พิมพ์สำนวน</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="105"/>
+        <source>Write the Hint</source>
+        <translation>เขียนคำใบ้</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="106"/>
+        <source>See the word — type its translation</source>
+        <translation>ดูคำศัพท์ — พิมพ์คำแปล</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="108"/>
+        <source>Pick the Word</source>
+        <translation>เลือกคำศัพท์</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="109"/>
+        <source>See the hint — choose from 4 options</source>
+        <translation>ดูคำใบ้ — เลือกจาก 4 ตัวเลือก</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="111"/>
+        <source>Pick the Hint</source>
+        <translation>เลือกคำใบ้</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="112"/>
+        <source>See the word — choose from 4 options</source>
+        <translation>ดูคำศัพท์ — เลือกจาก 4 ตัวเลือก</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="114"/>
+        <source>Progressive Learning</source>
+        <translation>การเรียนรู้แบบต่อเนื่อง</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="115"/>
+        <source>MC to learn, then write to master all words</source>
+        <translation>เลือกตอบแบบปรนัยเพื่อเรียนรู้ก่อน จากนั้นเขียนเพื่อฝึกฝนคำศัพท์ทั้งหมด</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="117"/>
+        <source>Reversed Progressive Learning</source>
+        <translation>การเรียนรู้แบบต่อเนื่องย้อนกลับ</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="118"/>
+        <source>MC to learn, then write to master all hints</source>
+        <translation>เลือกตอบแบบปรนัยเพื่อเรียนรู้ก่อน จากนั้นเขียนเพื่อฝึกฝนคำใบ้ทั้งหมด</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="141"/>
+        <source>✓ Done</source>
+        <translation>✓ เสร็จสิ้น</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="141"/>
+        <source>← Reset</source>
+        <translation>← รีเซ็ต</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="237"/>
+        <source>✍️ Spelling strictness</source>
+        <translation>✍️ ความเข้มงวดด้านการสะกดคำ</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="247"/>
+        <source>Strict</source>
+        <translation>เข้มงวด</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="248"/>
+        <source>Normal</source>
+        <translation>ปกติ</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="249"/>
+        <source>Lenient</source>
+        <translation>ผ่อนปรน</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="281"/>
+        <source>Cancel</source>
+        <translation>ยกเลิก</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="300"/>
+        <source>Review Expressions</source>
+        <translation>ทบทวนสำนวน</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="420"/>
+        <source>■  Stop</source>
+        <translation>■  หยุด</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="420"/>
+        <source>▶  Listen</source>
+        <translation>▶  ฟัง</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="474"/>
+        <source>Start Test</source>
+        <translation>เริ่มแบบทดสอบ</translation>
+    </message>
+    <message>
+        <location filename="../SetPreviewMenu.qml" line="474"/>
+        <source>No words yet</source>
+        <translation>ยังไม่มีคำศัพท์</translation>
+    </message>
+</context>
+<context>
+    <name>SpellingTest</name>
+    <message>
+        <location filename="../SpellingTest.qml" line="118"/>
+        <source>Learning ▸ Set1: %1 remaining</source>
+        <translation>การเรียนรู้ ▸ Set1: เหลืออีก %1</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="119"/>
+        <source>Testing ▸ Set2: %1 to master</source>
+        <translation>การทดสอบ ▸ Set2: ต้องฝึกฝนอีก %1</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="180"/>
+        <source>Type the hint / translation…</source>
+        <translation>พิมพ์คำใบ้ / คำแปล…</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="181"/>
+        <source>Type the expression…</source>
+        <translation>พิมพ์สำนวน…</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="208"/>
+        <location filename="../SpellingTest.qml" line="209"/>
+        <source>Correct: </source>
+        <translation>ถูกต้อง: </translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="220"/>
+        <source>✓ Mark as correct (I mistyped)</source>
+        <translation>✓ ทำเครื่องหมายว่าถูกต้อง (ฉันพิมพ์ผิด)</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="241"/>
+        <source>Submit</source>
+        <translation>ส่ง</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="324"/>
+        <source>✓ Mark as correct (I misclicked)</source>
+        <translation>✓ ทำเครื่องหมายว่าถูกต้อง (ฉันคลิกผิด)</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="348"/>
+        <source>Correct: %1 / %2</source>
+        <translation>ถูกต้อง: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="393"/>
+        <source>See Results</source>
+        <translation>ดูผลลัพธ์</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="394"/>
+        <source>Next →</source>
+        <translation>ถัดไป →</translation>
+    </message>
+</context>
+</TS>

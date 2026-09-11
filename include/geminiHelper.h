@@ -36,7 +36,10 @@ public:
     // No generationFailed follows a user-initiated cancel.
     Q_INVOKABLE void cancelGeneration();
 
-    static QObject* qmlInstance(QQmlEngine*, QJSEngine*) { return new GeminiHelper(); }
+    // Must be named "create" — that's the only name Qt's QML_SINGLETON
+    // machinery recognizes as a custom factory; anything else is silently
+    // ignored in favor of default-constructing the singleton instead.
+    static QObject* create(QQmlEngine*, QJSEngine*) { return new GeminiHelper(); }
 
 signals:
     void apiKeyChanged();

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 2.1.1 LANGUAGES CXX)
+project(Passepartout VERSION 2.2.0 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # FREE vs PRO are separate Play Store listings built from this same source
@@ -32,7 +32,7 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Core  Multimedia QuickControls2 QuickDialogs2 Network TextToSpeech)
+find_package(Qt6 REQUIRED COMPONENTS Quick Core  Multimedia QuickControls2 QuickDialogs2 Network TextToSpeech LinguistTools)
 
 if(Qt6_VERSION VERSION_GREATER_EQUAL "6.10.0")
     find_package(Qt6 REQUIRED COMPONENTS CorePrivate)
@@ -304,13 +304,30 @@ qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
     QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml FlashCard.qml
-    IMPORTS LeitnerTestController SpellingTestController FlashCardController
+    IMPORTS LeitnerTestController SpellingTestController FlashCardController LanguageHelper
 )
+
+# IMPORTS (above) only tells qmlimportscanner what to discover/bundle for
+# deployment — it does NOT give Ninja a rebuild-ordering dependency, since a
+# QML-only plugin like LanguageHelper is never linked into appPassepartout's
+# executable. Without this, editing languageHelper.h/cpp and then building
+# only the appPassepartout target can silently link/package a stale plugin
+# (verified: "ninja: no work to do" for appPassepartout even right after
+# LanguageHelper's own sources changed) — add_dependencies() is what actually
+# forces Ninja to rebuild LanguageHelper first when it's out of date.
+add_dependencies(appPassepartout LanguageHelper)
+
+# main.cpp calls AppController::resolveInterfaceLanguage()/applyInterfaceLanguage()
+# directly (in C++, ahead of any QML) — needs the header, and an explicit link
+# since that direct C++ dependency isn't declared via IMPORTS above the way the
+# QML-only singletons are (those get pulled in by Qt's qmlimportscanner instead).
+target_include_directories(appPassepartout PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(appPassepartout
     PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
             Qt6::Network Qt6::TextToSpeech
             SpellingTestController LeitnerTestController FlashCardController
+            AppController
 )
 
 qt_add_resources(appPassepartout "license_resources"
@@ -319,6 +336,76 @@ qt_add_resources(appPassepartout "license_resources"
         licenses/LGPL-3.0.txt
         licenses/GPL-3.0.txt
         licenses/qt_notice.txt
+)
+
+# One .ts per LanguageHelper language except English (the qsTr() source
+# language itself, so it needs no translation file — AppController::
+# applyInterfaceLanguage() leaves no translator installed for it and the
+# source text shows through as-is). SOURCE_TARGETS is deliberately omitted:
+# these .ts files are already fully populated by hand/AI rather than by
+# lupdate, so this only compiles+embeds them (as :/i18n/app_<code>.qm) —
+# it does not run lupdate against the sources or touch their content.
+# To pick up newly added qsTr() strings later, run lupdate manually against
+# the QML_FILES above into each translations/app_<code>.ts and fill in the
+# new <translation> entries (lupdate preserves the existing ones).
+qt_add_translations(appPassepartout
+    TS_FILES
+        translations/app_af.ts
+        translations/app_ar.ts
+        translations/app_az.ts
+        translations/app_be.ts
+        translations/app_bg.ts
+        translations/app_bn.ts
+        translations/app_ca.ts
+        translations/app_cs.ts
+        translations/app_cy.ts
+        translations/app_da.ts
+        translations/app_de.ts
+        translations/app_el.ts
+        translations/app_es.ts
+        translations/app_et.ts
+        translations/app_eu.ts
+        translations/app_fa.ts
+        translations/app_fi.ts
+        translations/app_fil.ts
+        translations/app_fr.ts
+        translations/app_gl.ts
+        translations/app_he.ts
+        translations/app_hi.ts
+        translations/app_hr.ts
+        translations/app_hu.ts
+        translations/app_hy.ts
+        translations/app_id.ts
+        translations/app_is.ts
+        translations/app_it.ts
+        translations/app_ja.ts
+        translations/app_ka.ts
+        translations/app_kk.ts
+        translations/app_ko.ts
+        translations/app_lt.ts
+        translations/app_lv.ts
+        translations/app_mr.ts
+        translations/app_ms.ts
+        translations/app_nb.ts
+        translations/app_nl.ts
+        translations/app_pl.ts
+        translations/app_pt.ts
+        translations/app_ro.ts
+        translations/app_ru.ts
+        translations/app_sk.ts
+        translations/app_sl.ts
+        translations/app_sq.ts
+        translations/app_sr.ts
+        translations/app_sv.ts
+        translations/app_sw.ts
+        translations/app_ta.ts
+        translations/app_th.ts
+        translations/app_tr.ts
+        translations/app_uk.ts
+        translations/app_ur.ts
+        translations/app_vi.ts
+        translations/app_zh_CN.ts
+    RESOURCE_PREFIX "/i18n"
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -339,7 +426,7 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "13"
+        QT_ANDROID_VERSION_CODE "14"
         # Human-readable app version
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 

@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQml.Models
 import AppController
+import LanguageHelper
 import ShareHelper
 import RecSetManager
 
@@ -24,6 +25,11 @@ Page {
     signal editRecSet(idx: int)
     signal folderSelected(path: string)
     signal aboutRequested()
+
+    // "Not selected" only makes sense for a word's own language, never for
+    // the interface itself.
+    readonly property var interfaceLangEntries: LanguageHelper.sortedLanguageEntries().filter(
+        function(e) { return e.id !== LanguageHelper.NotSelected })
 
     property int exportSetIdx: -1
 
@@ -383,19 +389,34 @@ Page {
                 }
             }
 
-            ToolButton {
-                anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 8 }
-                text: "ⓘ"
-                font.pixelSize: 22
-                contentItem: Label {
+            RowLayout {
+                anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 4 }
+                spacing: 0
+
+                ToolButton {
+                    contentItem: Label {
+                        text: LanguageHelper.flagEmoji(AppController.interfaceLanguage)
+                        font.pixelSize: 20
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    background: Item {}
+                    onClicked: interfaceLanguagePopup.open()
+                }
+
+                ToolButton {
                     text: "ⓘ"
                     font.pixelSize: 22
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    contentItem: Label {
+                        text: "ⓘ"
+                        font.pixelSize: 22
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    background: Item {}
+                    onClicked: page.aboutRequested()
                 }
-                background: Item {}
-                onClicked: page.aboutRequested()
             }
         }
     }
@@ -808,6 +829,136 @@ Page {
         MouseArea {
             anchors.fill: parent
             onClicked: createMenu.popup()
+        }
+    }
+
+    // ── Interface language picker ───────────────────────────────────────────
+    // Reached by tapping the flag in the header — flags read at a glance
+    // without needing a whole Settings page in between. Uses native-script
+    // names (LanguageHelper.displayName) since someone picking their
+    // interface language is exactly the person who may not read English yet.
+    Popup {
+        id: interfaceLanguagePopup
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(parent.width - 32, 340)
+        padding: 0
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        onOpened: Qt.callLater(function() {
+            var entries = page.interfaceLangEntries
+            var currentId = AppController.interfaceLanguage
+            for (var i = 0; i < entries.length; ++i) {
+                if (entries[i].id === currentId) {
+                    var itemH = 52
+                    var targetY = i * itemH
+                    var center = targetY - (langFlick.height - itemH) / 2
+                    langFlick.contentY = Math.max(0,
+                        Math.min(center, Math.max(0, langFlick.contentHeight - langFlick.height)))
+                    break
+                }
+            }
+        })
+
+        background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
+
+        contentItem: Column {
+            // Several entries in this list are RTL languages (Hebrew, Arabic,
+            // Urdu, Persian) — keep flag/name/checkmark in a fixed left-to-right
+            // order regardless, so layout doesn't mirror on top of the name
+            // Label's own RTL text shaping (handled by its horizontalAlignment).
+            LayoutMirroring.enabled: false
+            LayoutMirroring.childrenInherit: true
+            Rectangle {
+                width: interfaceLanguagePopup.availableWidth
+                height: 52
+                color: "#2c3e50"
+                radius: 14
+                Rectangle {
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                    height: 14; color: "#2c3e50"
+                }
+                Label {
+                    anchors.centerIn: parent
+                    text: qsTr("Interface Language")
+                    font.pixelSize: 16; font.bold: true; color: "white"
+                }
+            }
+
+            Flickable {
+                id: langFlick
+                width: interfaceLanguagePopup.availableWidth
+                height: Math.min(langCol.implicitHeight,
+                                 (Overlay.overlay ? Overlay.overlay.height * 0.65 : 380) - 52 - 52)
+                contentHeight: langCol.implicitHeight
+                clip: true
+
+                Column {
+                    id: langCol
+                    width: langFlick.width
+
+                    Repeater {
+                        model: page.interfaceLangEntries
+                        delegate: ItemDelegate {
+                            width: langCol.width
+                            height: 52
+                            required property var modelData
+
+                            readonly property bool isCurrent: modelData.id === AppController.interfaceLanguage
+
+                            background: Rectangle {
+                                color: isCurrent ? "#eaf4fb"
+                                     : parent.pressed ? "#f0f4f8" : "white"
+                                Rectangle {
+                                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                                    height: 1; color: "#ececec"
+                                }
+                            }
+                            contentItem: RowLayout {
+                                anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
+                                spacing: 10
+                                Label {
+                                    text: modelData.flag
+                                    font.pixelSize: 20
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: LanguageHelper.displayName(modelData.id)
+                                    color: isCurrent ? "#3498db" : "#2c3e50"
+                                    font.pixelSize: 15
+                                    font.bold: isCurrent
+                                    horizontalAlignment: Text.AlignLeft
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Label {
+                                    visible: isCurrent
+                                    text: "✓"
+                                    color: "#3498db"
+                                    font.pixelSize: 14
+                                }
+                            }
+                            onClicked: {
+                                AppController.interfaceLanguage = modelData.id
+                                interfaceLanguagePopup.close()
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle { width: interfaceLanguagePopup.availableWidth; height: 1; color: "#ececec" }
+            ItemDelegate {
+                width: interfaceLanguagePopup.availableWidth
+                height: 50
+                background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white"; radius: 14 }
+                contentItem: Text {
+                    text: qsTr("Cancel"); color: "#e74c3c"
+                    font.pixelSize: 15; font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: interfaceLanguagePopup.close()
+            }
         }
     }
 }

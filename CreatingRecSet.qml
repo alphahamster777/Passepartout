@@ -52,7 +52,7 @@ Page {
     // "card" = languagePickerPopup edits recSetModel[langPickerCardIndex]; "aiFrom"/"aiTo" = it edits the AI dialog's own selection instead.
     property string langPickerTarget: "card"
     property int aiFromLanguageId: LanguageHelper.English
-    property int aiToLanguageId: LanguageHelper.English
+    property int aiToLanguageId: AppController.defaultMeaningLanguage
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     background: Rectangle { color: "#f0f4f8" }
@@ -310,13 +310,20 @@ Page {
                                     page.aiFromLanguageId = modelData.id
                                 } else if (page.langPickerTarget === "aiTo") {
                                     page.aiToLanguageId = modelData.id
+                                    AppController.defaultMeaningLanguage = modelData.id
                                 } else {
                                     var cardIdx = page.langPickerCardIndex
                                     if (cardIdx >= 0) {
-                                        if (page.langPickerIsFrom)
+                                        if (page.langPickerIsFrom) {
                                             recSetModel.set(cardIdx, { languageFrom: modelData.id })
-                                        else
+                                        } else {
                                             recSetModel.set(cardIdx, { languageTo: modelData.id })
+                                            // Only a brand-new set's hint language sticks as the
+                                            // new default for future sets — changing it while
+                                            // editing an existing set is just editing that set.
+                                            if (page.recSetIdx === -1)
+                                                AppController.defaultMeaningLanguage = modelData.id
+                                        }
                                     }
                                 }
                                 languagePickerPopup.close()
@@ -436,7 +443,7 @@ Page {
                     Label {
                         width: parent.width
                         visible: FirebaseAiHelper.remaining >= 0
-                        text: qsTr("🎟 %1 of %2 generations left this month — resets %3")
+                        text: "🎟️ " + qsTr("%1 of %2 generations left this month — resets %3")
                               .arg(FirebaseAiHelper.remaining)
                               .arg(FirebaseAiHelper.monthlyLimit)
                               .arg(page.formatResetTime(FirebaseAiHelper.resetAt))
@@ -493,7 +500,7 @@ Page {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 4
-                            Label { text: qsTr("🗣 Word language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Label { text: "🗣️ " + qsTr("Word language"); font.pixelSize: 11; color: "#7f8c8d" }
                             Rectangle {
                                 Layout.fillWidth: true
                                 implicitHeight: 34
@@ -526,7 +533,7 @@ Page {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 4
-                            Label { text: qsTr("💡 Hint language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Label { text: "💡 " + qsTr("Hint language"); font.pixelSize: 11; color: "#7f8c8d" }
                             Rectangle {
                                 Layout.fillWidth: true
                                 implicitHeight: 34
@@ -1366,7 +1373,7 @@ Page {
             Component.onCompleted: {
                 recSetModel.append({
                     languageFrom: LanguageHelper.English,
-                    languageTo:   LanguageHelper.English,
+                    languageTo:   AppController.defaultMeaningLanguage,
                     expression: "", hint: "", audioPath: "", imagePath: "", exampleUsage: ""
                 })
                 page.selectedCardIndex = 0
