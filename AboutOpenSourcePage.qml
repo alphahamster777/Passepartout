@@ -47,6 +47,8 @@ Page {
                 ).arg(Qt.application.version)
                 font.pixelSize: 24
                 Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
                 horizontalAlignment: Text.AlignHCenter
             }
 
@@ -54,59 +56,67 @@ Page {
                 text: qsTr("Vocabulary trainer for memorizing word sets.")
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
                 horizontalAlignment: Text.AlignHCenter
             }
 
-            Frame {
+            Label {
+                text: qsTr("Open Source Licenses")
+                font.pixelSize: 20
+                font.bold: true
+                wrapMode: Text.WordWrap
                 Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+            }
 
-                ColumnLayout {
-                    width: parent.width
-                    spacing: 10
+            Label {
+                text: qsTr("This application uses Qt under the GNU Lesser General Public License version 3.")
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+            }
 
-                    Label {
-                        text: qsTr("Open Source Licenses")
-                        font.pixelSize: 20
-                        font.bold: true
-                        Layout.fillWidth: true
-                    }
+            Button {
+                text: qsTr("Qt notice")
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+                onClicked: licenseRequested(qsTr("Qt Notice"), "qrc:/licenses/qt_notice.txt")
+            }
 
-                    Label {
-                        text: qsTr("This application uses Qt under the GNU Lesser General Public License version 3.")
-                        wrapMode: Text.WordWrap
-                        Layout.fillWidth: true
-                    }
+            Button {
+                text: qsTr("GNU LGPL v3")
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+                onClicked: licenseRequested(qsTr("GNU LGPL v3"), "qrc:/licenses/LGPL-3.0.txt")
+            }
 
-                    Button {
-                        text: qsTr("Qt notice")
-                        Layout.fillWidth: true
-                        onClicked: licenseRequested(qsTr("Qt Notice"), "qrc:/licenses/qt_notice.txt")
-                    }
+            Button {
+                text: qsTr("GNU GPL v3")
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+                onClicked: licenseRequested(qsTr("GNU GPL v3"), "qrc:/licenses/GPL-3.0.txt")
+            }
 
-                    Button {
-                        text: qsTr("GNU LGPL v3")
-                        Layout.fillWidth: true
-                        onClicked: licenseRequested(qsTr("GNU LGPL v3"), "qrc:/licenses/LGPL-3.0.txt")
-                    }
+            Button {
+                text: qsTr("Qt source code")
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+                onClicked: Qt.openUrlExternally("https://www.qt.io/development/offline-installers")
+            }
 
-                    Button {
-                        text: qsTr("GNU GPL v3")
-                        Layout.fillWidth: true
-                        onClicked: licenseRequested(qsTr("GNU GPL v3"), "qrc:/licenses/GPL-3.0.txt")
-                    }
-
-                    Button {
-                        text: qsTr("Qt source code")
-                        Layout.fillWidth: true
-                        onClicked: Qt.openUrlExternally("https://www.qt.io/development/offline-installers")
-                    }
-
-                    Button {
-                        text: qsTr("Qt project website")
-                        Layout.fillWidth: true
-                        onClicked: Qt.openUrlExternally("https://www.qt.io/")
-                    }
-                }
+            Button {
+                text: qsTr("Qt project website")
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+                onClicked: Qt.openUrlExternally("https://www.qt.io/")
             }
 
             Item { Layout.preferredHeight: page.SafeArea.margins.bottom }

@@ -773,9 +773,11 @@ Page {
 
             Label {
                 anchors.centerIn: parent
+                width: Math.min(parent.width - 48, implicitWidth)
                 visible: itemModel.count === 0
                 text: qsTr("Nothing here yet.\nTap + Create to add a word set or library.")
                 horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
                 color: "#95a5a6"
                 font.pixelSize: 15
             }
