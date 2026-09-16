@@ -11,16 +11,16 @@
     </message>
     <message>
         <location filename="../AboutOpenSourcePage.qml" line="44"/>
-        <source>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color=&apos;#1e88e5&apos;&gt; v%1&lt;/font&gt;</source>
+        <source>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color='#1e88e5'&gt; v%1&lt;/font&gt;</source>
         <translation>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color='#1e88e5'&gt; v%1&lt;/font&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="54"/>
+        <location filename="../AboutOpenSourcePage.qml" line="56"/>
         <source>Vocabulary trainer for memorizing word sets.</source>
         <translation>Sõnavaratreener sõnakomplektide meeldejätmiseks.</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="68"/>
+        <location filename="../AboutOpenSourcePage.qml" line="65"/>
         <source>Open Source Licenses</source>
         <translation>Avatud lähtekoodiga litsentsid</translation>
     </message>
@@ -30,34 +30,34 @@
         <translation>See rakendus kasutab Qt-d GNU Lesser General Public License versiooni 3 alusel.</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="81"/>
+        <location filename="../AboutOpenSourcePage.qml" line="83"/>
         <source>Qt notice</source>
         <translation>Qt teatis</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="83"/>
+        <location filename="../AboutOpenSourcePage.qml" line="87"/>
         <source>Qt Notice</source>
         <translation>Qt teatis</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="87"/>
-        <location filename="../AboutOpenSourcePage.qml" line="89"/>
+        <location filename="../AboutOpenSourcePage.qml" line="91"/>
+        <location filename="../AboutOpenSourcePage.qml" line="95"/>
         <source>GNU LGPL v3</source>
         <translation>GNU LGPL v3</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="93"/>
-        <location filename="../AboutOpenSourcePage.qml" line="95"/>
+        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <location filename="../AboutOpenSourcePage.qml" line="103"/>
         <source>GNU GPL v3</source>
         <translation>GNU GPL v3</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <location filename="../AboutOpenSourcePage.qml" line="107"/>
         <source>Qt source code</source>
         <translation>Qt lähtekood</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="105"/>
+        <location filename="../AboutOpenSourcePage.qml" line="115"/>
         <source>Qt project website</source>
         <translation>Qt projekti veebisait</translation>
     </message>
@@ -146,7 +146,7 @@
     </message>
     <message>
         <location filename="../CreatingRecSet.qml" line="479"/>
-        <source>Describe the set you want — e.g. &quot;kitchen items you&apos;d find in a French household&quot; or &quot;business travel phrases for a conference&quot;…</source>
+        <source>Describe the set you want — e.g. "kitchen items you'd find in a French household" or "business travel phrases for a conference"…</source>
         <translation>Kirjelda soovitud komplekti — nt „köögitarbed, mida leiaks Prantsuse kodust” või „ärireisi fraasid konverentsile”…</translation>
     </message>
     <message>
@@ -342,6 +342,367 @@
     </message>
 </context>
 <context>
+    <name>CreatingRuleSet</name>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="359"/>
+        <source>soon</source>
+        <translation>varsti</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="363"/>
+        <source>in %1d %2h</source>
+        <translation>%1p %2t pärast</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="364"/>
+        <source>in %1h %2m</source>
+        <translation>%1t %2min pärast</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="364"/>
+        <source>in %1m</source>
+        <translation>%1min pärast</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="407"/>
+        <source>Select Image</source>
+        <translation>Vali pilt</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="414"/>
+        <source>Select Audio</source>
+        <translation>Vali heli</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="436"/>
+        <source>✨ AI</source>
+        <translation>✨ Tehisintellekt</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="457"/>
+        <source>New Rule Set</source>
+        <translation>Uus reeglistik</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="457"/>
+        <source>Edit Rule Set</source>
+        <translation>Muuda reeglistikku</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="467"/>
+        <source>Import</source>
+        <translation>Impordi</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="487"/>
+        <source>Import Rule Set</source>
+        <translation>Impordi reeglistik</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="618"/>
+        <source>✨ AI Rule Set Generator</source>
+        <translation>✨ Tehisintellekti reeglistiku generaator</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="623"/>
+        <source>Powered by Gemini</source>
+        <translation>Toiteallikas Gemini</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="642"/>
+        <source>%1 of %2 generations left this month — resets %3</source>
+        <translation>Sel kuul jäänud %1 genereerimist %2-st — lähtestatakse %3</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="653"/>
+        <source>🎯 Rule/topic to explain</source>
+        <translation>🎯 Selgitatav reegel/teema</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="675"/>
+        <source>Describe the rule you want — e.g. "present simple vs present continuous" or "third conditional sentences"…</source>
+        <translation>Kirjelda soovitud reeglit — nt "present simple vs present continuous" või "kolmanda tüübi tingimuslaused"…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="688"/>
+        <source>%1/%2</source>
+        <translation>%1/%2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="695"/>
+        <source>🔢 Questions per type</source>
+        <translation>🔢 Küsimusi tüübi kohta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="698"/>
+        <source>📝 Fill in the Gap</source>
+        <translation>📝 Täida lünk</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="699"/>
+        <source>🔘 Multiple Choice</source>
+        <translation>🔘 Valikvastus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="700"/>
+        <source>🔽 Dropdown Choice</source>
+        <translation>🔽 Rippmenüü valik</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="701"/>
+        <source>🫳 Drag &amp; Drop</source>
+        <translation>🫳 Lohista ja aseta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="721"/>
+        <source>Asking Gemini…</source>
+        <translation>Küsitakse Geminilt…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="735"/>
+        <source>Cancel request</source>
+        <translation>Tühista päring</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="735"/>
+        <location filename="../CreatingRuleSet.qml" line="1833"/>
+        <source>Cancel</source>
+        <translation>Tühista</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="770"/>
+        <source>✨ Generate</source>
+        <translation>✨ Loo</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="824"/>
+        <source>Set title…</source>
+        <translation>Sisesta pealkiri…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="866"/>
+        <source>Theory Explanation</source>
+        <translation>Teooria selgitus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="868"/>
+        <source>Hidden during testing until the learner makes a mistake — always readable in preview.</source>
+        <translation>Peidetud testimise ajal, kuni õppija teeb vea — eelvaates alati loetav.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="875"/>
+        <source>Use ▲▼ to reorder a block. Drag a photo's // corner to resize it.</source>
+        <translation>Ploki ümberjärjestamiseks kasuta ▲▼. Foto suuruse muutmiseks lohista selle // nurka.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="941"/>
+        <source>Explain the rule this set practices…</source>
+        <translation>Selgita reeglit, mida see komplekt harjutab…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1034"/>
+        <source>Audio clip</source>
+        <translation>Heliklipp</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1064"/>
+        <source>+ Text</source>
+        <translation>+ Tekst</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1069"/>
+        <source>+ Photo</source>
+        <translation>+ Foto</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1074"/>
+        <source>+ Audio</source>
+        <translation>+ Heli</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1130"/>
+        <location filename="../CreatingRuleSet.qml" line="1189"/>
+        <source>Question</source>
+        <translation>Küsimus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1137"/>
+        <source>selected</source>
+        <translation>valitud</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1158"/>
+        <source>Fill in the Gap</source>
+        <translation>Täida lünk</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1159"/>
+        <source>Multiple Choice</source>
+        <translation>Valikvastus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1160"/>
+        <source>Dropdown Choice</source>
+        <translation>Rippmenüü valik</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1161"/>
+        <source>Drag &amp; Drop</source>
+        <translation>Lohista ja aseta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1193"/>
+        <source>Use ___ (three underscores) for each blank the learner fills in.</source>
+        <translation>Kasuta ___ (kolm alakriipsu) iga lünga jaoks, mille õppija täidab.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1202"/>
+        <source>e.g. What does she do every day?</source>
+        <translation>nt Mida ta iga päev teeb?</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1203"/>
+        <source>e.g. She ___ to school every day.</source>
+        <translation>nt Ta läheb iga päev ___ kooli.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1213"/>
+        <source>Answers</source>
+        <translation>Vastused</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1219"/>
+        <source>One answer per blank, separated by commas, in order. Use , for a literal comma.</source>
+        <translation>Üks vastus lünga kohta, komadega eraldatud, järjekorras. Kasuta sõnasõnalise koma jaoks \,.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1228"/>
+        <source>e.g. goes</source>
+        <translation>nt läheb</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1234"/>
+        <location filename="../CreatingRuleSet.qml" line="1592"/>
+        <source>Options</source>
+        <translation>Valikud</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1240"/>
+        <source>Separate choices for one blank with commas; separate blanks with double colons (::). A single : is safe as-is; use , for a literal comma, :: for a literal ::, and ___ for a deliberately blank choice. E.g. for two blanks: goes, go, going::every, some, most.</source>
+        <translation>Eralda ühe lünga valikud komadega; eralda lüngad topeltkooloniga (::). Üksik : on turvaline nagu on; kasuta sõnasõnalise koma jaoks \,, sõnasõnalise :: jaoks \::, ja tahtlikult tühja valiku jaoks ___. Nt kahe lünga jaoks: läheb, minna, minnes::iga, mõned, enamik.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1248"/>
+        <source>Comma-separated draggable tiles — include the correct answers, plus optional decoys the learner can be tricked by. Use , for a literal comma, and ___ for a blank tile (for a blank that should correctly stay empty). Fill in the blanks below once these are set.</source>
+        <translation>Komadega eraldatud lohistatavad plaadid — lisa õiged vastused, pluss valikulised petised, millega õppijat saab eksitada. Kasuta sõnasõnalise koma jaoks \, ja tühja plaadi jaoks ___ (lünga jaoks, mis peab õigesti tühjaks jääma). Täida allolevad lüngad, kui need on määratud.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1258"/>
+        <source>e.g. goes, go, going::every, some, most</source>
+        <translation>nt läheb, minna, minnes::iga, mõned, enamik</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1259"/>
+        <source>e.g. goes, go, going, went</source>
+        <translation>nt läheb, minna, minnes, läinud</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1271"/>
+        <source>Correct answer for each blank</source>
+        <translation>Iga lünga õige vastus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1278"/>
+        <source>Tap the correct choice in each box below.</source>
+        <translation>Puuduta õiget valikut igas allolevas kastis.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1304"/>
+        <source>Select a correct answer for every blank.</source>
+        <translation>Vali igale lüngale õige vastus.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1322"/>
+        <source>Blank %1</source>
+        <translation>Lünk %1</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1375"/>
+        <source>Fill in the blanks</source>
+        <translation>Täida lüngad</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1382"/>
+        <source>Drag a tile onto a blank below, or tap a tile then tap a blank to place it.</source>
+        <translation>Lohista plaat allolevale lüngale või puuduta plaati ja seejärel lünka, et see paigutada.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1419"/>
+        <source>Fill every blank with a tile.</source>
+        <translation>Täida iga lünk plaadiga.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1599"/>
+        <source>Comma-separated choices — tap the correct answer below. Use , for a literal comma.</source>
+        <translation>Komadega eraldatud valikud — puuduta allolevat õiget vastust. Kasuta sõnasõnalise koma jaoks \,.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1600"/>
+        <source>Comma-separated choices — tap all correct answers below. Use , for a literal comma.</source>
+        <translation>Komadega eraldatud valikud — puuduta kõiki allolevaid õigeid vastuseid. Kasuta sõnasõnalise koma jaoks \,.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1609"/>
+        <source>e.g. go, goes, going, went</source>
+        <translation>nt läheb, minna, minnes, läinud</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1628"/>
+        <source>Only one correct answer</source>
+        <translation>Ainult üks õige vastus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1654"/>
+        <source>Correct answer</source>
+        <translation>Õige vastus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1654"/>
+        <source>Correct answer(s)</source>
+        <translation>Õige(d) vastus(ed)</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1680"/>
+        <source>Select the correct answer.</source>
+        <translation>Vali õige vastus.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1680"/>
+        <source>Select at least one correct answer.</source>
+        <translation>Vali vähemalt üks õige vastus.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1757"/>
+        <source>+ Add question</source>
+        <translation>+ Lisa küsimus</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1781"/>
+        <source>Remove</source>
+        <translation>Eemalda</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1806"/>
+        <source>Save</source>
+        <translation>Salvesta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1815"/>
+        <source>Title is required</source>
+        <translation>Pealkiri on nõutav</translation>
+    </message>
+</context>
+<context>
     <name>FlashCard</name>
     <message>
         <location filename="../FlashCard.qml" line="222"/>
@@ -365,7 +726,7 @@
     </message>
     <message>
         <location filename="../FlashCard.qml" line="351"/>
-        <source>x  Don&apos;t know</source>
+        <source>x  Don't know</source>
         <translation>x  Ei tea</translation>
     </message>
     <message>
@@ -385,28 +746,30 @@
 <context>
     <name>Main</name>
     <message>
-        <location filename="../Main.qml" line="145"/>
+        <location filename="../Main.qml" line="306"/>
         <source>Passepartout</source>
         <translation>Passepartout</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="154"/>
+        <location filename="../Main.qml" line="315"/>
         <source>Sign in to continue</source>
         <translation>Jätkamiseks logi sisse</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="189"/>
+        <location filename="../Main.qml" line="350"/>
         <source>Opening browser…</source>
         <translation>Brauseri avamine…</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="189"/>
+        <location filename="../Main.qml" line="350"/>
         <source>Sign in with Google</source>
         <translation>Logi sisse Google'iga</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="423"/>
-        <location filename="../Main.qml" line="430"/>
+        <location filename="../Main.qml" line="646"/>
+        <location filename="../Main.qml" line="653"/>
+        <location filename="../Main.qml" line="717"/>
+        <location filename="../Main.qml" line="724"/>
         <source>A library or set with this name already exists here.</source>
         <translation>Sellenimeline teek või komplekt on siin juba olemas.</translation>
     </message>
@@ -446,7 +809,7 @@
     </message>
     <message>
         <location filename="../Results.qml" line="90"/>
-        <source>Don&apos;t give up – practice makes perfect!</source>
+        <source>Don't give up – practice makes perfect!</source>
         <translation>Ära anna alla – harjutamine teeb meistriks!</translation>
     </message>
     <message>
@@ -456,7 +819,7 @@
     </message>
     <message>
         <location filename="../Results.qml" line="133"/>
-        <source>Don&apos;t know</source>
+        <source>Don't know</source>
         <translation>Ei tea</translation>
     </message>
     <message>
@@ -471,160 +834,332 @@
     </message>
 </context>
 <context>
+    <name>RuleSetPreview</name>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="65"/>
+        <source>Reset Test Progress?</source>
+        <translation>Lähtestada testi edenemine?</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="70"/>
+        <source>This clears your progress on this rule set and starts a fresh session.</source>
+        <translation>See kustutab sinu edenemise selles reeglistikus ja alustab uue seansi.</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="92"/>
+        <source>%1 questions</source>
+        <translation>%1 küsimust</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="99"/>
+        <source>Completed: %1 / %2</source>
+        <translation>Lõpetatud: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="100"/>
+        <source>In progress: %1 / %2</source>
+        <translation>Pooleli: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="108"/>
+        <source>← Reset</source>
+        <translation>← Lähtesta</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Rule Explanation</source>
+        <translation>Reegli selgitus</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="136"/>
+        <source>No explanation was added for this set.</source>
+        <translation>Sellele komplektile pole selgitust lisatud.</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="201"/>
+        <source>Audio clip</source>
+        <translation>Heliklipp</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="216"/>
+        <source>✍️ Spelling strictness</source>
+        <translation>✍️ Õigekirja rangus</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="225"/>
+        <source>Strict</source>
+        <translation>Range</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="226"/>
+        <source>Normal</source>
+        <translation>Tavaline</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="227"/>
+        <source>Lenient</source>
+        <translation>Leebe</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="263"/>
+        <source>Start Test</source>
+        <translation>Alusta testi</translation>
+    </message>
+</context>
+<context>
+    <name>RuleTest</name>
+    <message>
+        <location filename="../RuleTest.qml" line="233"/>
+        <source>Rule</source>
+        <translation>Reegel</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="291"/>
+        <source>💡 Rule Explanation</source>
+        <translation>💡 Reegli selgitus</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="377"/>
+        <source>Audio clip</source>
+        <translation>Heliklipp</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="392"/>
+        <source>Cancel</source>
+        <translation>Tühista</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="418"/>
+        <source>💡 View rule</source>
+        <translation>💡 Vaata reeglit</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="550"/>
+        <source>Spin the wheel to choose each blank's word.</source>
+        <translation>Keera ratast, et valida iga lünga sõna.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="596"/>
+        <source>Blank %1</source>
+        <translation>Lünk %1</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="613"/>
+        <location filename="../RuleTest.qml" line="688"/>
+        <source>null</source>
+        <translation>null</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="888"/>
+        <source>Drag a tile onto a blank, or tap a tile then tap a blank to place it.</source>
+        <translation>Lohista plaat lünka või puuduta plaati ja seejärel lünka, et see paigutada.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1002"/>
+        <source>Select the correct answer.</source>
+        <translation>Vali õige vastus.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1002"/>
+        <source>Select all that apply.</source>
+        <translation>Vali kõik sobivad.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1093"/>
+        <location filename="../RuleTest.qml" line="1099"/>
+        <source>Correct: </source>
+        <translation>Õige: </translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1111"/>
+        <source>Submit</source>
+        <translation>Esita</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1129"/>
+        <source>Correct: %1 / %2</source>
+        <translation>Õige: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1171"/>
+        <source>See Results</source>
+        <translation>Vaata tulemusi</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1171"/>
+        <source>Next →</source>
+        <translation>Järgmine →</translation>
+    </message>
+</context>
+<context>
     <name>SetDirMenu</name>
     <message>
-        <location filename="../SetDirMenu.qml" line="105"/>
-        <location filename="../SetDirMenu.qml" line="169"/>
+        <location filename="../SetDirMenu.qml" line="119"/>
+        <location filename="../SetDirMenu.qml" line="186"/>
         <source>Overwrite word set?</source>
         <translation>Kirjutada sõnakomplekt üle?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="105"/>
+        <location filename="../SetDirMenu.qml" line="119"/>
         <source>Merge libraries?</source>
         <translation>Ühendada teegid?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="113"/>
-        <source>A word set named &quot;%1&quot; already exists here. Overwrite it with the moved set?</source>
+        <location filename="../SetDirMenu.qml" line="127"/>
+        <source>A word set named "%1" already exists here. Overwrite it with the moved set?</source>
         <translation>Sõnakomplekt nimega „%1” on siin juba olemas. Kas kirjutada see teisaldatud komplektiga üle?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="114"/>
-        <source>A library named &quot;%1&quot; already exists here. Merge its contents into it?</source>
+        <location filename="../SetDirMenu.qml" line="128"/>
+        <source>A library named "%1" already exists here. Merge its contents into it?</source>
         <translation>Teek nimega „%1” on siin juba olemas. Kas ühendada selle sisu sellega?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="179"/>
-        <source>A word set named &quot;%1&quot; already exists in %2. Overwrite it with the version being merged in?</source>
+        <location filename="../SetDirMenu.qml" line="196"/>
+        <source>A word set named "%1" already exists in %2. Overwrite it with the version being merged in?</source>
         <translation>Sõnakomplekt nimega „%1” on juba olemas kohas %2. Kas kirjutada see ühendatud versiooniga üle?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="181"/>
+        <location filename="../SetDirMenu.qml" line="198"/>
         <source>the destination library</source>
         <translation>sihtteek</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="209"/>
+        <location filename="../SetDirMenu.qml" line="226"/>
         <source>Export as .ppset</source>
         <translation>Ekspordi kui .ppset</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="221"/>
+        <location filename="../SetDirMenu.qml" line="239"/>
         <source>New Library</source>
         <translation>Uus teek</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="240"/>
+        <location filename="../SetDirMenu.qml" line="258"/>
         <source>Library name:</source>
         <translation>Teegi nimi:</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="244"/>
+        <location filename="../SetDirMenu.qml" line="262"/>
         <source>e.g. Travel, Work, School…</source>
         <translation>nt Reisimine, Töö, Kool…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="256"/>
-        <location filename="../SetDirMenu.qml" line="330"/>
+        <location filename="../SetDirMenu.qml" line="274"/>
+        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
         <translation>Sellenimeline teek või komplekt on siin juba olemas.</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="263"/>
+        <location filename="../SetDirMenu.qml" line="281"/>
         <source>Create</source>
         <translation>Loo</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="291"/>
+        <location filename="../SetDirMenu.qml" line="309"/>
         <source>Rename Library</source>
         <translation>Nimeta teek ümber</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="315"/>
+        <location filename="../SetDirMenu.qml" line="333"/>
         <source>New name:</source>
         <translation>Uus nimi:</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="337"/>
-        <location filename="../SetDirMenu.qml" line="630"/>
+        <location filename="../SetDirMenu.qml" line="355"/>
+        <location filename="../SetDirMenu.qml" line="657"/>
         <source>Rename</source>
         <translation>Nimeta ümber</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="385"/>
+        <location filename="../SetDirMenu.qml" line="403"/>
         <source>Your word sets</source>
         <translation>Sinu sõnakomplektid</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="385"/>
-        <location filename="../SetDirMenu.qml" line="804"/>
+        <location filename="../SetDirMenu.qml" line="403"/>
+        <location filename="../SetDirMenu.qml" line="879"/>
         <source>Library</source>
         <translation>Teek</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="455"/>
+        <location filename="../SetDirMenu.qml" line="473"/>
         <source>Move out of</source>
         <translation>Liiguta väljapoole</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="585"/>
+        <location filename="../SetDirMenu.qml" line="605"/>
         <source>Drop to move inside</source>
         <translation>Lohista siia, et liigutada sisse</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="616"/>
+        <location filename="../SetDirMenu.qml" line="637"/>
         <source>words</source>
         <translation>sõna</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="640"/>
+        <location filename="../SetDirMenu.qml" line="643"/>
+        <source>questions</source>
+        <translation>küsimust</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="667"/>
         <source>Delete Library</source>
         <translation>Kustuta teek</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="653"/>
+        <location filename="../SetDirMenu.qml" line="680"/>
+        <location filename="../SetDirMenu.qml" line="721"/>
         <source>Edit</source>
         <translation>Muuda</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="659"/>
+        <location filename="../SetDirMenu.qml" line="686"/>
+        <location filename="../SetDirMenu.qml" line="727"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="671"/>
+        <location filename="../SetDirMenu.qml" line="698"/>
+        <location filename="../SetDirMenu.qml" line="739"/>
         <source>Share .ppset file</source>
         <translation>Jaga .ppset faili</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="682"/>
+        <location filename="../SetDirMenu.qml" line="709"/>
+        <location filename="../SetDirMenu.qml" line="750"/>
         <source>Export .ppset (save to disk)</source>
         <translation>Ekspordi .ppset (salvesta kettale)</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="777"/>
+        <location filename="../SetDirMenu.qml" line="845"/>
         <source>Nothing here yet.
 Tap + Create to add a word set or library.</source>
         <translation>Siin pole veel midagi.
 Puuduta + Loo, et lisada sõnakomplekt või teek.</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="800"/>
+        <location filename="../SetDirMenu.qml" line="871"/>
         <source>Word Set</source>
         <translation>Sõnakomplekt</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="823"/>
+        <location filename="../SetDirMenu.qml" line="875"/>
+        <source>Rule Set</source>
+        <translation>Reeglistik</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="898"/>
         <source>+ Create</source>
         <translation>+ Loo</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="877"/>
+        <location filename="../SetDirMenu.qml" line="958"/>
         <source>Interface Language</source>
         <translation>Liidese keel</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="948"/>
+        <location filename="../SetDirMenu.qml" line="1030"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>

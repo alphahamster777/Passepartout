@@ -11,16 +11,16 @@
     </message>
     <message>
         <location filename="../AboutOpenSourcePage.qml" line="44"/>
-        <source>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color=&apos;#1e88e5&apos;&gt; v%1&lt;/font&gt;</source>
+        <source>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color='#1e88e5'&gt; v%1&lt;/font&gt;</source>
         <translation>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color='#1e88e5'&gt; v%1&lt;/font&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="54"/>
+        <location filename="../AboutOpenSourcePage.qml" line="56"/>
         <source>Vocabulary trainer for memorizing word sets.</source>
         <translation>Treinador de vocabulário para memorizar conjuntos de palavras.</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="68"/>
+        <location filename="../AboutOpenSourcePage.qml" line="65"/>
         <source>Open Source Licenses</source>
         <translation>Licenças de código aberto</translation>
     </message>
@@ -30,34 +30,34 @@
         <translation>Esta aplicação usa o Qt sob a GNU Lesser General Public License versão 3.</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="81"/>
+        <location filename="../AboutOpenSourcePage.qml" line="83"/>
         <source>Qt notice</source>
         <translation>Aviso do Qt</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="83"/>
+        <location filename="../AboutOpenSourcePage.qml" line="87"/>
         <source>Qt Notice</source>
         <translation>Aviso do Qt</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="87"/>
-        <location filename="../AboutOpenSourcePage.qml" line="89"/>
+        <location filename="../AboutOpenSourcePage.qml" line="91"/>
+        <location filename="../AboutOpenSourcePage.qml" line="95"/>
         <source>GNU LGPL v3</source>
         <translation>GNU LGPL v3</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="93"/>
-        <location filename="../AboutOpenSourcePage.qml" line="95"/>
+        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <location filename="../AboutOpenSourcePage.qml" line="103"/>
         <source>GNU GPL v3</source>
         <translation>GNU GPL v3</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <location filename="../AboutOpenSourcePage.qml" line="107"/>
         <source>Qt source code</source>
         <translation>Código-fonte do Qt</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="105"/>
+        <location filename="../AboutOpenSourcePage.qml" line="115"/>
         <source>Qt project website</source>
         <translation>Site do projeto Qt</translation>
     </message>
@@ -146,7 +146,7 @@
     </message>
     <message>
         <location filename="../CreatingRecSet.qml" line="479"/>
-        <source>Describe the set you want — e.g. &quot;kitchen items you&apos;d find in a French household&quot; or &quot;business travel phrases for a conference&quot;…</source>
+        <source>Describe the set you want — e.g. "kitchen items you'd find in a French household" or "business travel phrases for a conference"…</source>
         <translation>Descreva o conjunto que deseja — ex. "utensílios de cozinha que encontraria numa casa francesa" ou "frases de viagem de negócios para uma conferência"…</translation>
     </message>
     <message>
@@ -342,6 +342,367 @@
     </message>
 </context>
 <context>
+    <name>CreatingRuleSet</name>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="359"/>
+        <source>soon</source>
+        <translation>em breve</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="363"/>
+        <source>in %1d %2h</source>
+        <translation>em %1d %2h</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="364"/>
+        <source>in %1h %2m</source>
+        <translation>em %1h %2min</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="364"/>
+        <source>in %1m</source>
+        <translation>em %1min</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="407"/>
+        <source>Select Image</source>
+        <translation>Selecionar Imagem</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="414"/>
+        <source>Select Audio</source>
+        <translation>Selecionar Áudio</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="436"/>
+        <source>✨ AI</source>
+        <translation>✨ IA</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="457"/>
+        <source>New Rule Set</source>
+        <translation>Novo Conjunto de Regras</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="457"/>
+        <source>Edit Rule Set</source>
+        <translation>Editar Conjunto de Regras</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="467"/>
+        <source>Import</source>
+        <translation>Importar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="487"/>
+        <source>Import Rule Set</source>
+        <translation>Importar Conjunto de Regras</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="618"/>
+        <source>✨ AI Rule Set Generator</source>
+        <translation>✨ Gerador de Conjuntos de Regras com IA</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="623"/>
+        <source>Powered by Gemini</source>
+        <translation>Desenvolvido com Gemini</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="642"/>
+        <source>%1 of %2 generations left this month — resets %3</source>
+        <translation>Restam %1 de %2 gerações este mês — reinicia %3</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="653"/>
+        <source>🎯 Rule/topic to explain</source>
+        <translation>🎯 Regra/tópico a explicar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="675"/>
+        <source>Describe the rule you want — e.g. "present simple vs present continuous" or "third conditional sentences"…</source>
+        <translation>Descreva a regra que deseja — ex. "presente simples vs. presente contínuo" ou "orações condicionais do terceiro tipo"…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="688"/>
+        <source>%1/%2</source>
+        <translation>%1/%2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="695"/>
+        <source>🔢 Questions per type</source>
+        <translation>🔢 Perguntas por tipo</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="698"/>
+        <source>📝 Fill in the Gap</source>
+        <translation>📝 Preencher a lacuna</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="699"/>
+        <source>🔘 Multiple Choice</source>
+        <translation>🔘 Múltipla escolha</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="700"/>
+        <source>🔽 Dropdown Choice</source>
+        <translation>🔽 Seleção suspensa</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="701"/>
+        <source>🫳 Drag &amp; Drop</source>
+        <translation>🫳 Arrastar e soltar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="721"/>
+        <source>Asking Gemini…</source>
+        <translation>Perguntando ao Gemini…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="735"/>
+        <source>Cancel request</source>
+        <translation>Cancelar pedido</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="735"/>
+        <location filename="../CreatingRuleSet.qml" line="1833"/>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="770"/>
+        <source>✨ Generate</source>
+        <translation>✨ Gerar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="824"/>
+        <source>Set title…</source>
+        <translation>Insira o título…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="866"/>
+        <source>Theory Explanation</source>
+        <translation>Explicação da teoria</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="868"/>
+        <source>Hidden during testing until the learner makes a mistake — always readable in preview.</source>
+        <translation>Oculto durante o teste até o aluno cometer um erro — sempre legível na pré-visualização.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="875"/>
+        <source>Use ▲▼ to reorder a block. Drag a photo's // corner to resize it.</source>
+        <translation>Use ▲▼ para reordenar um bloco. Arraste o canto // de uma foto para redimensioná-la.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="941"/>
+        <source>Explain the rule this set practices…</source>
+        <translation>Explique a regra que este conjunto pratica…</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1034"/>
+        <source>Audio clip</source>
+        <translation>Clipe de áudio</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1064"/>
+        <source>+ Text</source>
+        <translation>+ Texto</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1069"/>
+        <source>+ Photo</source>
+        <translation>+ Foto</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1074"/>
+        <source>+ Audio</source>
+        <translation>+ Áudio</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1130"/>
+        <location filename="../CreatingRuleSet.qml" line="1189"/>
+        <source>Question</source>
+        <translation>Pergunta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1137"/>
+        <source>selected</source>
+        <translation>selecionado</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1158"/>
+        <source>Fill in the Gap</source>
+        <translation>Preencher a lacuna</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1159"/>
+        <source>Multiple Choice</source>
+        <translation>Múltipla escolha</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1160"/>
+        <source>Dropdown Choice</source>
+        <translation>Seleção suspensa</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1161"/>
+        <source>Drag &amp; Drop</source>
+        <translation>Arrastar e soltar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1193"/>
+        <source>Use ___ (three underscores) for each blank the learner fills in.</source>
+        <translation>Use ___ (três sublinhados) para cada lacuna que o aluno preencher.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1202"/>
+        <source>e.g. What does she do every day?</source>
+        <translation>ex. O que ela faz todos os dias?</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1203"/>
+        <source>e.g. She ___ to school every day.</source>
+        <translation>ex. Ela vai ___ à escola todos os dias.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1213"/>
+        <source>Answers</source>
+        <translation>Respostas</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1219"/>
+        <source>One answer per blank, separated by commas, in order. Use , for a literal comma.</source>
+        <translation>Uma resposta por lacuna, separadas por vírgulas, em ordem. Use \, para uma vírgula literal.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1228"/>
+        <source>e.g. goes</source>
+        <translation>ex. vai</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1234"/>
+        <location filename="../CreatingRuleSet.qml" line="1592"/>
+        <source>Options</source>
+        <translation>Opções</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1240"/>
+        <source>Separate choices for one blank with commas; separate blanks with double colons (::). A single : is safe as-is; use , for a literal comma, :: for a literal ::, and ___ for a deliberately blank choice. E.g. for two blanks: goes, go, going::every, some, most.</source>
+        <translation>Separe as opções de uma lacuna com vírgulas; separe as lacunas com dois-pontos duplos (::). Um único : é seguro como está; use \, para uma vírgula literal, \:: para um :: literal, e ___ para uma opção deliberadamente vazia. Ex. para duas lacunas: vai, ir, indo::cada, alguns, a maioria.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1248"/>
+        <source>Comma-separated draggable tiles — include the correct answers, plus optional decoys the learner can be tricked by. Use , for a literal comma, and ___ for a blank tile (for a blank that should correctly stay empty). Fill in the blanks below once these are set.</source>
+        <translation>Peças arrastáveis separadas por vírgulas — inclua as respostas corretas, além de iscas opcionais com as quais o aluno pode ser enganado. Use \, para uma vírgula literal, e ___ para uma peça vazia (para uma lacuna que deve corretamente permanecer vazia). Preencha as lacunas abaixo assim que estas forem definidas.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1258"/>
+        <source>e.g. goes, go, going::every, some, most</source>
+        <translation>ex. vai, ir, indo::cada, alguns, a maioria</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1259"/>
+        <source>e.g. goes, go, going, went</source>
+        <translation>ex. vai, ir, indo, ido</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1271"/>
+        <source>Correct answer for each blank</source>
+        <translation>Resposta correta para cada lacuna</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1278"/>
+        <source>Tap the correct choice in each box below.</source>
+        <translation>Toque na opção correta em cada caixa abaixo.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1304"/>
+        <source>Select a correct answer for every blank.</source>
+        <translation>Selecione uma resposta correta para cada lacuna.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1322"/>
+        <source>Blank %1</source>
+        <translation>Lacuna %1</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1375"/>
+        <source>Fill in the blanks</source>
+        <translation>Preencha as lacunas</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1382"/>
+        <source>Drag a tile onto a blank below, or tap a tile then tap a blank to place it.</source>
+        <translation>Arraste uma peça para uma lacuna abaixo, ou toque em uma peça e depois em uma lacuna para posicioná-la.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1419"/>
+        <source>Fill every blank with a tile.</source>
+        <translation>Preencha cada lacuna com uma peça.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1599"/>
+        <source>Comma-separated choices — tap the correct answer below. Use , for a literal comma.</source>
+        <translation>Opções separadas por vírgulas — toque na resposta correta abaixo. Use \, para uma vírgula literal.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1600"/>
+        <source>Comma-separated choices — tap all correct answers below. Use , for a literal comma.</source>
+        <translation>Opções separadas por vírgulas — toque em todas as respostas corretas abaixo. Use \, para uma vírgula literal.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1609"/>
+        <source>e.g. go, goes, going, went</source>
+        <translation>ex. vai, ir, indo, ido</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1628"/>
+        <source>Only one correct answer</source>
+        <translation>Apenas uma resposta correta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1654"/>
+        <source>Correct answer</source>
+        <translation>Resposta correta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1654"/>
+        <source>Correct answer(s)</source>
+        <translation>Resposta(s) correta(s)</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1680"/>
+        <source>Select the correct answer.</source>
+        <translation>Selecione a resposta correta.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1680"/>
+        <source>Select at least one correct answer.</source>
+        <translation>Selecione pelo menos uma resposta correta.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1757"/>
+        <source>+ Add question</source>
+        <translation>+ Adicionar pergunta</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1781"/>
+        <source>Remove</source>
+        <translation>Remover</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1806"/>
+        <source>Save</source>
+        <translation>Guardar</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="1815"/>
+        <source>Title is required</source>
+        <translation>O título é obrigatório</translation>
+    </message>
+</context>
+<context>
     <name>FlashCard</name>
     <message>
         <location filename="../FlashCard.qml" line="222"/>
@@ -365,7 +726,7 @@
     </message>
     <message>
         <location filename="../FlashCard.qml" line="351"/>
-        <source>x  Don&apos;t know</source>
+        <source>x  Don't know</source>
         <translation>x  Não sei</translation>
     </message>
     <message>
@@ -385,28 +746,30 @@
 <context>
     <name>Main</name>
     <message>
-        <location filename="../Main.qml" line="145"/>
+        <location filename="../Main.qml" line="306"/>
         <source>Passepartout</source>
         <translation>Passepartout</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="154"/>
+        <location filename="../Main.qml" line="315"/>
         <source>Sign in to continue</source>
         <translation>Inicie sessão para continuar</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="189"/>
+        <location filename="../Main.qml" line="350"/>
         <source>Opening browser…</source>
         <translation>A abrir o navegador…</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="189"/>
+        <location filename="../Main.qml" line="350"/>
         <source>Sign in with Google</source>
         <translation>Iniciar sessão com o Google</translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="423"/>
-        <location filename="../Main.qml" line="430"/>
+        <location filename="../Main.qml" line="646"/>
+        <location filename="../Main.qml" line="653"/>
+        <location filename="../Main.qml" line="717"/>
+        <location filename="../Main.qml" line="724"/>
         <source>A library or set with this name already exists here.</source>
         <translation>Já existe aqui uma biblioteca ou conjunto com este nome.</translation>
     </message>
@@ -446,7 +809,7 @@
     </message>
     <message>
         <location filename="../Results.qml" line="90"/>
-        <source>Don&apos;t give up – practice makes perfect!</source>
+        <source>Don't give up – practice makes perfect!</source>
         <translation>Não desista – a prática leva à perfeição!</translation>
     </message>
     <message>
@@ -456,7 +819,7 @@
     </message>
     <message>
         <location filename="../Results.qml" line="133"/>
-        <source>Don&apos;t know</source>
+        <source>Don't know</source>
         <translation>Não sei</translation>
     </message>
     <message>
@@ -471,160 +834,332 @@
     </message>
 </context>
 <context>
+    <name>RuleSetPreview</name>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="65"/>
+        <source>Reset Test Progress?</source>
+        <translation>Repor o progresso do teste?</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="70"/>
+        <source>This clears your progress on this rule set and starts a fresh session.</source>
+        <translation>Isto irá apagar o seu progresso neste conjunto de regras e iniciar uma nova sessão.</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="92"/>
+        <source>%1 questions</source>
+        <translation>%1 perguntas</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="99"/>
+        <source>Completed: %1 / %2</source>
+        <translation>Concluído: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="100"/>
+        <source>In progress: %1 / %2</source>
+        <translation>Em curso: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="108"/>
+        <source>← Reset</source>
+        <translation>← Repor</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Rule Explanation</source>
+        <translation>Explicação da Regra</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="136"/>
+        <source>No explanation was added for this set.</source>
+        <translation>Não foi adicionada nenhuma explicação para este conjunto.</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="201"/>
+        <source>Audio clip</source>
+        <translation>Clipe de áudio</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="216"/>
+        <source>✍️ Spelling strictness</source>
+        <translation>✍️ Rigor ortográfico</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="225"/>
+        <source>Strict</source>
+        <translation>Rigoroso</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="226"/>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="227"/>
+        <source>Lenient</source>
+        <translation>Flexível</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="263"/>
+        <source>Start Test</source>
+        <translation>Iniciar Teste</translation>
+    </message>
+</context>
+<context>
+    <name>RuleTest</name>
+    <message>
+        <location filename="../RuleTest.qml" line="233"/>
+        <source>Rule</source>
+        <translation>Regra</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="291"/>
+        <source>💡 Rule Explanation</source>
+        <translation>💡 Explicação da Regra</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="377"/>
+        <source>Audio clip</source>
+        <translation>Clipe de áudio</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="392"/>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="418"/>
+        <source>💡 View rule</source>
+        <translation>💡 Ver regra</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="550"/>
+        <source>Spin the wheel to choose each blank's word.</source>
+        <translation>Rode a roda para escolher a palavra de cada lacuna.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="596"/>
+        <source>Blank %1</source>
+        <translation>Lacuna %1</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="613"/>
+        <location filename="../RuleTest.qml" line="688"/>
+        <source>null</source>
+        <translation>null</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="888"/>
+        <source>Drag a tile onto a blank, or tap a tile then tap a blank to place it.</source>
+        <translation>Arraste uma peça para uma lacuna, ou toque em uma peça e depois em uma lacuna para posicioná-la.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1002"/>
+        <source>Select the correct answer.</source>
+        <translation>Selecione a resposta correta.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1002"/>
+        <source>Select all that apply.</source>
+        <translation>Selecione tudo o que se aplica.</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1093"/>
+        <location filename="../RuleTest.qml" line="1099"/>
+        <source>Correct: </source>
+        <translation>Correto: </translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1111"/>
+        <source>Submit</source>
+        <translation>Submeter</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1129"/>
+        <source>Correct: %1 / %2</source>
+        <translation>Correto: %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1171"/>
+        <source>See Results</source>
+        <translation>Ver Resultados</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="1171"/>
+        <source>Next →</source>
+        <translation>Seguinte →</translation>
+    </message>
+</context>
+<context>
     <name>SetDirMenu</name>
     <message>
-        <location filename="../SetDirMenu.qml" line="105"/>
-        <location filename="../SetDirMenu.qml" line="169"/>
+        <location filename="../SetDirMenu.qml" line="119"/>
+        <location filename="../SetDirMenu.qml" line="186"/>
         <source>Overwrite word set?</source>
         <translation>Substituir conjunto de palavras?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="105"/>
+        <location filename="../SetDirMenu.qml" line="119"/>
         <source>Merge libraries?</source>
         <translation>Combinar bibliotecas?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="113"/>
-        <source>A word set named &quot;%1&quot; already exists here. Overwrite it with the moved set?</source>
+        <location filename="../SetDirMenu.qml" line="127"/>
+        <source>A word set named "%1" already exists here. Overwrite it with the moved set?</source>
         <translation>Já existe aqui um conjunto de palavras chamado «%1». Substituí-lo pelo conjunto movido?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="114"/>
-        <source>A library named &quot;%1&quot; already exists here. Merge its contents into it?</source>
+        <location filename="../SetDirMenu.qml" line="128"/>
+        <source>A library named "%1" already exists here. Merge its contents into it?</source>
         <translation>Já existe aqui uma biblioteca chamada «%1». Combinar o seu conteúdo com ela?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="179"/>
-        <source>A word set named &quot;%1&quot; already exists in %2. Overwrite it with the version being merged in?</source>
+        <location filename="../SetDirMenu.qml" line="196"/>
+        <source>A word set named "%1" already exists in %2. Overwrite it with the version being merged in?</source>
         <translation>Já existe um conjunto de palavras chamado «%1» em %2. Substituí-lo pela versão a ser combinada?</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="181"/>
+        <location filename="../SetDirMenu.qml" line="198"/>
         <source>the destination library</source>
         <translation>a biblioteca de destino</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="209"/>
+        <location filename="../SetDirMenu.qml" line="226"/>
         <source>Export as .ppset</source>
         <translation>Exportar como .ppset</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="221"/>
+        <location filename="../SetDirMenu.qml" line="239"/>
         <source>New Library</source>
         <translation>Nova biblioteca</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="240"/>
+        <location filename="../SetDirMenu.qml" line="258"/>
         <source>Library name:</source>
         <translation>Nome da biblioteca:</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="244"/>
+        <location filename="../SetDirMenu.qml" line="262"/>
         <source>e.g. Travel, Work, School…</source>
         <translation>ex. Viagens, Trabalho, Escola…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="256"/>
-        <location filename="../SetDirMenu.qml" line="330"/>
+        <location filename="../SetDirMenu.qml" line="274"/>
+        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
         <translation>Já existe aqui uma biblioteca ou conjunto com este nome.</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="263"/>
+        <location filename="../SetDirMenu.qml" line="281"/>
         <source>Create</source>
         <translation>Criar</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="291"/>
+        <location filename="../SetDirMenu.qml" line="309"/>
         <source>Rename Library</source>
         <translation>Renomear biblioteca</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="315"/>
+        <location filename="../SetDirMenu.qml" line="333"/>
         <source>New name:</source>
         <translation>Novo nome:</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="337"/>
-        <location filename="../SetDirMenu.qml" line="630"/>
+        <location filename="../SetDirMenu.qml" line="355"/>
+        <location filename="../SetDirMenu.qml" line="657"/>
         <source>Rename</source>
         <translation>Renomear</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="385"/>
+        <location filename="../SetDirMenu.qml" line="403"/>
         <source>Your word sets</source>
         <translation>Os seus conjuntos de palavras</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="385"/>
-        <location filename="../SetDirMenu.qml" line="804"/>
+        <location filename="../SetDirMenu.qml" line="403"/>
+        <location filename="../SetDirMenu.qml" line="879"/>
         <source>Library</source>
         <translation>Biblioteca</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="455"/>
+        <location filename="../SetDirMenu.qml" line="473"/>
         <source>Move out of</source>
         <translation>Mover para fora de</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="585"/>
+        <location filename="../SetDirMenu.qml" line="605"/>
         <source>Drop to move inside</source>
         <translation>Largar para mover para dentro</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="616"/>
+        <location filename="../SetDirMenu.qml" line="637"/>
         <source>words</source>
         <translation>palavras</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="640"/>
+        <location filename="../SetDirMenu.qml" line="643"/>
+        <source>questions</source>
+        <translation>perguntas</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="667"/>
         <source>Delete Library</source>
         <translation>Eliminar biblioteca</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="653"/>
+        <location filename="../SetDirMenu.qml" line="680"/>
+        <location filename="../SetDirMenu.qml" line="721"/>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="659"/>
+        <location filename="../SetDirMenu.qml" line="686"/>
+        <location filename="../SetDirMenu.qml" line="727"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="671"/>
+        <location filename="../SetDirMenu.qml" line="698"/>
+        <location filename="../SetDirMenu.qml" line="739"/>
         <source>Share .ppset file</source>
         <translation>Partilhar ficheiro .ppset</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="682"/>
+        <location filename="../SetDirMenu.qml" line="709"/>
+        <location filename="../SetDirMenu.qml" line="750"/>
         <source>Export .ppset (save to disk)</source>
         <translation>Exportar .ppset (guardar no disco)</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="777"/>
+        <location filename="../SetDirMenu.qml" line="845"/>
         <source>Nothing here yet.
 Tap + Create to add a word set or library.</source>
         <translation>Ainda nada aqui.
 Toque em + Criar para adicionar um conjunto de palavras ou biblioteca.</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="800"/>
+        <location filename="../SetDirMenu.qml" line="871"/>
         <source>Word Set</source>
         <translation>Conjunto de palavras</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="823"/>
+        <location filename="../SetDirMenu.qml" line="875"/>
+        <source>Rule Set</source>
+        <translation>Conjunto de Regras</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="898"/>
         <source>+ Create</source>
         <translation>+ Criar</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="877"/>
+        <location filename="../SetDirMenu.qml" line="958"/>
         <source>Interface Language</source>
         <translation>Idioma da interface</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="948"/>
+        <location filename="../SetDirMenu.qml" line="1030"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>

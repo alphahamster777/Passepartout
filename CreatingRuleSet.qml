@@ -872,7 +872,7 @@ Page {
             Layout.fillWidth: true
         }
         Label {
-            text: qsTr("Use ▲▼ to reorder a block. Drag a photo's ⤡ corner to resize it.")
+            text: qsTr("Use ▲▼ to reorder a block. Drag a photo's // corner to resize it.")
             font.pixelSize: 10
             color: "#95a5a6"
             wrapMode: Text.WordWrap
