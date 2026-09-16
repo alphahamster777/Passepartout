@@ -16,6 +16,11 @@ constexpr auto kMeaningLanguageOverrideKey = "meaningLanguageOverride";
 }
 
 AppController::AppController(QObject *parent) {
+    // Rule sets share RecSetManager's folder tree (order/uniqueness) but
+    // own their own content vector — wire the two managers together before
+    // anything tries to create/move/query a rule set.
+    m_recSetManager.setRuleSetManager(&m_ruleSetManager);
+    m_ruleSetManager.setRecSetManager(&m_recSetManager);
     loadData();
 }
 
@@ -33,11 +38,22 @@ QString AppController::dataFilePath() const {
     return dir + "/wordsets.json";
 }
 
+QString AppController::ruleDataFilePath() const {
+    QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dir);
+    return dir + "/rulesets.json";
+}
+
 void AppController::saveData() {
     m_recSetManager.saveAllToJson(dataFilePath());
+    m_ruleSetManager.saveAllToJson(ruleDataFilePath());
 }
 
 bool AppController::loadData() {
+    // Rule sets are a newer, separate file — its absence (e.g. on first
+    // run, or an install predating this feature) isn't a load failure the
+    // way a missing/corrupt wordsets.json would be.
+    m_ruleSetManager.loadFromJson(ruleDataFilePath());
     return m_recSetManager.loadFromJson(dataFilePath());
 }
 

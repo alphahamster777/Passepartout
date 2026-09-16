@@ -22,11 +22,32 @@
 #include "dictRec.h"
 #include "recSet.h"
 
+class RuleSetManager;
+
 class RecSetManager : public QObject {
     Q_OBJECT
     QML_ELEMENT
 public:
     explicit RecSetManager(QObject* parent = nullptr);
+
+    // Wired once by AppController after both managers exist. Rule sets
+    // share this class's folder tree (m_folderItemOrder) via "ruleset:"
+    // keys, so folder-orchestration methods below (deleteFolder/renameFolder/
+    // moveFolderToFolder/mergeFolderInto/findMergeSetConflicts) delegate the
+    // rule-set side of their work here, and isFolderNameTaken() also
+    // checks rule-set names so a folder can't contain a word set and a
+    // rule set with the same name.
+    void setRuleSetManager(RuleSetManager* mgr) { m_ruleSetManager = mgr; }
+
+    // Public wrappers so RuleSetManager can register/unregister its own
+    // "ruleset:NAME" keys in the shared per-folder order lists this class
+    // owns, without exposing the full order map itself.
+    void registerOrderKey(const QString& folderPath, const QString& key) {
+        ensureInOrder(folderPath, key);
+    }
+    void unregisterOrderKey(const QString& folderPath, const QString& key) {
+        removeFromOrder(folderPath, key);
+    }
     RecSetManager(const RecSetManager& other);
     RecSetManager(RecSetManager&& other);
     RecSetManager& operator=(const RecSetManager& other);
@@ -135,9 +156,11 @@ public:
 
 private:
     QVector<RecSet> m_recSetVec;
-    // Maps folderPath → ordered list of "folder:FULLPATH" or "set:NAME" keys.
-    // An entry here whose key doesn't appear in any set's folderPath represents an empty folder.
+    // Maps folderPath → ordered list of "folder:FULLPATH", "set:NAME", or
+    // "ruleset:NAME" keys. An entry here whose key doesn't appear in any
+    // set's folderPath represents an empty folder.
     QMap<QString, QStringList> m_folderItemOrder;
+    RuleSetManager* m_ruleSetManager = nullptr;
 
     // Appends an item key to a folder's order list if not already present.
     void ensureInOrder(const QString& folderPath, const QString& key);

@@ -23,6 +23,9 @@ Page {
     signal recSetSelected(idx: int)
     signal addRecSet()
     signal editRecSet(idx: int)
+    signal ruleSetSelected(idx: int)
+    signal addRuleSet()
+    signal editRuleSet(idx: int)
     signal folderSelected(path: string)
     signal aboutRequested()
 
@@ -32,6 +35,9 @@ Page {
         function(e) { return e.id !== LanguageHelper.NotSelected })
 
     property int exportSetIdx: -1
+    // "set" (word set, via RecSetManager) or "ruleset" (via RuleSetManager) —
+    // set right before opening zipExportDialog so it calls the right manager.
+    property string exportKind: "set"
 
     // Set by dwell timer (folder item) or parent zone:
     //   "into:FULLPATH"  → drop will move dragged item inside that library
@@ -54,13 +60,18 @@ Page {
     Component.onCompleted: refreshModel()
 
     // ── Drag-and-drop move, with overwrite/merge confirmation on name clashes ──
-    // itemType: "set" | "folder"; sourceRef: set index (int) or folder full path (string)
+    // itemType: "set" | "ruleset" | "folder"; sourceRef: set index (int) or
+    // folder full path (string)
     function requestMove(itemType, sourceRef, name, destFolder) {
         var mgr = AppController.recSetManager
-        if (itemType === "set") {
+        if (itemType === "set" || itemType === "ruleset") {
+            var contentMgr = itemType === "set" ? mgr : AppController.ruleSetManager
             if (mgr.isLibraryNameTaken(destFolder, name))
                 return // can't drop a set onto a library of the same name
-            if (mgr.isSetNameTaken(destFolder, name, sourceRef)) {
+            var nameTaken = itemType === "set"
+                ? mgr.isSetNameTaken(destFolder, name, sourceRef)
+                : contentMgr.isRuleSetNameTaken(destFolder, name, sourceRef)
+            if (nameTaken) {
                 moveConflictDialog.mode = "overwriteSet"
                 moveConflictDialog.itemName = name
                 moveConflictDialog.pendingType = itemType
@@ -69,7 +80,10 @@ Page {
                 moveConflictDialog.open()
                 return
             }
-            mgr.moveSetToFolder(sourceRef, destFolder)
+            if (itemType === "set")
+                mgr.moveSetToFolder(sourceRef, destFolder)
+            else
+                contentMgr.moveRuleSetToFolder(sourceRef, destFolder)
         } else {
             if (mgr.isSetNameTaken(destFolder, name))
                 return // can't merge a library into a set of the same name
@@ -117,7 +131,10 @@ Page {
 
         onAccepted: {
             if (mode === "overwriteSet") {
-                AppController.recSetManager.moveSetToFolder(pendingSource, pendingDest, true)
+                if (pendingType === "ruleset")
+                    AppController.ruleSetManager.moveRuleSetToFolder(pendingSource, pendingDest, true)
+                else
+                    AppController.recSetManager.moveSetToFolder(pendingSource, pendingDest, true)
                 AppController.saveData()
                 AppController.recSetNameListChanged()
             } else if (mode === "mergeFolder") {
@@ -211,7 +228,8 @@ Page {
         nameFilters: ["Passepartout Set (*.ppset)"]
         defaultSuffix: "ppset"
         onAccepted: {
-            AppController.recSetManager.exportSetToZip(page.exportSetIdx, selectedFile.toString())
+            var mgr = page.exportKind === "ruleset" ? AppController.ruleSetManager : AppController.recSetManager
+            mgr.exportSetToZip(page.exportSetIdx, selectedFile.toString())
         }
     }
 
@@ -563,11 +581,13 @@ Page {
                             }
                         }
 
-                        // Left accent bar – blue for sets, amber for libraries
+                        // Left accent bar – blue for word sets, purple for rule
+                        // sets, amber for libraries
                         Rectangle {
                             width: 4; height: parent.height
                             radius: 2
-                            color: model.type === "folder" ? "#f39c12" : "#3498db"
+                            color: model.type === "folder" ? "#f39c12"
+                                 : model.type === "ruleset" ? "#9b59b6" : "#3498db"
                             anchors.left: parent.left
                         }
 
@@ -595,11 +615,12 @@ Page {
 
                             // Icon
                             Label {
-                                text: model.type === "folder" ? "/" : ""
+                                text: model.type === "folder" ? "/"
+                                    : model.type === "ruleset" ? "📖" : ""
                                 font.pixelSize: 20
                             }
 
-                            // Name + word count
+                            // Name + word/question count
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: 0
@@ -614,6 +635,12 @@ Page {
                                 Label {
                                     visible: model.type === "set"
                                     text: model.wordCount + " " + qsTr("words")
+                                    font.pixelSize: 11
+                                    color: "#95a5a6"
+                                }
+                                Label {
+                                    visible: model.type === "ruleset"
+                                    text: model.questionCount + " " + qsTr("questions")
                                     font.pixelSize: 11
                                     color: "#95a5a6"
                                 }
@@ -681,6 +708,48 @@ Page {
                                     height: visible ? implicitHeight : 0
                                     text: qsTr("Export .ppset (save to disk)")
                                     onTriggered: {
+                                        page.exportKind = "set"
+                                        page.exportSetIdx = model.index
+                                        zipExportDialog.open()
+                                    }
+                                }
+
+                                // Rule set items
+                                MenuItem {
+                                    visible: model.type === "ruleset"
+                                    height: visible ? implicitHeight : 0
+                                    text: qsTr("Edit")
+                                    onTriggered: editRuleSet(model.index)
+                                }
+                                MenuItem {
+                                    visible: model.type === "ruleset"
+                                    height: visible ? implicitHeight : 0
+                                    text: qsTr("Delete")
+                                    onTriggered: {
+                                        AppController.ruleSetManager.deleteRuleSetAt(model.index)
+                                        AppController.saveData()
+                                        AppController.recSetNameListChanged()
+                                    }
+                                }
+                                MenuSeparator { visible: model.type === "ruleset"; height: visible ? implicitHeight : 0 }
+                                MenuItem {
+                                    visible: model.type === "ruleset"
+                                    height: visible ? implicitHeight : 0
+                                    enabled: Qt.platform.os === "android"
+                                    text: qsTr("Share .ppset file")
+                                    onTriggered: {
+                                        var path = ShareHelper.shareableExportPath(model.name)
+                                        AppController.ruleSetManager.exportSetToZip(model.index, path)
+                                        ShareHelper.shareFile(path, model.name)
+                                    }
+                                }
+                                MenuSeparator { visible: model.type === "ruleset"; height: visible ? implicitHeight : 0 }
+                                MenuItem {
+                                    visible: model.type === "ruleset"
+                                    height: visible ? implicitHeight : 0
+                                    text: qsTr("Export .ppset (save to disk)")
+                                    onTriggered: {
+                                        page.exportKind = "ruleset"
                                         page.exportSetIdx = model.index
                                         zipExportDialog.open()
                                     }
@@ -722,20 +791,16 @@ Page {
                                         if (action.startsWith("into:")) {
                                             var targetFolder = action.substring(5)
                                             var itm = itemModel.get(myIndex)
-                                            if (itm.type === "folder")
-                                                page.requestMove("folder", itm.fullPath, itm.name, targetFolder)
-                                            else
-                                                page.requestMove("set", itm.index, itm.name, targetFolder)
+                                            page.requestMove(itm.type, itm.type === "folder" ? itm.fullPath : itm.index,
+                                                              itm.name, targetFolder)
                                         } else if (action === "parent") {
                                             var parentPath = page.folderPath.includes("/")
                                                 ? page.folderPath.substring(
                                                       0, page.folderPath.lastIndexOf("/"))
                                                 : ""
                                             var itm2 = itemModel.get(myIndex)
-                                            if (itm2.type === "folder")
-                                                page.requestMove("folder", itm2.fullPath, itm2.name, parentPath)
-                                            else
-                                                page.requestMove("set", itm2.index, itm2.name, parentPath)
+                                            page.requestMove(itm2.type, itm2.type === "folder" ? itm2.fullPath : itm2.index,
+                                                              itm2.name, parentPath)
                                         } else {
                                             saveOrder()
                                         }
@@ -763,6 +828,8 @@ Page {
                             onClicked: {
                                 if (model.type === "folder")
                                     folderSelected(model.fullPath)
+                                else if (model.type === "ruleset")
+                                    ruleSetSelected(model.index)
                                 else
                                     recSetSelected(model.index)
                             }
@@ -789,7 +856,9 @@ Page {
         var keys = []
         for (var i = 0; i < itemModel.count; ++i) {
             var item = itemModel.get(i)
-            keys.push(item.type === "folder" ? "folder:" + item.fullPath : "set:" + item.name)
+            keys.push(item.type === "folder" ? "folder:" + item.fullPath
+                    : item.type === "ruleset" ? "ruleset:" + item.name
+                    : "set:" + item.name)
         }
         AppController.recSetManager.reorderFolderItems(page.folderPath, keys)
         AppController.saveData()
@@ -801,6 +870,10 @@ Page {
         MenuItem {
             text: qsTr("Word Set")
             onTriggered: page.addRecSet()
+        }
+        MenuItem {
+            text: qsTr("Grammar Set")
+            onTriggered: page.addRuleSet()
         }
         MenuItem {
             text: qsTr("Library")

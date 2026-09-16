@@ -15,12 +15,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="54"/>
+        <location filename="../AboutOpenSourcePage.qml" line="56"/>
         <source>Vocabulary trainer for memorizing word sets.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="68"/>
+        <location filename="../AboutOpenSourcePage.qml" line="65"/>
         <source>Open Source Licenses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -30,34 +30,34 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="81"/>
+        <location filename="../AboutOpenSourcePage.qml" line="83"/>
         <source>Qt notice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="83"/>
+        <location filename="../AboutOpenSourcePage.qml" line="87"/>
         <source>Qt Notice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="87"/>
-        <location filename="../AboutOpenSourcePage.qml" line="89"/>
+        <location filename="../AboutOpenSourcePage.qml" line="91"/>
+        <location filename="../AboutOpenSourcePage.qml" line="95"/>
         <source>GNU LGPL v3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="93"/>
-        <location filename="../AboutOpenSourcePage.qml" line="95"/>
+        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <location filename="../AboutOpenSourcePage.qml" line="103"/>
         <source>GNU GPL v3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="99"/>
+        <location filename="../AboutOpenSourcePage.qml" line="107"/>
         <source>Qt source code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="105"/>
+        <location filename="../AboutOpenSourcePage.qml" line="115"/>
         <source>Qt project website</source>
         <translation type="unfinished"></translation>
     </message>
@@ -71,6 +71,100 @@
     </message>
     <message>
         <location filename="../CameraCapture.qml" line="78"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CreatingGrammarSet</name>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="35"/>
+        <source>New Grammar Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="35"/>
+        <source>Edit Grammar Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="54"/>
+        <source>Set title…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="158"/>
+        <location filename="../CreatingGrammarSet.qml" line="178"/>
+        <source>Question</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="165"/>
+        <source>selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="76"/>
+        <source>Grammar Explanation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="91"/>
+        <source>Explain the grammar rule this set practices…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="100"/>
+        <source>Hidden during testing until the learner makes a mistake — always readable in preview.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="181"/>
+        <source>Use ___ (three underscores) for each blank the learner fills in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="189"/>
+        <source>e.g. She ___ to school every day.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="194"/>
+        <source>Answers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="197"/>
+        <source>One answer per blank, separated by commas, in order.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="205"/>
+        <source>e.g. goes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="218"/>
+        <source>+ Add question</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="232"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="267"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="276"/>
+        <source>Title is required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CreatingGrammarSet.qml" line="285"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -375,6 +469,77 @@
     </message>
 </context>
 <context>
+    <name>GrammarSetPreview</name>
+    <message>
+        <location filename="../GrammarSetPreview.qml" line="41"/>
+        <source>%1 questions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarSetPreview.qml" line="48"/>
+        <source>Grammar Explanation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarSetPreview.qml" line="64"/>
+        <source>No explanation was added for this set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarSetPreview.qml" line="84"/>
+        <source>Start Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GrammarTest</name>
+    <message>
+        <location filename="../GrammarTest.qml" line="58"/>
+        <source>Grammar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="170"/>
+        <source>Correct: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="178"/>
+        <source>Submit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="84"/>
+        <source>Grammar Explanation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="96"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="113"/>
+        <source>💡 View grammar rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="193"/>
+        <source>Correct: %1 / %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="235"/>
+        <source>See Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GrammarTest.qml" line="235"/>
+        <source>Next →</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LicenseTextPage</name>
     <message>
         <location filename="../LicenseTextPage.qml" line="37"/>
@@ -385,28 +550,30 @@
 <context>
     <name>Main</name>
     <message>
-        <location filename="../Main.qml" line="145"/>
+        <location filename="../Main.qml" line="155"/>
         <source>Passepartout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="154"/>
+        <location filename="../Main.qml" line="164"/>
         <source>Sign in to continue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="189"/>
+        <location filename="../Main.qml" line="199"/>
         <source>Opening browser…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="189"/>
+        <location filename="../Main.qml" line="199"/>
         <source>Sign in with Google</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Main.qml" line="423"/>
-        <location filename="../Main.qml" line="430"/>
+        <location filename="../Main.qml" line="490"/>
+        <location filename="../Main.qml" line="497"/>
+        <location filename="../Main.qml" line="561"/>
+        <location filename="../Main.qml" line="568"/>
         <source>A library or set with this name already exists here.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -473,157 +640,169 @@
 <context>
     <name>SetDirMenu</name>
     <message>
-        <location filename="../SetDirMenu.qml" line="105"/>
-        <location filename="../SetDirMenu.qml" line="169"/>
+        <location filename="../SetDirMenu.qml" line="116"/>
+        <location filename="../SetDirMenu.qml" line="183"/>
         <source>Overwrite word set?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="105"/>
+        <location filename="../SetDirMenu.qml" line="116"/>
         <source>Merge libraries?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="113"/>
+        <location filename="../SetDirMenu.qml" line="124"/>
         <source>A word set named &quot;%1&quot; already exists here. Overwrite it with the moved set?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="114"/>
+        <location filename="../SetDirMenu.qml" line="125"/>
         <source>A library named &quot;%1&quot; already exists here. Merge its contents into it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="179"/>
+        <location filename="../SetDirMenu.qml" line="193"/>
         <source>A word set named &quot;%1&quot; already exists in %2. Overwrite it with the version being merged in?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="181"/>
+        <location filename="../SetDirMenu.qml" line="195"/>
         <source>the destination library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="209"/>
+        <location filename="../SetDirMenu.qml" line="223"/>
         <source>Export as .ppset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="221"/>
+        <location filename="../SetDirMenu.qml" line="235"/>
         <source>New Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="240"/>
+        <location filename="../SetDirMenu.qml" line="254"/>
         <source>Library name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="244"/>
+        <location filename="../SetDirMenu.qml" line="258"/>
         <source>e.g. Travel, Work, School…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="256"/>
-        <location filename="../SetDirMenu.qml" line="330"/>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
         <source>A library or set with this name already exists here.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="263"/>
+        <location filename="../SetDirMenu.qml" line="277"/>
         <source>Create</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="291"/>
+        <location filename="../SetDirMenu.qml" line="305"/>
         <source>Rename Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="315"/>
+        <location filename="../SetDirMenu.qml" line="329"/>
         <source>New name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="337"/>
-        <location filename="../SetDirMenu.qml" line="630"/>
+        <location filename="../SetDirMenu.qml" line="351"/>
+        <location filename="../SetDirMenu.qml" line="653"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="385"/>
+        <location filename="../SetDirMenu.qml" line="399"/>
         <source>Your word sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="385"/>
-        <location filename="../SetDirMenu.qml" line="804"/>
+        <location filename="../SetDirMenu.qml" line="399"/>
+        <location filename="../SetDirMenu.qml" line="851"/>
         <source>Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="455"/>
+        <location filename="../SetDirMenu.qml" line="469"/>
         <source>Move out of</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="585"/>
+        <location filename="../SetDirMenu.qml" line="601"/>
         <source>Drop to move inside</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="616"/>
+        <location filename="../SetDirMenu.qml" line="633"/>
         <source>words</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="640"/>
+        <location filename="../SetDirMenu.qml" line="639"/>
+        <source>questions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="663"/>
         <source>Delete Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="653"/>
+        <location filename="../SetDirMenu.qml" line="676"/>
+        <location filename="../SetDirMenu.qml" line="716"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="659"/>
+        <location filename="../SetDirMenu.qml" line="682"/>
+        <location filename="../SetDirMenu.qml" line="722"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="671"/>
+        <location filename="../SetDirMenu.qml" line="694"/>
         <source>Share .ppset file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="682"/>
+        <location filename="../SetDirMenu.qml" line="705"/>
         <source>Export .ppset (save to disk)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="777"/>
+        <location filename="../SetDirMenu.qml" line="817"/>
         <source>Nothing here yet.
 Tap + Create to add a word set or library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="800"/>
+        <location filename="../SetDirMenu.qml" line="843"/>
         <source>Word Set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="823"/>
+        <location filename="../SetDirMenu.qml" line="847"/>
+        <source>Grammar Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="870"/>
         <source>+ Create</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="877"/>
+        <location filename="../SetDirMenu.qml" line="930"/>
         <source>Interface Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="948"/>
+        <location filename="../SetDirMenu.qml" line="1002"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>

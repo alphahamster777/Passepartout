@@ -8,6 +8,7 @@ import SetPreviewMenuController
 import SpellingTestController
 import LeitnerTestController
 import FlashCardController
+import RuleTestController
 import RecSetManager
 import ShareHelper
 import GoogleSignInHelper
@@ -45,6 +46,174 @@ ApplicationWindow {
                 if (typeof stackView.currentItem.openTestTypePopup === "function")
                     stackView.currentItem.openTestTypePopup()
             })
+        }
+
+        // Mirrors CreatingRuleSet.qml's splitEscaped()/decodeBlankMarker() —
+        // needed again here since this is where rule-set questions are
+        // actually parsed into their saved shape (and reconstructed back
+        // into editable text). Splits `text` on `delimiter`, honoring "\\"
+        // as an escaped literal backslash and "\<delimiter>" as an escaped
+        // literal occurrence of the delimiter itself inside one option.
+        function splitEscaped(text, delimiter) {
+            var result = []
+            var current = ""
+            var i = 0
+            var s = text || ""
+            var dLen = delimiter.length
+            while (i < s.length) {
+                if (s[i] === "\\" && s[i + 1] === "\\") {
+                    current += "\\"; i += 2
+                } else if (s[i] === "\\" && s.substr(i + 1, dLen) === delimiter) {
+                    current += delimiter; i += 1 + dLen
+                } else if (s.substr(i, dLen) === delimiter) {
+                    result.push(current); current = ""; i += dLen
+                } else {
+                    current += s[i]; i += 1
+                }
+            }
+            result.push(current)
+            return result
+        }
+
+        // "___" authored as a whole option means "deliberately blank" — see
+        // CreatingRuleSet.qml's Options hint for combobox/dragdrop questions.
+        function decodeBlankMarker(s) {
+            return s === "___" ? "" : s
+        }
+
+        // Inverse of decodeBlankMarker + splitEscaped()'s delimiter-escaping
+        // — re-encodes a stored option/answer value back into authored text
+        // so editing an existing question round-trips exactly, including
+        // any literal comma/"::" it contains or an intentionally blank ("")
+        // value. A lone ":" never needs escaping — splitEscaped() only ever
+        // splits on the exact 2-character "::" — so only "\\", ",", and an
+        // actual "::" run get escaped here, matching what splitEscaped()
+        // actually knows how to reverse.
+        function escapeListValue(s) {
+            if (s === "") return "___"
+            return String(s).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/::/g, "\\::")
+        }
+
+        // Converts one saved/JSON-shaped question — as returned by both
+        // RuleSetManager::getQuestionFromSetQML (editing an existing set)
+        // and RuleSetManager::readSetFromZip (importing a shared .ppset) —
+        // into the row shape CreatingRuleSet.qml's ruleSetModel expects.
+        // Shared between onEditRuleSet and onIncomingFileReady below since
+        // both need the exact same conversion. Doesn't set "id" — the
+        // caller assigns that based on its own context (an existing
+        // question's saved id vs. a freshly imported question having none).
+        function ruleSetRowFromQuestion(q) {
+            if (q.type === "mc") {
+                return {
+                    questionType: "mc",
+                    questionText: q.text || "",
+                    answersText: "",
+                    mcOptionsText: (q.options || []).map(rootScope.escapeListValue).join(", "),
+                    mcCorrectIndicesText: (q.correctIndices || []).join(","),
+                    poolOptionsText: "",
+                    comboCorrectIndicesText: "",
+                    ddPlacementsText: "",
+                    mcSingleAnswer: q.singleAnswer === true
+                }
+            } else if (q.type === "combobox") {
+                var loadedGroups = q.optionsPerGap || []
+                var loadedAnswers = q.answers || []
+                // Re-derive which chip was tapped from the saved answer's
+                // position within its own blank's group.
+                var comboCorrectIndices = loadedGroups.map(function(group, gIdx) {
+                    return group.indexOf(loadedAnswers[gIdx])
+                })
+                return {
+                    questionType: "combobox",
+                    questionText: q.text || "",
+                    answersText: "",
+                    mcOptionsText: "",
+                    mcCorrectIndicesText: "",
+                    poolOptionsText: loadedGroups
+                        .map(function(group) { return group.map(rootScope.escapeListValue).join(", ") })
+                        .join("::"),
+                    comboCorrectIndicesText: comboCorrectIndices.join(","),
+                    ddPlacementsText: "",
+                    mcSingleAnswer: false
+                }
+            } else if (q.type === "dragdrop") {
+                var ddPool = q.options || []
+                var ddSavedAnswers = q.answers || []
+                // Re-derive which pool tile fills each blank from the saved
+                // answer's position in the saved pool — each pool tile used
+                // at most once, so a repeated answer value (two identical
+                // decoy-free tiles) still maps each blank to its own
+                // distinct tile.
+                var ddUsed = []
+                var ddPlacements = ddSavedAnswers.map(function(ans) {
+                    for (var pi = 0; pi < ddPool.length; ++pi) {
+                        if (ddUsed[pi]) continue
+                        if (ddPool[pi] === ans) { ddUsed[pi] = true; return pi }
+                    }
+                    return -1
+                })
+                return {
+                    questionType: "dragdrop",
+                    questionText: q.text || "",
+                    answersText: "",
+                    mcOptionsText: "",
+                    mcCorrectIndicesText: "",
+                    poolOptionsText: ddPool.map(rootScope.escapeListValue).join(", "),
+                    comboCorrectIndicesText: "",
+                    ddPlacementsText: ddPlacements.join(","),
+                    mcSingleAnswer: false
+                }
+            }
+            return {
+                questionType: "gap",
+                questionText: q.text || "",
+                answersText: (q.answers || []).map(rootScope.escapeListValue).join(", "),
+                mcOptionsText: "",
+                mcCorrectIndicesText: "",
+                poolOptionsText: "",
+                comboCorrectIndicesText: "",
+                ddPlacementsText: "",
+                mcSingleAnswer: false
+            }
+        }
+
+        // Shared between onEditRuleSet and onIncomingFileReady's rule-set
+        // import path — populates a CreatingRuleSet page's theory blocks
+        // model from a {blocks:[...]} theory object.
+        function hydrateTheoryBlocks(blocksModelRef, theory) {
+            blocksModelRef.clear()
+            var blocks = (theory && theory.blocks) || []
+            for (var bi = 0; bi < blocks.length; ++bi) {
+                var b = blocks[bi]
+                blocksModelRef.append({
+                    kind: b.kind || "text",
+                    value: b.value || "",
+                    imgHeight: b.imgHeight || (b.kind === "image" ? 200 : 0)
+                })
+            }
+        }
+
+        // CreatingRuleSet.qml's counterpart to CreatingRecSet.qml's own
+        // importFromPath() — that one lives on the page itself since
+        // RecSetManager::readSetFromZip returns words directly in the
+        // row shape recSetModel wants; a rule set's saved questions need
+        // the same ruleSetRowFromQuestion() conversion onEditRuleSet uses,
+        // so this lives here instead where that's already in scope.
+        function importRuleSetFromPath(page, path) {
+            var result = AppController.ruleSetManager.readSetFromZip(path)
+            if (!result || !result.name) return
+            page.ruleSetName = result.name
+            rootScope.hydrateTheoryBlocks(page.theoryBlocksModelRef, result.theory || {})
+            var gModelRef = page.ruleSetModelRef
+            gModelRef.clear()
+            var questions = result.questions || []
+            for (var i = 0; i < questions.length; ++i) {
+                var row = rootScope.ruleSetRowFromQuestion(questions[i])
+                row.id = i + 1
+                gModelRef.append(row)
+            }
+            page.nextQuestionId = questions.length + 1
+            page.selectedCardIndex = questions.length > 0 ? questions.length - 1 : 0
         }
 
         Keys.onReleased: function(event) {
@@ -109,8 +278,23 @@ ApplicationWindow {
             id: flashCardController
         }
 
-        // Active controller — switches to leitnerTestController for TypeE_Leitner,
-        // stays on regularTestController for all other test types.
+        RuleTestController {
+            id: ruleTestController
+        }
+        // Bridges the id above into a property reachable from separately
+        // pushed pages (ids declared here aren't visible from other .qml
+        // files) — RuleSetPreview.qml needs a stable handle to the
+        // rule controller itself, independent of whatever the shared
+        // "active controller" slot below currently points to.
+        property var ruleTestControllerRef: ruleTestController
+
+        // Active controller — this same slot is repointed at ruleTestController
+        // for rule sets too (see onRuleSetSelected below), since it's what
+        // SpellingTest.qml/FlashCard.qml/Results.qml already read from; despite
+        // the name, it just means "whichever controller is running the current
+        // test session." RuleTestController's testType (100) doesn't match
+        // any BaseTestController::TestType, so Results.qml's Leitner/FlashCard
+        // branches correctly fall through to its plain session-totals display.
         property var spellingTestController: regularTestController
 
         SetPreviewMenuController {
@@ -216,6 +400,9 @@ ApplicationWindow {
 
         Component { id: setDirMenu;         SetDirMenu {}           }
         Component { id: creatingRecSetMenu; CreatingRecSet {}       }
+        Component { id: creatingRuleSetMenu; CreatingRuleSet {} }
+        Component { id: ruleSetPreviewPage; RuleSetPreview {} }
+        Component { id: ruleTestPage;    RuleTest {}          }
         Component { id: setPreviewMenu;     SetPreviewMenu {}       }
         Component { id: spellingTestPage;   SpellingTest {}         }
         Component { id: flashCardPage;      FlashCard {}            }
@@ -277,6 +464,47 @@ ApplicationWindow {
                 function onFolderSelected(path: string) {
                     stackView.push(setDirMenu, { folderPath: path })
                 }
+                function onRuleSetSelected(num: int) {
+                    // Theory is freely readable here before testing — it's
+                    // only hidden (behind a mistake-triggered popup link)
+                    // once the actual test starts.
+                    var gmgr = AppController.ruleSetManager
+                    var ginfo = gmgr.getRuleSetInfoQML(num)
+                    stackView.push(ruleSetPreviewPage, {
+                        ruleSetIdx: num,
+                        setName: ginfo.name,
+                        theory: ginfo.theory,
+                        questionCount: ginfo.questionCount
+                    })
+                }
+                function onAddRuleSet() {
+                    stackView.push(creatingRuleSetMenu,
+                                   { folderPath: stackView.currentItem.folderPath })
+                }
+                function onEditRuleSet(num: int) {
+                    stackView.push(creatingRuleSetMenu)
+                    var gmgr = AppController.ruleSetManager
+                    var ginfo = gmgr.getRuleSetInfoQML(num)
+                    stackView.currentItem.ruleSetName = ginfo.name
+                    stackView.currentItem.ruleSetIdx  = num
+                    stackView.currentItem.folderPath     = ginfo.folderPath
+                    rootScope.hydrateTheoryBlocks(stackView.currentItem.theoryBlocksModelRef, ginfo.theory || {})
+                    var gModelRef = stackView.currentItem.ruleSetModelRef
+                    gModelRef.clear()
+                    var maxQuestionId = 0
+                    for (var gi = 0; gi < ginfo.questionCount; ++gi) {
+                        var q = gmgr.getQuestionFromSetQML(num, gi)
+                        // Questions saved before ids existed have none —
+                        // assign one from position so old sets still work.
+                        var qId = q.id !== undefined && q.id !== null ? q.id : (gi + 1)
+                        maxQuestionId = Math.max(maxQuestionId, qId)
+                        var row = rootScope.ruleSetRowFromQuestion(q)
+                        row.id = qId
+                        gModelRef.append(row)
+                    }
+                    stackView.currentItem.nextQuestionId = maxQuestionId + 1
+                    stackView.currentItem.selectedCardIndex = ginfo.questionCount > 0 ? ginfo.questionCount - 1 : 0
+                }
             }
         }
 
@@ -304,6 +532,24 @@ ApplicationWindow {
                         testType)
                     stackView.push(testType === SpellingTestController.TypeG_FlashCard
                                    ? flashCardPage : spellingTestPage)
+                }
+            }
+        }
+
+        Loader {
+            id: ruleSetPreviewConnectionLoader
+            active: stackView.currentItem && typeof stackView.currentItem.startRuleTest === "function"
+            sourceComponent: ruleSetPreviewConnectionComponent
+        }
+
+        Component {
+            id: ruleSetPreviewConnectionComponent
+            Connections {
+                target: stackView.currentItem
+                function onStartRuleTest(idx: int) {
+                    rootScope.spellingTestController = ruleTestController
+                    ruleTestController.initialize(AppController.ruleSetManager, idx)
+                    stackView.push(ruleTestPage)
                 }
             }
         }
@@ -462,6 +708,155 @@ ApplicationWindow {
         }
 
         Loader {
+            id: creatingRuleSetConnectionLoader
+            active: stackView.currentItem &&
+                    typeof stackView.currentItem.creatingRuleSetCancel === "function"
+            sourceComponent: creatingRuleSetConnectionComponent
+        }
+
+        Component {
+            id: creatingRuleSetConnectionComponent
+            Connections {
+                target: stackView.currentItem
+
+                function onCreatingRuleSetCancel() {
+                    stackView.pop()
+                }
+
+                function onCreatingRuleSetSave() {
+                    var setName      = stackView.currentItem.ruleSetName
+                    var setIdx       = stackView.currentItem.ruleSetIdx
+                    var setFolder    = stackView.currentItem.folderPath
+                    var blocksModelRef = stackView.currentItem.theoryBlocksModelRef
+                    var modelRef     = stackView.currentItem.ruleSetModelRef
+                    var mgr          = AppController.ruleSetManager
+
+                    if (setName === "") return
+
+                    if (setIdx === -1) {
+                        setIdx = mgr.createRuleSet(setName, setFolder)
+                        if (setIdx === -1) {
+                            stackView.currentItem.titleErrorMessage =
+                                qsTr("A library or set with this name already exists here.")
+                            stackView.currentItem.titleError = true
+                            return
+                        }
+                    } else {
+                        if (!mgr.renameRuleSet(setIdx, setName)) {
+                            stackView.currentItem.titleErrorMessage =
+                                qsTr("A library or set with this name already exists here.")
+                            stackView.currentItem.titleError = true
+                            return
+                        }
+                        mgr.clearQuestionsAt(setIdx)
+                    }
+
+                    // Blank text blocks (e.g. a leftover "+ Text" the creator
+                    // never filled in) are dropped rather than persisted.
+                    var blocks = []
+                    for (var bi = 0; bi < blocksModelRef.count; ++bi) {
+                        var b = blocksModelRef.get(bi)
+                        if (b.kind === "text" && (b.value || "").trim() === "") continue
+                        blocks.push({ kind: b.kind, value: b.value, imgHeight: b.imgHeight || 0 })
+                    }
+                    mgr.setTheoryAt(setIdx, { blocks: blocks })
+
+                    for (var i = 0; i < modelRef.count; ++i) {
+                        var q = modelRef.get(i)
+                        if (q.questionText === null || q.questionText.trim() === "") continue
+                        if (q.questionType === "mc") {
+                            var options = rootScope.splitEscaped(q.mcOptionsText || "", ",")
+                                .map(function(a) { return a.trim() })
+                                .filter(function(a) { return a !== "" })
+                            if (options.length < 2) continue
+                            var correctIndices = (q.mcCorrectIndicesText || "").split(",")
+                                .map(function(s) { return s.trim() })
+                                .filter(function(s) { return s !== "" })
+                                .map(function(s) { return parseInt(s, 10) })
+                                .filter(function(idx) { return idx >= 0 && idx < options.length })
+                            if (correctIndices.length === 0) correctIndices = [0]
+                            // Defensive clamp — the chip UI itself already
+                            // keeps this to one entry in single-answer mode.
+                            if (q.mcSingleAnswer && correctIndices.length > 1) correctIndices = [correctIndices[0]]
+                            mgr.addQuestionToSetAt(setIdx, {
+                                id: q.id, type: "mc", text: q.questionText,
+                                options: options, correctIndices: correctIndices,
+                                singleAnswer: q.mcSingleAnswer === true
+                            })
+                        } else if (q.questionType === "combobox") {
+                            // "::" separates one blank's option group from
+                            // the next, "," separates choices within a
+                            // group — see CreatingRuleSet.qml's Options hint.
+                            var optionsPerGap = rootScope.splitEscaped(q.poolOptionsText || "", "::")
+                                .map(function(group) {
+                                    return rootScope.splitEscaped(group, ",")
+                                        .map(function(a) { return a.trim() })
+                                        .filter(function(a) { return a !== "" })
+                                        .map(rootScope.decodeBlankMarker)
+                                })
+                                .filter(function(group) { return group.length > 0 })
+                            if (optionsPerGap.length === 0) continue
+                            // The answer for each blank is whichever chip
+                            // was tapped in that blank's group (see
+                            // CreatingRuleSet.qml's comboCorrectIndicesText),
+                            // not typed text — every blank must have a valid
+                            // tapped choice, or the question can't be saved.
+                            var comboCorrectIdx = (q.comboCorrectIndicesText || "").split(",")
+                                .map(function(s) { return s.trim() === "" ? -1 : parseInt(s.trim(), 10) })
+                            var comboAnswers = []
+                            var comboValid = true
+                            for (var gIdx = 0; gIdx < optionsPerGap.length; ++gIdx) {
+                                var ci = gIdx < comboCorrectIdx.length ? comboCorrectIdx[gIdx] : -1
+                                if (ci < 0 || ci >= optionsPerGap[gIdx].length) { comboValid = false; break }
+                                comboAnswers.push(optionsPerGap[gIdx][ci])
+                            }
+                            if (!comboValid) continue
+                            mgr.addQuestionToSetAt(setIdx, {
+                                id: q.id, type: "combobox", text: q.questionText,
+                                answers: comboAnswers, optionsPerGap: optionsPerGap
+                            })
+                        } else if (q.questionType === "dragdrop") {
+                            var pool = rootScope.splitEscaped(q.poolOptionsText || "", ",")
+                                .map(function(a) { return a.trim() })
+                                .filter(function(a) { return a !== "" })
+                                .map(rootScope.decodeBlankMarker)
+                            var ddGapCount = (q.questionText || "").split("___").length - 1
+                            if (pool.length === 0 || ddGapCount === 0) continue
+                            // The answer for each blank is whichever tile was
+                            // dragged/tapped into it (see CreatingRuleSet.qml's
+                            // "Fill in the blanks" section), not typed text —
+                            // every blank must have a tile placed, or the
+                            // question can't be saved.
+                            var ddPlacements = (q.ddPlacementsText || "").split(",")
+                                .map(function(s) { return s.trim() === "" ? -1 : parseInt(s.trim(), 10) })
+                            var ddAnswers = []
+                            var ddValid = true
+                            for (var ddGap = 0; ddGap < ddGapCount; ++ddGap) {
+                                var ddIdx = ddGap < ddPlacements.length ? ddPlacements[ddGap] : -1
+                                if (ddIdx < 0 || ddIdx >= pool.length) { ddValid = false; break }
+                                ddAnswers.push(pool[ddIdx])
+                            }
+                            if (!ddValid) continue
+                            mgr.addQuestionToSetAt(setIdx, {
+                                id: q.id, type: "dragdrop", text: q.questionText,
+                                answers: ddAnswers, options: pool
+                            })
+                        } else {
+                            var answers = rootScope.splitEscaped(q.answersText || "", ",")
+                                .map(function(a) { return a.trim() })
+                                .filter(function(a) { return a !== "" })
+                            mgr.addQuestionToSetAt(setIdx, { id: q.id, type: "gap", text: q.questionText, answers: answers })
+                        }
+                    }
+
+                    AppController.saveData()
+                    AppController.recSetNameListChanged()
+                    stackView.pop()
+                }
+            }
+        }
+
+        Loader {
             active: stackView.currentItem && typeof stackView.currentItem.aboutRequested === "function"
             sourceComponent: Component {
                 Connections {
@@ -522,8 +917,19 @@ ApplicationWindow {
                 // duplicate page on top of it instead of replacing it.
                 // Return to the root first, same as any normal "open with" flow.
                 stackView.pop(null)
-                var page = stackView.push(creatingRecSetMenu)
-                Qt.callLater(function() { page.importFromPath(localPath) })
+                // A rule-set .ppset's manifest carries "kind":"ruleset" (see
+                // RuleSetManager::exportSetToZip); a word-set one has no
+                // "kind" at all. Checked up front so this routes to the
+                // right creation page instead of always assuming word set —
+                // opening a grammar .ppset through the wrong importer just
+                // silently produced an empty word set sharing its name.
+                if (AppController.ruleSetManager.isRuleSetZip(localPath)) {
+                    var rulePage = stackView.push(creatingRuleSetMenu)
+                    Qt.callLater(function() { rootScope.importRuleSetFromPath(rulePage, localPath) })
+                } else {
+                    var wordPage = stackView.push(creatingRecSetMenu)
+                    Qt.callLater(function() { wordPage.importFromPath(localPath) })
+                }
             }
             function onIncomingFileFailed(error) {
                 console.warn("Couldn't open shared file:", error)

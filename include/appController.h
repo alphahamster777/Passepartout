@@ -9,6 +9,7 @@
 
 #include "baseTestController.h"
 #include "recSetManager.h"
+#include "ruleSetManager.h"
 
 class QQmlEngine;
 class QJSEngine;
@@ -19,6 +20,7 @@ class AppController: public QObject
     QML_ELEMENT
     QML_SINGLETON
     Q_PROPERTY(RecSetManager* recSetManager READ recSetManager CONSTANT)
+    Q_PROPERTY(RuleSetManager* ruleSetManager READ ruleSetManager CONSTANT)
     Q_PROPERTY(QList<QString> recSetNameList READ getRecSetNameList NOTIFY recSetNameListChanged)
     // BaseTestController::SpellingStrictness value (Strict/Normal/Lenient),
     // persisted via QSettings so it's remembered across sessions. Read
@@ -49,6 +51,10 @@ public:
 
     Q_INVOKABLE RecSetManager* recSetManager() {
         return &m_recSetManager;
+    }
+
+    Q_INVOKABLE RuleSetManager* ruleSetManager() {
+        return &m_ruleSetManager;
     }
 
     QList<QString> getRecSetNameList() const;
@@ -96,6 +102,8 @@ signals:
 
 private:
     RecSetManager m_recSetManager;
+    RuleSetManager m_ruleSetManager;
     QQmlEngine* m_engine = nullptr;
     QString dataFilePath() const;
+    QString ruleDataFilePath() const;
 };

@@ -82,6 +82,23 @@ target_link_libraries(RecSet
     PRIVATE DictRec Qt6::Core
 )
 
+add_library(RuleSet
+    ${CMAKE_SOURCE_DIR}/include/ruleSet.h
+    ${CMAKE_SOURCE_DIR}/src/ruleSet.cpp
+)
+target_include_directories(RuleSet
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+target_link_libraries(RuleSet
+    PRIVATE Qt6::Core
+)
+
+# RecSetManager and RuleSetManager reference each other directly (rule
+# sets share RecSetManager's folder tree — see setRuleSetManager()/
+# setRecSetManager()), which would be a circular target dependency if built
+# as separate qt_add_qml_module libraries. Compiling ruleSetManager.*
+# into this same module sidesteps that while keeping them separate, clearly
+# bounded C++ classes.
 qt_add_qml_module(RecSetManager
     URI RecSetManager
     VERSION 1.0
@@ -89,6 +106,8 @@ qt_add_qml_module(RecSetManager
     SOURCES
     ${CMAKE_SOURCE_DIR}/include/recSetManager.h
     ${CMAKE_SOURCE_DIR}/src/recSetManager.cpp
+    ${CMAKE_SOURCE_DIR}/include/ruleSetManager.h
+    ${CMAKE_SOURCE_DIR}/src/ruleSetManager.cpp
     OUTPUT_DIRECTORY
       "${CMAKE_BINARY_DIR}/RecSetManager"
 )
@@ -98,7 +117,7 @@ target_include_directories(RecSetManager
 )
 
 target_link_libraries(RecSetManager
-    PRIVATE DictRec RecSet Qt6::Core
+    PRIVATE DictRec RecSet RuleSet Qt6::Core
 )
 
 # QZipReader/QZipWriter private headers require explicit CorePrivate linkage in Qt 6.10+;
@@ -154,6 +173,24 @@ qt_add_qml_module(FlashCardController
 )
 
 target_link_libraries(FlashCardController PRIVATE Qt6::Core BaseTestController)
+
+# Doesn't inherit BaseTestController (see ruleTestController.h) so it
+# doesn't link that static lib — but does link RecSetManager, since that's
+# where RuleSetManager is compiled (see the RecSetManager block above),
+# and links BaseTestController's headers-only for the shared strictness
+# enum/settings key it reuses without inheriting the class.
+qt_add_qml_module(RuleTestController
+    URI RuleTestController
+    VERSION 1.0
+    RESOURCE_PREFIX /
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/include/ruleTestController.h
+    ${CMAKE_SOURCE_DIR}/src/ruleTestController.cpp
+    OUTPUT_DIRECTORY
+      "${CMAKE_BINARY_DIR}/RuleTestController"
+)
+
+target_link_libraries(RuleTestController PRIVATE Qt6::Core RecSetManager BaseTestController)
 
 qt_add_qml_module(SetPreviewMenuController
     URI SetPreviewMenuController
@@ -303,8 +340,8 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml FlashCard.qml
-    IMPORTS LeitnerTestController SpellingTestController FlashCardController LanguageHelper
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml FlashCard.qml CreatingRuleSet.qml RuleSetPreview.qml RuleTest.qml
+    IMPORTS LeitnerTestController SpellingTestController FlashCardController RuleTestController LanguageHelper
 )
 
 # IMPORTS (above) only tells qmlimportscanner what to discover/bundle for
@@ -327,6 +364,7 @@ target_link_libraries(appPassepartout
     PRIVATE Qt6::Multimedia Qt6::QuickControls2 Qt6::QuickDialogs2
             Qt6::Network Qt6::TextToSpeech
             SpellingTestController LeitnerTestController FlashCardController
+            RuleTestController
             AppController
 )
 

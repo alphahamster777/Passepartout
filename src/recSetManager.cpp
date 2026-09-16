@@ -1,4 +1,5 @@
 #include "recSetManager.h"
+#include "ruleSetManager.h"
 
 #include <private/qzipreader_p.h>
 #include <private/qzipwriter_p.h>
@@ -221,6 +222,7 @@ QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
                 item["fullPath"] = fp;
                 item["index"]    = -1;
                 item["wordCount"] = 0;
+                item["questionCount"] = 0;
                 result.append(item);
             } else if (key.startsWith(QLatin1String("set:"))) {
                 QString name = key.mid(4);
@@ -233,6 +235,21 @@ QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
                 item["fullPath"] = QString();
                 item["index"]    = idx;
                 item["wordCount"] = m_recSetVec.at(idx).getWordCount();
+                item["questionCount"] = 0;
+                result.append(item);
+            } else if (key.startsWith(QLatin1String("ruleset:"))) {
+                if (!m_ruleSetManager) continue;
+                QString name = key.mid(8);
+                int idx = m_ruleSetManager->indexOf(folderPath, name);
+                if (idx == -1) continue;
+                QVariant count = m_ruleSetManager->getRuleSetInfoQML(idx).value("questionCount");
+                QVariantMap item;
+                item["type"]          = QStringLiteral("ruleset");
+                item["name"]          = name;
+                item["fullPath"]      = QString();
+                item["index"]         = idx;
+                item["wordCount"]     = count;
+                item["questionCount"] = count;
                 result.append(item);
             }
         }
@@ -250,7 +267,27 @@ QVariantList RecSetManager::getFolderItems(const QString& folderPath) const {
         item["fullPath"] = QString();
         item["index"]    = i;
         item["wordCount"] = rs.getWordCount();
+        item["questionCount"] = 0;
         result.append(item);
+    }
+
+    // Same self-healing pass for rule sets not yet tracked in the order list.
+    if (m_ruleSetManager) {
+        for (int i = 0; i < m_ruleSetManager->getRuleSetCount(); ++i) {
+            QVariantMap info = m_ruleSetManager->getRuleSetInfoQML(i);
+            if (info.value("folderPath").toString() != folderPath) continue;
+            QString name = info.value("name").toString();
+            QString key = "ruleset:" + name;
+            if (seen.contains(key)) continue;
+            QVariantMap item;
+            item["type"]          = QStringLiteral("ruleset");
+            item["name"]          = name;
+            item["fullPath"]      = QString();
+            item["index"]         = i;
+            item["wordCount"]     = info.value("questionCount");
+            item["questionCount"] = info.value("questionCount");
+            result.append(item);
+        }
     }
 
     return result;
@@ -280,8 +317,11 @@ bool RecSetManager::isSetNameTaken(const QString& parentPath, const QString& nam
 
 bool RecSetManager::isFolderNameTaken(const QString& parentPath, const QString& name,
                                        const QString& excludeFullPath) const {
-    return isLibraryNameTaken(parentPath, name, excludeFullPath) ||
-           isSetNameTaken(parentPath, name);
+    if (isLibraryNameTaken(parentPath, name, excludeFullPath) || isSetNameTaken(parentPath, name))
+        return true;
+    if (m_ruleSetManager && m_ruleSetManager->isRuleSetNameTaken(parentPath, name))
+        return true;
+    return false;
 }
 
 bool RecSetManager::createFolder(const QString& folderPath) {
@@ -310,6 +350,8 @@ bool RecSetManager::deleteFolder(const QString& folderPath) {
             ++sit;
         }
     }
+    if (m_ruleSetManager)
+        m_ruleSetManager->deleteInSubtree(folderPath);
 
     // Remove all order entries for the folder and its children
     QList<QString> toRemove;
@@ -343,6 +385,8 @@ bool RecSetManager::renameFolder(const QString& oldPath, const QString& newPath)
             rs.setFolderPath(newPath + fp.mid(oldPath.length()));
         }
     }
+    if (m_ruleSetManager)
+        m_ruleSetManager->updateFolderPathsForRename(oldPath, newPath);
 
     // Rebuild order map entries for the renamed subtree
     QMap<QString, QStringList> rebuildEntries;
@@ -425,8 +469,11 @@ bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString&
     // Prevent moving a folder into itself or any of its descendants
     if (newParentPath == folderPath || newParentPath.startsWith(folderPath + "/"))
         return false;
-    // A set with the same name can't be merged into or replaced by a library.
+    // A set (word or rule) with the same name can't be merged into or
+    // replaced by a library.
     if (isSetNameTaken(newParentPath, lastName)) return false;
+    if (m_ruleSetManager && m_ruleSetManager->isRuleSetNameTaken(newParentPath, lastName))
+        return false;
 
     if (isLibraryNameTaken(newParentPath, lastName, folderPath)) {
         if (!merge) return false;
@@ -443,6 +490,8 @@ bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString&
         else if (fp.startsWith(folderPath + "/"))
             rs.setFolderPath(newPath + fp.mid(folderPath.length()));
     }
+    if (m_ruleSetManager)
+        m_ruleSetManager->updateFolderPathsForRename(folderPath, newPath);
 
     // 2. Rebuild the order map for the moved subtree
     QMap<QString, QStringList> toAdd;
@@ -485,6 +534,8 @@ QVariantList RecSetManager::findMergeSetConflicts(const QString& sourcePath, con
             result.append(m);
         }
     }
+    if (m_ruleSetManager)
+        result += m_ruleSetManager->findConflictsInFolder(sourcePath, destPath);
 
     auto orderIt = m_folderItemOrder.find(sourcePath);
     if (orderIt != m_folderItemOrder.end()) {
@@ -531,6 +582,9 @@ void RecSetManager::mergeFolderInto(const QString& sourcePath, const QString& de
             stuckSetIdx.insert(idx);
     }
 
+    bool ruleStuck = m_ruleSetManager &&
+        m_ruleSetManager->mergeDirectSetsInto(sourcePath, destPath, overwriteKeys);
+
     // Move every direct sub-library, merging into same-named siblings recursively.
     QStringList childFolders;
     auto orderIt = m_folderItemOrder.find(sourcePath);
@@ -556,7 +610,7 @@ void RecSetManager::mergeFolderInto(const QString& sourcePath, const QString& de
 
     // Drop sourcePath's own bookkeeping only if it's actually empty now — a stuck
     // set (see above) keeps it alive so nothing becomes invisible/orphaned.
-    bool stillHasSets = !stuckSetIdx.isEmpty();
+    bool stillHasSets = !stuckSetIdx.isEmpty() || ruleStuck;
     bool stillHasFolders = false;
     auto remainingIt = m_folderItemOrder.find(sourcePath);
     if (remainingIt != m_folderItemOrder.end()) {
