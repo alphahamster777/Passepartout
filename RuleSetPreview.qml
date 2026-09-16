@@ -67,7 +67,7 @@ Page {
         Label {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: qsTr("This clears your progress on this grammar set and starts a fresh session.")
+            text: qsTr("This clears your progress on this rule set and starts a fresh session.")
         }
 
         onAccepted: {
@@ -112,7 +112,7 @@ Page {
 
             Label {
                 Layout.fillWidth: true
-                text: qsTr("Grammar Explanation")
+                text: qsTr("Rule Explanation")
                 font.pixelSize: 15
                 font.bold: true
                 color: "#2c3e50"

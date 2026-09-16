@@ -872,7 +872,7 @@ Page {
             onTriggered: page.addRecSet()
         }
         MenuItem {
-            text: qsTr("Grammar Set")
+            text: qsTr("Rule Set")
             onTriggered: page.addRuleSet()
         }
         MenuItem {

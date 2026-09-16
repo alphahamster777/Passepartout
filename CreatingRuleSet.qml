@@ -4,6 +4,8 @@ import QtQuick.Controls.Material
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtMultimedia
+import AppController
+import FirebaseAiHelper
 
 Page {
     id: page
@@ -18,6 +20,9 @@ Page {
     property bool titleError: false
     property string titleErrorMessage: ""
     property string previewPlayingPath: ""
+    property string aiError: ""
+    readonly property QtObject aiBackend: FirebaseAiHelper
+    readonly property bool aiGenerating: page.aiBackend.ruleGenerating
     // Briefly highlights an MC question card whose "Correct answer(s)" was
     // left unset when Save is pressed — see the Save button's onClicked and
     // mcErrorFlashTimer below.
@@ -37,6 +42,34 @@ Page {
         id: mcErrorFlashTimer
         interval: 1200
         onTriggered: page.mcErrorCardIndex = -1
+    }
+
+    // ── AI backend signal handlers ─────────────────────────────────────────────
+    Connections {
+        target: page.aiBackend
+        function onRuleSetGenerated(ruleSet) {
+            // Replaces whatever's here rather than appending — unlike
+            // CreatingRecSet.qml's word cards, a new rule set starts with
+            // zero questions (no single blank "starter" row to detect/
+            // replace), so there's no less-surprising alternative to
+            // "Generate" fully populating the page.
+            if (page.ruleSetName.trim() === "")
+                page.ruleSetName = aiThemeField.text.trim()
+            page.hydrateTheoryBlocks(theoryBlocksModel, ruleSet.theory || {})
+            ruleSetModel.clear()
+            var questions = ruleSet.questions || []
+            for (var i = 0; i < questions.length; ++i) {
+                var row = page.ruleSetRowFromQuestion(questions[i])
+                row.id = page.nextQuestionId++
+                ruleSetModel.append(row)
+            }
+            page.selectedCardIndex = ruleSetModel.count > 0 ? ruleSetModel.count - 1 : 0
+            page.aiError = ""
+            aiGeneratorPopup.close()
+        }
+        function onRuleGenerationFailed(error) {
+            page.aiError = error
+        }
     }
 
     // Returns the index of the first "mc"-type question (with non-blank
@@ -213,7 +246,146 @@ Page {
         return -1
     }
 
-    // The Grammar Explanation is an ordered list of blocks — "text"
+    // Inverse of decodeBlankMarker + splitEscaped()'s delimiter-escaping —
+    // re-encodes a stored option/answer value back into authored text.
+    // Mirrors Main.qml's rootScope.escapeListValue exactly (duplicated
+    // rather than shared — see splitEscaped's own comment above for why);
+    // needed here for both importFromPath() and the AI generator below,
+    // which both hand this page saved-shape data (options/answers as plain
+    // strings) that must round-trip through the same authored-text fields
+    // as anything typed by hand.
+    function escapeListValue(s) {
+        if (s === "") return "___"
+        return String(s).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/::/g, "\\::")
+    }
+
+    // Converts one saved/JSON-shaped question — as returned by both
+    // RuleSetManager::readSetFromZip (importFromPath below) and
+    // AiRuleSetShared::parseRuleSet (the AI generator below) — into the row
+    // shape ruleSetModel expects. Mirrors Main.qml's rootScope.
+    // ruleSetRowFromQuestion, which does the same job for editing an
+    // existing set — duplicated rather than shared since this page can't
+    // reach that other document's rootScope id.
+    function ruleSetRowFromQuestion(q) {
+        if (q.type === "mc") {
+            return {
+                questionType: "mc",
+                questionText: q.text || "",
+                answersText: "",
+                mcOptionsText: (q.options || []).map(page.escapeListValue).join(", "),
+                mcCorrectIndicesText: (q.correctIndices || []).join(","),
+                poolOptionsText: "",
+                comboCorrectIndicesText: "",
+                ddPlacementsText: "",
+                mcSingleAnswer: q.singleAnswer === true
+            }
+        } else if (q.type === "combobox") {
+            var loadedGroups = q.optionsPerGap || []
+            var loadedAnswers = q.answers || []
+            var comboCorrectIndices = loadedGroups.map(function(group, gIdx) {
+                return group.indexOf(loadedAnswers[gIdx])
+            })
+            return {
+                questionType: "combobox",
+                questionText: q.text || "",
+                answersText: "",
+                mcOptionsText: "",
+                mcCorrectIndicesText: "",
+                poolOptionsText: loadedGroups
+                    .map(function(group) { return group.map(page.escapeListValue).join(", ") })
+                    .join("::"),
+                comboCorrectIndicesText: comboCorrectIndices.join(","),
+                ddPlacementsText: "",
+                mcSingleAnswer: false
+            }
+        } else if (q.type === "dragdrop") {
+            var ddPool = q.options || []
+            var ddSavedAnswers = q.answers || []
+            var ddUsed = []
+            var ddPlacements = ddSavedAnswers.map(function(ans) {
+                for (var pi = 0; pi < ddPool.length; ++pi) {
+                    if (ddUsed[pi]) continue
+                    if (ddPool[pi] === ans) { ddUsed[pi] = true; return pi }
+                }
+                return -1
+            })
+            return {
+                questionType: "dragdrop",
+                questionText: q.text || "",
+                answersText: "",
+                mcOptionsText: "",
+                mcCorrectIndicesText: "",
+                poolOptionsText: ddPool.map(page.escapeListValue).join(", "),
+                comboCorrectIndicesText: "",
+                ddPlacementsText: ddPlacements.join(","),
+                mcSingleAnswer: false
+            }
+        }
+        return {
+            questionType: "gap",
+            questionText: q.text || "",
+            answersText: (q.answers || []).map(page.escapeListValue).join(", "),
+            mcOptionsText: "",
+            mcCorrectIndicesText: "",
+            poolOptionsText: "",
+            comboCorrectIndicesText: "",
+            ddPlacementsText: "",
+            mcSingleAnswer: false
+        }
+    }
+
+    // Mirrors Main.qml's rootScope.hydrateTheoryBlocks — see
+    // ruleSetRowFromQuestion above for why this is duplicated here too.
+    function hydrateTheoryBlocks(blocksModelRef, theory) {
+        blocksModelRef.clear()
+        var blocks = (theory && theory.blocks) || []
+        for (var bi = 0; bi < blocks.length; ++bi) {
+            var b = blocks[bi]
+            blocksModelRef.append({
+                kind: b.kind || "text",
+                value: b.value || "",
+                imgHeight: b.imgHeight || (b.kind === "image" ? 200 : 0)
+            })
+        }
+    }
+
+    // "in 12d 4h" / "in 3h 20m" / "in 45m" / "soon" from an ISO 8601 UTC
+    // instant — mirrors CreatingRecSet.qml's own formatResetTime exactly.
+    function formatResetTime(isoString) {
+        if (!isoString) return ""
+        var resetDate = new Date(isoString)
+        if (isNaN(resetDate.getTime())) return ""
+        var diffMs = resetDate.getTime() - Date.now()
+        if (diffMs <= 0) return qsTr("soon")
+        var days = Math.floor(diffMs / 86400000)
+        var hours = Math.floor((diffMs % 86400000) / 3600000)
+        var mins = Math.floor((diffMs % 3600000) / 60000)
+        if (days > 0) return qsTr("in %1d %2h").arg(days).arg(hours)
+        return hours > 0 ? qsTr("in %1h %2m").arg(hours).arg(mins) : qsTr("in %1m").arg(mins)
+    }
+
+    // Populates this page's fields from an imported .ppset's parsed
+    // {name, theory, questions} — called both from the header's Import
+    // button/FileDialog and from Main.qml's onIncomingFileReady (an
+    // "open with" shared file) via the same signal path CreatingRecSet.qml
+    // already uses for its own importFromPath.
+    function importFromPath(path) {
+        var result = AppController.ruleSetManager.readSetFromZip(path)
+        if (!result || !result.name) return
+        page.ruleSetName = result.name
+        page.hydrateTheoryBlocks(theoryBlocksModel, result.theory || {})
+        ruleSetModel.clear()
+        var questions = result.questions || []
+        for (var i = 0; i < questions.length; ++i) {
+            var row = page.ruleSetRowFromQuestion(questions[i])
+            row.id = i + 1
+            ruleSetModel.append(row)
+        }
+        page.nextQuestionId = questions.length + 1
+        page.selectedCardIndex = questions.length > 0 ? questions.length - 1 : 0
+    }
+
+    // The Rule Explanation is an ordered list of blocks — "text"
     // (freely editable prose), "image" (with a resizable height) and
     // "audio" — edited directly in place rather than as raw text with
     // placement markers, so what the creator sees here (photo included) is
@@ -258,13 +430,356 @@ Page {
             height: 56
             spacing: 4
 
+            Button {
+                implicitWidth: 76
+                implicitHeight: 36
+                text: qsTr("✨ AI")
+                background: Rectangle {
+                    radius: 8
+                    color: parent.pressed ? "#7d3c98" : "#9b59b6"
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: "white"
+                    font.pixelSize: 13
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: {
+                    page.aiError = ""
+                    aiGeneratorPopup.open()
+                }
+            }
+
             Label {
                 Layout.fillWidth: true
-                text: page.ruleSetIdx === -1 ? qsTr("New Grammar Set") : qsTr("Edit Grammar Set")
+                text: page.ruleSetIdx === -1 ? qsTr("New Rule Set") : qsTr("Edit Rule Set")
                 font.pixelSize: 18
                 font.bold: true
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
+            }
+
+            Button {
+                implicitWidth: 76
+                implicitHeight: 36
+                text: qsTr("Import")
+                background: Rectangle {
+                    radius: 8
+                    color: parent.pressed ? "#1a6ca8" : "#3498db"
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: "white"
+                    font.pixelSize: 13
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: importDialog.open()
+            }
+        }
+    }
+
+    FileDialog {
+        id: importDialog
+        title: qsTr("Import Rule Set")
+        nameFilters: ["Passepartout Set (*.ppset)", "All files (*)"]
+        onAccepted: page.importFromPath(selectedFile.toString())
+    }
+
+    // A labeled +/- count control for one question type in the AI generator
+    // popup below — pulled out as an inline component since the popup needs
+    // four of these (one per question type the app supports) and the
+    // SpinBox's custom indicator styling is too much to repeat four times
+    // inline. Must be declared at this top level (a direct child of the
+    // root Page) — QML inline components aren't allowed nested inside an
+    // arbitrary Item.
+    component AiTypeCountSpin: RowLayout {
+        id: countRow
+        property alias label: countLabel.text
+        property alias value: countSpin.value
+        width: parent ? parent.width : implicitWidth
+        spacing: 10
+
+        Label {
+            id: countLabel
+            font.pixelSize: 12; color: "#2c3e50"
+            Layout.fillWidth: true
+        }
+        SpinBox {
+            id: countSpin
+            from: 0; to: 20
+            editable: true
+            font.pixelSize: 14
+            implicitWidth: 140
+            implicitHeight: 40
+
+            contentItem: TextInput {
+                anchors {
+                    left: parent.left; leftMargin: 36
+                    right: parent.right; rightMargin: 36
+                    verticalCenter: parent.verticalCenter
+                }
+                text: countSpin.textFromValue(countSpin.value, countSpin.locale)
+                font: countSpin.font
+                color: "#2c3e50"
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: Qt.AlignVCenter
+                readOnly: !countSpin.editable
+                validator: countSpin.validator
+                inputMethodHints: Qt.ImhDigitsOnly
+            }
+            up.indicator: Rectangle {
+                x: countSpin.width - width
+                width: 36
+                height: countSpin.height
+                radius: 8
+                color: countSpin.up.pressed ? "#7d3c98" : "#9b59b6"
+                Text { text: "+"; anchors.centerIn: parent; color: "white"; font.pixelSize: 16; font.bold: true }
+            }
+            down.indicator: Rectangle {
+                x: 0
+                width: 36
+                height: countSpin.height
+                radius: 8
+                color: countSpin.down.pressed ? "#7d3c98" : "#9b59b6"
+                Text { text: "−"; anchors.centerIn: parent; color: "white"; font.pixelSize: 16; font.bold: true }
+            }
+            background: Rectangle {
+                radius: 8
+                color: "#faf6fc"
+                border.color: "#e7d5ef"
+            }
+        }
+    }
+
+    // ── AI Rule Set Generator popup ──────────────────────────────────────────
+    // Mirrors CreatingRecSet.qml's "AI Word Set Generator" popup closely (same
+    // sizing/keyboard-avoidance approach, same footer/quota-line layout) but
+    // without a language picker — a rule set isn't tied to a language pair the
+    // way a word set is — and one +/- count per question type (AiTypeCountSpin
+    // above) in place of a single "Number of words".
+    Popup {
+        id: aiGeneratorPopup
+        readonly property bool keyboardUp: Qt.inputMethod.visible
+        readonly property real overlayHeight: Overlay.overlay ? Overlay.overlay.height : 640
+        readonly property real visibleAreaHeight: keyboardUp ? overlayHeight * 0.55 : overlayHeight * 0.92
+
+        x: Overlay.overlay ? (Overlay.overlay.width - width) / 2 : 0
+        y: keyboardUp ? 16 : Math.max(20, (overlayHeight - height) / 2)
+        width: Math.min(parent.width - 32, 380)
+        height: Math.min(implicitHeight, visibleAreaHeight)
+        padding: 0
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        // Closing while a request is in flight (Cancel, tap outside, Escape,
+        // the Android back gesture) must abort it — otherwise the dialog just
+        // disappears while Gemini keeps "generating" forever in the background,
+        // and reopening it shows a stuck, unresponsive Generate button.
+        onClosed: if (page.aiGenerating) page.aiBackend.cancelRuleGeneration()
+        onOpened: FirebaseAiHelper.refreshRuleQuota()
+
+        background: Rectangle {
+            radius: 18
+            color: "white"
+            layer.enabled: true
+            border.color: "#e7d5ef"
+            border.width: 1
+        }
+
+        contentItem: ScrollView {
+            id: aiPopupScrollView
+            clip: true
+            contentWidth: availableWidth
+
+            Column {
+            width: aiPopupScrollView.availableWidth
+
+            // ── Gradient header ──────────────────────────────────────────────
+            Rectangle {
+                width: parent.width
+                height: 68
+                radius: 18
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#a55cc2" }
+                    GradientStop { position: 1.0; color: "#8e44ad" }
+                }
+                Rectangle {
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                    height: 18; color: "#8e44ad"
+                }
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 2
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: qsTr("✨ AI Rule Set Generator")
+                        font.pixelSize: 17; font.bold: true; color: "white"
+                    }
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: qsTr("Powered by Gemini")
+                        font.pixelSize: 10; color: "#f3e5f9"
+                    }
+                }
+            }
+
+            Item {
+                width: parent.width
+                implicitHeight: formColumn.implicitHeight + 36
+                height: implicitHeight
+
+                Column {
+                    id: formColumn
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 18 }
+                    spacing: 12
+
+                    Label {
+                        width: parent.width
+                        visible: FirebaseAiHelper.ruleRemaining >= 0
+                        text: "🎟️ " + qsTr("%1 of %2 generations left this month — resets %3")
+                              .arg(FirebaseAiHelper.ruleRemaining)
+                              .arg(FirebaseAiHelper.ruleMonthlyLimit)
+                              .arg(page.formatResetTime(FirebaseAiHelper.ruleResetAt))
+                        font.pixelSize: 11
+                        color: "#7f8c8d"
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: qsTr("🎯 Rule/topic to explain")
+                        font.pixelSize: 12; font.bold: true; color: "#2c3e50"
+                    }
+                    Rectangle {
+                        width: parent.width
+                        height: 88
+                        radius: 10
+                        color: "#faf6fc"
+                        border.color: aiThemeField.activeFocus ? "#9b59b6" : "#e7d5ef"
+                        border.width: aiThemeField.activeFocus ? 2 : 1
+
+                        ScrollView {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            clip: true
+                            TextArea {
+                                id: aiThemeField
+                                // TextArea has no maximumLength property (unlike
+                                // TextField) — enforce the cap manually. This is a
+                                // UX nicety only; the Cloud Function is what
+                                // actually enforces it (MAX_THEME_LENGTH).
+                                readonly property int maxLength: 200
+                                placeholderText: qsTr("Describe the rule you want — e.g. \"present simple vs present continuous\" or \"third conditional sentences\"…")
+                                font.pixelSize: 14
+                                color: "#2c3e50"
+                                wrapMode: TextArea.Wrap
+                                selectByMouse: true
+                                background: null
+                                onTextChanged: if (text.length > maxLength) text = text.substring(0, maxLength)
+                            }
+                        }
+                    }
+                    Label {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignRight
+                        text: qsTr("%1/%2").arg(aiThemeField.text.length).arg(aiThemeField.maxLength)
+                        font.pixelSize: 10
+                        color: aiThemeField.text.length >= aiThemeField.maxLength ? "#e74c3c" : "#b8a9c2"
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: qsTr("🔢 Questions per type")
+                        font.pixelSize: 12; font.bold: true; color: "#2c3e50"
+                    }
+                    AiTypeCountSpin { id: aiGapCountSpin; label: qsTr("📝 Fill in the Gap"); value: 5 }
+                    AiTypeCountSpin { id: aiMcCountSpin; label: qsTr("🔘 Multiple Choice"); value: 5 }
+                    AiTypeCountSpin { id: aiComboCountSpin; label: qsTr("🔽 Dropdown Choice"); value: 0 }
+                    AiTypeCountSpin { id: aiDragdropCountSpin; label: qsTr("🫳 Drag & Drop"); value: 0 }
+
+                    Label {
+                        width: parent.width
+                        visible: page.aiError !== ""
+                        text: "⚠ " + page.aiError
+                        color: "#e74c3c"
+                        font.pixelSize: 11
+                        wrapMode: Text.WordWrap
+                    }
+
+                    RowLayout {
+                        width: parent.width
+                        visible: page.aiGenerating
+                        spacing: 8
+                        BusyIndicator {
+                            running: page.aiGenerating
+                            implicitWidth: 22; implicitHeight: 22
+                            Material.accent: "#9b59b6"
+                        }
+                        Label { text: qsTr("Asking Gemini…"); font.pixelSize: 12; color: "#7f8c8d" }
+                    }
+                }
+            }
+
+            Rectangle { width: parent.width; height: 1; color: "#ececec" }
+
+            Row {
+                width: parent.width
+                ItemDelegate {
+                    width: parent.width / 2
+                    height: 52
+                    background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white"; radius: 18 }
+                    contentItem: Text {
+                        text: page.aiGenerating ? qsTr("Cancel request") : qsTr("Cancel")
+                        color: "#e74c3c"
+                        font.pixelSize: 15; font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    // aiGeneratorPopup.onClosed aborts the in-flight request, if any.
+                    onClicked: aiGeneratorPopup.close()
+                }
+                ItemDelegate {
+                    id: generateButton
+                    width: parent.width / 2
+                    height: 52
+                    enabled: !page.aiGenerating && aiThemeField.text.trim() !== ""
+                        && (aiGapCountSpin.value + aiMcCountSpin.value
+                            + aiComboCountSpin.value + aiDragdropCountSpin.value) > 0
+                    background: Item {
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 18
+                            visible: generateButton.enabled
+                            opacity: generateButton.pressed ? 0.85 : 1.0
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#a55cc2" }
+                                GradientStop { position: 1.0; color: "#8e44ad" }
+                            }
+                        }
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 18
+                            color: "#bbb"
+                            visible: !generateButton.enabled
+                        }
+                    }
+                    contentItem: Text {
+                        text: qsTr("✨ Generate"); color: "white"
+                        font.pixelSize: 15; font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        page.aiError = ""
+                        page.aiBackend.generateRuleSet(aiThemeField.text.trim(),
+                            aiGapCountSpin.value, aiMcCountSpin.value,
+                            aiComboCountSpin.value, aiDragdropCountSpin.value)
+                    }
+                }
+            }
             }
         }
     }
@@ -423,7 +938,7 @@ Page {
                                 visible: blockDelegate.kind === "text"
                                 Layout.fillWidth: true
                                 text: blockDelegate.value
-                                placeholderText: qsTr("Explain the grammar rule this set practices…")
+                                placeholderText: qsTr("Explain the rule this set practices…")
                                 wrapMode: TextArea.Wrap
                                 selectByMouse: true
                                 onEditingFinished: theoryBlocksModel.set(blockDelegate.index, { value: text })

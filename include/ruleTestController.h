@@ -17,7 +17,7 @@ class RuleSetManager;
 // RuleSetManager) doesn't fit DictRec/RecSetManager; the small amount of
 // logic that would be shared (fuzzy string matching per gap) is small
 // enough to duplicate. One linear pass per session in the question's
-// authored order (not shuffled — grammar questions are typically written
+// authored order (not shuffled — rule questions are typically written
 // in a deliberate order), rather than Leitner's spaced-repetition
 // complexity.
 class RuleTestController : public QObject {

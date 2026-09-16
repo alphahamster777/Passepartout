@@ -268,6 +268,15 @@ target_include_directories(AiWordSetShared
 )
 target_link_libraries(AiWordSetShared PRIVATE Qt6::Core)
 
+add_library(AiRuleSetShared STATIC
+    ${CMAKE_SOURCE_DIR}/include/aiRuleSetShared.h
+    ${CMAKE_SOURCE_DIR}/src/aiRuleSetShared.cpp
+)
+target_include_directories(AiRuleSetShared
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+)
+target_link_libraries(AiRuleSetShared PRIVATE Qt6::Core)
+
 qt_add_qml_module(GeminiHelper
     URI GeminiHelper
     VERSION 1.0
@@ -300,7 +309,7 @@ target_include_directories(FirebaseAiHelper
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 
-target_link_libraries(FirebaseAiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared)
+target_link_libraries(FirebaseAiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared AiRuleSetShared)
 target_compile_definitions(FirebaseAiHelper PRIVATE PASSEPARTOUT_TIER_${PASSEPARTOUT_TIER}=1)
 
 qt_add_qml_module(GoogleSignInHelper

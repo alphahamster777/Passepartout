@@ -1,24 +1,30 @@
-"""Cloud Functions backing Passepartout's AI word-set generator.
+"""Cloud Functions backing Passepartout's AI word-set and rule-set generators.
 
-Two deployed functions — generate_word_set_free and generate_word_set_pro —
-share all logic below via _handle_generate(), differing only in their
-monthly quota. There's no client-supplied "I'm pro" flag to fake: which
-limit applies is decided by which URL the calling app was built with (see
-FirebaseAiHelper's PASSEPARTOUT_TIER build option), and the Free build
-never contains the Pro URL at all. The residual risk is someone who
-legitimately bought the Pro app leaking that URL publicly — much narrower
-than an anyone-can-spoof flag, and reasonable to accept for now.
+Four deployed functions, one pair per feature:
+- generate_word_set_free / generate_word_set_pro share _handle_generate().
+- generate_rule_set_free / generate_rule_set_pro share _handle_generate_rules().
+Each pair differs only in monthly quota. There's no client-supplied "I'm pro"
+flag to fake: which limit applies is decided by which URL the calling app
+was built with (see FirebaseAiHelper's PASSEPARTOUT_TIER build option), and
+the Free build never contains the Pro URLs at all. The residual risk is
+someone who legitimately bought the Pro app leaking a URL publicly — much
+narrower than an anyone-can-spoof flag, and reasonable to accept for now.
+PRO_EMAILS below grants specific accounts the Pro limit regardless of which
+URL they call.
 
-Called with a Firebase Auth ID token and {theme, fromLanguage, toLanguage,
-wordCount}. Verifies the token, enforces a per-user monthly quota in
-Firestore, calls Gemini, and returns the generated words plus the caller's
-remaining quota. The Gemini API key lives only here (as a Secret Manager
-secret) — it never reaches the client.
+Word-set calls take a Firebase Auth ID token and {theme, fromLanguage,
+toLanguage, wordCount}; rule-set calls take {theme, gapCount, mcCount,
+comboCount, dragdropCount} — one independent count per question type. Both
+verify the token, enforce a per-user monthly quota in Firestore (in separate
+buckets — see _handle_generate_rules' comment), call Gemini, and return the
+generated content plus the caller's remaining quota. The Gemini API key
+lives only here (as a Secret Manager secret) — it never reaches the client.
 
-Keep build_prompt()/build_schema() in sync with AiWordSetShared
-(include/aiWordSetShared.h / src/aiWordSetShared.cpp) on the C++ side —
-there's no code sharing across the language boundary, so this is a manual
-port of the same wording/shape.
+Keep build_prompt()/build_schema() in sync with AiWordSetShared, and
+build_rule_prompt()/build_rule_schema() with AiRuleSetShared
+(include/aiWordSetShared.h+.cpp / include/aiRuleSetShared.h+.cpp) on the C++
+side — there's no code sharing across the language boundary, so this is a
+manual port of the same wording/shape.
 """
 
 import json
@@ -43,13 +49,42 @@ MODEL_NAME = "gemini-3.6-flash"  # keep in sync with AiWordSetShared::kModelName
 MAX_THEME_LENGTH = 200
 MAX_WORD_COUNT = 20
 
-# Firebase Auth UIDs exempt from the quota cap — find yours in Firebase
-# Console -> Authentication -> Users (the "User UID" column). Handy while
-# testing so you don't burn through your own quota; anonymous sign-in means
-# there's no email to allowlist by, only the per-install UID.
+# Grammar rule-set generation's own limits — a separate feature with its own
+# monthly quota bucket (see _handle_generate's usage_ref vs
+# _handle_generate_rules' rule_usage_ref), so generating rule sets doesn't
+# consume/share the word-set quota above. Keep MAX_QUESTION_COUNT in sync
+# with AiRuleSetShared::kMaxQuestionCount on the C++ side.
+RULE_FREE_MONTHLY_LIMIT = 2
+RULE_PRO_MONTHLY_LIMIT = 30
+MAX_QUESTION_COUNT = 20
+
+# Firebase Auth UIDs exempt from the quota cap entirely (remaining reported
+# as unlimited, no Firestore increment) — find yours in Firebase Console ->
+# Authentication -> Users (the "User UID" column). Handy while testing so you
+# don't burn through your own quota; anonymous sign-in means there's no email
+# to allowlist by, only the per-install UID. Applies to both word-set and
+# rule-set generation.
 UNLIMITED_UIDS: set[str] = {
     # "your-anonymous-uid-here",
 }
+
+# Emails treated as Pro tier regardless of which Cloud Function URL (free or
+# pro) the calling app was built to call — i.e. they get PRO_MONTHLY_LIMIT /
+# RULE_PRO_MONTHLY_LIMIT instead of the Free limit, not literally uncapped
+# like UNLIMITED_UIDS above. Sign-in is now mandatory Google sign-in (see
+# firebaseAiHelper.h), so a verified ID token always carries an "email" claim.
+PRO_EMAILS: set[str] = {
+    "some@gmail",
+}
+
+
+def _is_unlimited(decoded_token: dict) -> bool:
+    return decoded_token.get("uid") in UNLIMITED_UIDS
+
+
+def _apply_pro_override(decoded_token: dict, monthly_limit: int, pro_limit: int) -> int:
+    email = decoded_token.get("email")
+    return pro_limit if email and email in PRO_EMAILS else monthly_limit
 
 
 def build_prompt(theme: str, from_lang: str, to_lang: str, word_count: int) -> str:
@@ -80,7 +115,139 @@ def build_schema() -> dict:
     }
 
 
-def call_gemini(prompt: str, schema: dict, api_key: str) -> list:
+# A model asked for a hard number of each type sticks to it far more
+# reliably than one asked to "mix" a single total — that instruction alone
+# is exactly what produced an all-"gap" result in practice. The buffer below
+# covers the few items per type that typically fail the client's parsing
+# validation (a mismatched blank/answer count, an out-of-range correctIndex)
+# and get dropped there — without it, every dropped item is a guaranteed
+# shortfall against what the learner asked for. Only applied to a type
+# actually requested (count > 0). Keep in sync with
+# AiRuleSetShared::kPerTypeRequestBuffer (aiRuleSetShared.h/.cpp) on the C++
+# side, which applies the identical logic to cap the result back down after
+# parsing.
+RULE_PER_TYPE_REQUEST_BUFFER = 2
+
+
+def _clamp_count(count: int) -> int:
+    return max(0, min(count, MAX_QUESTION_COUNT))
+
+
+# Mirrors AiRuleSetShared::buildPrompt / buildResponseSchema (aiRuleSetShared.h
+# / aiRuleSetShared.cpp) on the C++ side — keep the wording and shape in sync.
+# The four counts are dialed in independently by the creator (one +/-
+# control per question type in CreatingRuleSet.qml) rather than derived from
+# one combined total.
+def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: int, dragdrop_count: int) -> str:
+    gap_count, mc_count, combo_count, dragdrop_count = (
+        _clamp_count(gap_count), _clamp_count(mc_count), _clamp_count(combo_count), _clamp_count(dragdrop_count))
+
+    def count_line(target: int) -> str:
+        return f"{target + RULE_PER_TYPE_REQUEST_BUFFER}" if target > 0 else "0 (leave this array empty)"
+
+    return (
+        f'Generate a grammar lesson for a language learner on the topic "{theme}".\n'
+        'First write a short, clear grammar explanation in "theory" as 1 to 4 short '
+        "plain-text paragraphs (one paragraph per array entry) — this is the only thing "
+        "you write explaining the rule; do not describe or reference any images or audio.\n"
+        "Then generate exactly this many entries in each of these four arrays:\n"
+        f'- "gapQuestions": {count_line(gap_count)} entries, each a sentence in "text" with '
+        'each blank written as exactly "___" (three underscores), and "answers" listing '
+        "the correct word or short phrase for each blank in order, one entry per blank.\n"
+        f'- "mcQuestions": {count_line(mc_count)} entries, each a question or '
+        'sentence-with-blank in "text", 3 to 5 short "options", and a required zero-based '
+        '"correctIndex" pointing at the single correct option.\n'
+        f'- "comboQuestions": {count_line(combo_count)} entries, each a sentence in "text" '
+        'with exactly ONE blank written as "___", 3 to 5 short "options" for that blank '
+        '(to be picked from a dropdown), and a required zero-based "correctIndex".\n'
+        f'- "dragdropQuestions": {count_line(dragdrop_count)} entries, each a sentence in '
+        '"text" with exactly ONE blank written as "___", 3 to 5 short "options" '
+        "(draggable word/phrase tiles — the correct one plus clearly-wrong decoys), and a "
+        'required zero-based "correctIndex" pointing at the correct tile.\n'
+        "Every mcQuestions/comboQuestions/dragdropQuestions entry must include "
+        f'correctIndex. Keep sentences concise and strictly about "{theme}". Do not repeat '
+        "the same sentence."
+    )
+
+
+def _single_blank_item_schema() -> dict:
+    # Shared by mc/combo/dragdrop — see aiRuleSetShared.h's header comment
+    # for why all three are modeled identically for generation purposes.
+    return {
+        "type": "OBJECT",
+        "properties": {
+            "text": {"type": "STRING"},
+            "options": {"type": "ARRAY", "items": {"type": "STRING"}},
+            "correctIndex": {"type": "INTEGER"},
+        },
+        # "correctIndex" being schema-required (not merely listed under
+        # "properties") is the actual fix here — see this section's comment
+        # above and aiRuleSetShared.cpp's matching one: when it was only in
+        # "properties", Gemini routinely omitted it, which dropped every one
+        # of those items client-side and produced an all-"gap" result
+        # despite the prompt explicitly asking for a mix.
+        "required": ["text", "options", "correctIndex"],
+    }
+
+
+def build_rule_schema() -> dict:
+    gap_item = {
+        "type": "OBJECT",
+        "properties": {
+            "text": {"type": "STRING"},
+            "answers": {"type": "ARRAY", "items": {"type": "STRING"}},
+        },
+        "required": ["text", "answers"],
+    }
+    single_blank_item = _single_blank_item_schema()
+    return {
+        "type": "OBJECT",
+        "properties": {
+            "theory": {"type": "ARRAY", "items": {"type": "STRING"}},
+            "gapQuestions": {"type": "ARRAY", "items": gap_item},
+            "mcQuestions": {"type": "ARRAY", "items": single_blank_item},
+            "comboQuestions": {"type": "ARRAY", "items": single_blank_item},
+            "dragdropQuestions": {"type": "ARRAY", "items": single_blank_item},
+        },
+        "required": ["theory", "gapQuestions", "mcQuestions", "comboQuestions", "dragdropQuestions"],
+    }
+
+
+def _valid_single_blank_count(questions: list) -> int:
+    """Rough server-side mirror of the client's
+    AiRuleSetShared::parseSingleBlankArray — used for mc/combo/dragdrop,
+    which all share the {text,options,correctIndex} shape. Just enough to
+    judge whether a Gemini response is worth keeping or worth retrying (see
+    _handle_generate_rules), not a full port; the client remains the source
+    of truth for what actually gets parsed and saved."""
+    n = 0
+    for q in questions:
+        if not isinstance(q, dict):
+            continue
+        if not str(q.get("text", "")).strip():
+            continue
+        options = q.get("options")
+        correct_index = q.get("correctIndex")
+        if (isinstance(options, list) and len(options) >= 2
+                and isinstance(correct_index, int) and 0 <= correct_index < len(options)):
+            n += 1
+    return n
+
+
+def _valid_gap_count(gap_questions: list) -> int:
+    n = 0
+    for q in gap_questions:
+        if not isinstance(q, dict):
+            continue
+        text = str(q.get("text", "")).strip()
+        gap_count = text.count("___")
+        answers = q.get("answers")
+        if gap_count > 0 and isinstance(answers, list) and len(answers) == gap_count:
+            n += 1
+    return n
+
+
+def call_gemini_json(prompt: str, schema: dict, api_key: str) -> dict:
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent"
     body = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
@@ -112,8 +279,11 @@ def call_gemini(prompt: str, schema: dict, api_key: str) -> list:
     if not parts:
         raise RuntimeError("Gemini returned an empty response.")
     text = parts[0].get("text", "")
-    words = json.loads(text).get("words") or []
-    return words
+    return json.loads(text) or {}
+
+
+def call_gemini(prompt: str, schema: dict, api_key: str) -> list:
+    return call_gemini_json(prompt, schema, api_key).get("words") or []
 
 
 def _json_response(payload: dict, status: int) -> https_fn.Response:
@@ -147,7 +317,8 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
     except Exception:
         return _json_response({"error": "Invalid or expired token"}, 401)
     uid = decoded["uid"]
-    unlimited = uid in UNLIMITED_UIDS
+    unlimited = _is_unlimited(decoded)
+    monthly_limit = _apply_pro_override(decoded, monthly_limit, PRO_MONTHLY_LIMIT)
 
     body = req.get_json(silent=True) or {}
     reset_at = _reset_at_iso()
@@ -234,6 +405,154 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
     )
 
 
+def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_fn.Response:
+    if req.method != "POST":
+        return _json_response({"error": "Method not allowed"}, 405)
+
+    auth_header = req.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return _json_response({"error": "Missing bearer token"}, 401)
+    try:
+        decoded = auth.verify_id_token(auth_header[len("Bearer "):])
+    except Exception:
+        return _json_response({"error": "Invalid or expired token"}, 401)
+    uid = decoded["uid"]
+    unlimited = _is_unlimited(decoded)
+    monthly_limit = _apply_pro_override(decoded, monthly_limit, RULE_PRO_MONTHLY_LIMIT)
+
+    body = req.get_json(silent=True) or {}
+    reset_at = _reset_at_iso()
+
+    # A separate bucket ("ruleMonths", not "months") from word-set generation
+    # above — generating rule sets doesn't consume/share that quota.
+    db = firestore.client()
+    usage_ref = db.collection("usage").document(uid).collection("ruleMonths").document(_month_key())
+
+    if bool(body.get("checkOnly", False)):
+        if unlimited:
+            remaining = -1
+        else:
+            snapshot = usage_ref.get()
+            count = snapshot.get("count") if snapshot.exists else 0
+            remaining = max(0, monthly_limit - count)
+        return _json_response({"remaining": remaining, "limit": monthly_limit, "resetAt": reset_at}, 200)
+
+    theme = str(body.get("theme", "")).strip()
+
+    def _int_field(key: str, default: int) -> int:
+        try:
+            return _clamp_count(int(body.get(key, default)))
+        except (TypeError, ValueError):
+            return default
+
+    gap_target = _int_field("gapCount", 5)
+    mc_target = _int_field("mcCount", 5)
+    combo_target = _int_field("comboCount", 0)
+    dragdrop_target = _int_field("dragdropCount", 0)
+    if not theme:
+        return _json_response({"error": "Theme is required"}, 400)
+    if len(theme) > MAX_THEME_LENGTH:
+        return _json_response({"error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
+    if gap_target == 0 and mc_target == 0 and combo_target == 0 and dragdrop_target == 0:
+        return _json_response({"error": "Set at least one question type above zero"}, 400)
+
+    if unlimited:
+        remaining = -1
+    else:
+        transaction = db.transaction()
+
+        @firestore.transactional
+        def check_and_increment(tx: firestore.Transaction):
+            snapshot = usage_ref.get(transaction=tx)
+            count = snapshot.get("count") if snapshot.exists else 0
+            if count >= monthly_limit:
+                return None
+            tx.set(usage_ref, {"count": count + 1, "updatedAt": firestore.SERVER_TIMESTAMP}, merge=True)
+            return monthly_limit - (count + 1)
+
+        remaining = check_and_increment(transaction)
+        if remaining is None:
+            return _json_response(
+                {"error": f"Monthly limit of {monthly_limit} reached", "remaining": 0,
+                 "limit": monthly_limit, "resetAt": reset_at},
+                429,
+            )
+
+    # Even with an explicit per-type quota in the prompt, Gemini won't always
+    # comply — one observed run returned every question as "gap" despite
+    # being asked for an even split. A single call already retries once
+    # internally for a transient HTTP error (see call_gemini_json); this is
+    # a separate concept — the call *succeeds* but the *content* falls short
+    # of what was asked for — so it gets its own retry, up to two attempts
+    # total, keeping the first one that actually meets the target and
+    # otherwise falling back to whichever attempt did best. This costs at
+    # most one extra Gemini call, never an extra unit of the quota already
+    # charged above.
+    payload = None
+    best_payload = None
+    best_score = -1
+    for attempt in range(2):
+        try:
+            candidate = call_gemini_json(
+                build_rule_prompt(theme, gap_target, mc_target, combo_target, dragdrop_target),
+                build_rule_schema(),
+                os.environ["GEMINI_API_KEY"],
+            )
+        except requests.exceptions.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else 502
+            print(f"Gemini call failed with status {status}: {exc}")
+            if attempt == 0 and status in (429, 503):
+                continue  # transient/overloaded — worth one more try
+            if best_payload is not None:
+                break  # keep whatever the first attempt produced
+            if status in (429, 503):
+                return _json_response(
+                    {"error": "The shared AI service is temporarily busy — please try again in a moment."},
+                    503,
+                )
+            return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
+        except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
+            print(f"Gemini call failed unexpectedly: {exc}")
+            if attempt == 0:
+                continue
+            if best_payload is not None:
+                break
+            return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
+        else:
+            gap_n = _valid_gap_count(candidate.get("gapQuestions") or [])
+            mc_n = _valid_single_blank_count(candidate.get("mcQuestions") or [])
+            combo_n = _valid_single_blank_count(candidate.get("comboQuestions") or [])
+            dragdrop_n = _valid_single_blank_count(candidate.get("dragdropQuestions") or [])
+            score = (min(gap_n, gap_target) + min(mc_n, mc_target)
+                     + min(combo_n, combo_target) + min(dragdrop_n, dragdrop_target))
+            if score > best_score:
+                best_payload, best_score = candidate, score
+            if (gap_n >= gap_target and mc_n >= mc_target
+                    and combo_n >= combo_target and dragdrop_n >= dragdrop_target):
+                break  # good enough — no need to spend a second Gemini call
+            print(f"Rule-set generation attempt {attempt + 1} came up short "
+                  f"(gap {gap_n}/{gap_target}, mc {mc_n}/{mc_target}, "
+                  f"combo {combo_n}/{combo_target}, dragdrop {dragdrop_n}/{dragdrop_target})")
+    payload = best_payload
+    if payload is None:
+        return _json_response({"error": "Gemini returned no usable content."}, 502)
+
+    theory = payload.get("theory") or []
+    gap_questions = payload.get("gapQuestions") or []
+    mc_questions = payload.get("mcQuestions") or []
+    combo_questions = payload.get("comboQuestions") or []
+    dragdrop_questions = payload.get("dragdropQuestions") or []
+    if not gap_questions and not mc_questions and not combo_questions and not dragdrop_questions:
+        return _json_response({"error": "Gemini returned no questions"}, 502)
+
+    return _json_response(
+        {"theory": theory, "gapQuestions": gap_questions, "mcQuestions": mc_questions,
+         "comboQuestions": combo_questions, "dragdropQuestions": dragdrop_questions,
+         "remaining": remaining, "limit": monthly_limit, "resetAt": reset_at},
+        200,
+    )
+
+
 # Matches the "eur3" Firestore location (spans europe-west1 + europe-west4) —
 # keeps every request's Firestore round-trip within the same region instead
 # of crossing the Atlantic on top of the Gemini call. Change both together
@@ -249,3 +568,13 @@ def generate_word_set_free(req: https_fn.Request) -> https_fn.Response:
 @https_fn.on_request(**_COMMON_OPTIONS)
 def generate_word_set_pro(req: https_fn.Request) -> https_fn.Response:
     return _handle_generate(req, PRO_MONTHLY_LIMIT)
+
+
+@https_fn.on_request(**_COMMON_OPTIONS)
+def generate_rule_set_free(req: https_fn.Request) -> https_fn.Response:
+    return _handle_generate_rules(req, RULE_FREE_MONTHLY_LIMIT)
+
+
+@https_fn.on_request(**_COMMON_OPTIONS)
+def generate_rule_set_pro(req: https_fn.Request) -> https_fn.Response:
+    return _handle_generate_rules(req, RULE_PRO_MONTHLY_LIMIT)

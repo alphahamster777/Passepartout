@@ -94,14 +94,13 @@ ApplicationWindow {
             return String(s).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/::/g, "\\::")
         }
 
-        // Converts one saved/JSON-shaped question — as returned by both
-        // RuleSetManager::getQuestionFromSetQML (editing an existing set)
-        // and RuleSetManager::readSetFromZip (importing a shared .ppset) —
-        // into the row shape CreatingRuleSet.qml's ruleSetModel expects.
-        // Shared between onEditRuleSet and onIncomingFileReady below since
-        // both need the exact same conversion. Doesn't set "id" — the
-        // caller assigns that based on its own context (an existing
-        // question's saved id vs. a freshly imported question having none).
+        // Converts one saved/JSON-shaped question — as returned by
+        // RuleSetManager::getQuestionFromSetQML — into the row shape
+        // ruleSetModel expects, for onEditRuleSet below. CreatingRuleSet.qml
+        // has its own identical copy for its importFromPath()/AI generator,
+        // which can't reach this rootScope. Doesn't set "id" — the caller
+        // assigns that based on its own context (an existing question's
+        // saved id vs. a freshly imported/generated question having none).
         function ruleSetRowFromQuestion(q) {
             if (q.type === "mc") {
                 return {
@@ -177,9 +176,10 @@ ApplicationWindow {
             }
         }
 
-        // Shared between onEditRuleSet and onIncomingFileReady's rule-set
-        // import path — populates a CreatingRuleSet page's theory blocks
-        // model from a {blocks:[...]} theory object.
+        // Used by onEditRuleSet below to populate a CreatingRuleSet page's
+        // theory blocks model from a {blocks:[...]} theory object.
+        // CreatingRuleSet.qml has its own identical copy for its
+        // importFromPath()/AI generator, which can't reach this rootScope.
         function hydrateTheoryBlocks(blocksModelRef, theory) {
             blocksModelRef.clear()
             var blocks = (theory && theory.blocks) || []
@@ -191,29 +191,6 @@ ApplicationWindow {
                     imgHeight: b.imgHeight || (b.kind === "image" ? 200 : 0)
                 })
             }
-        }
-
-        // CreatingRuleSet.qml's counterpart to CreatingRecSet.qml's own
-        // importFromPath() — that one lives on the page itself since
-        // RecSetManager::readSetFromZip returns words directly in the
-        // row shape recSetModel wants; a rule set's saved questions need
-        // the same ruleSetRowFromQuestion() conversion onEditRuleSet uses,
-        // so this lives here instead where that's already in scope.
-        function importRuleSetFromPath(page, path) {
-            var result = AppController.ruleSetManager.readSetFromZip(path)
-            if (!result || !result.name) return
-            page.ruleSetName = result.name
-            rootScope.hydrateTheoryBlocks(page.theoryBlocksModelRef, result.theory || {})
-            var gModelRef = page.ruleSetModelRef
-            gModelRef.clear()
-            var questions = result.questions || []
-            for (var i = 0; i < questions.length; ++i) {
-                var row = rootScope.ruleSetRowFromQuestion(questions[i])
-                row.id = i + 1
-                gModelRef.append(row)
-            }
-            page.nextQuestionId = questions.length + 1
-            page.selectedCardIndex = questions.length > 0 ? questions.length - 1 : 0
         }
 
         Keys.onReleased: function(event) {
@@ -921,11 +898,11 @@ ApplicationWindow {
                 // RuleSetManager::exportSetToZip); a word-set one has no
                 // "kind" at all. Checked up front so this routes to the
                 // right creation page instead of always assuming word set —
-                // opening a grammar .ppset through the wrong importer just
+                // opening a rule .ppset through the wrong importer just
                 // silently produced an empty word set sharing its name.
                 if (AppController.ruleSetManager.isRuleSetZip(localPath)) {
                     var rulePage = stackView.push(creatingRuleSetMenu)
-                    Qt.callLater(function() { rootScope.importRuleSetFromPath(rulePage, localPath) })
+                    Qt.callLater(function() { rulePage.importFromPath(localPath) })
                 } else {
                     var wordPage = stackView.push(creatingRecSetMenu)
                     Qt.callLater(function() { wordPage.importFromPath(localPath) })

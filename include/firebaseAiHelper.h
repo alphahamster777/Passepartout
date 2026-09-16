@@ -4,6 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QVariantList>
+#include <QVariantMap>
 #include <QtQml/qqml.h>
 
 #include <functional>
@@ -55,6 +56,15 @@ class FirebaseAiHelper : public QObject {
     // this to decide whether to show the AI dialog or a sign-in prompt.
     Q_PROPERTY(bool signedIn READ isSignedIn NOTIFY signedInChanged)
 
+    // Rule-set generation's own parallel state — a separate Cloud
+    // Function (generate_rule_set_free/pro) and its own Firestore usage
+    // bucket, so generating a rule set doesn't consume/share the word-set
+    // quota above, or vice versa. See generateRuleSet()'s .cpp comment.
+    Q_PROPERTY(bool ruleGenerating READ isRuleGenerating NOTIFY ruleGeneratingChanged)
+    Q_PROPERTY(int ruleRemaining READ ruleRemaining NOTIFY ruleQuotaChanged)
+    Q_PROPERTY(int ruleMonthlyLimit READ ruleMonthlyLimit NOTIFY ruleQuotaChanged)
+    Q_PROPERTY(QString ruleResetAt READ ruleResetAt NOTIFY ruleQuotaChanged)
+
 public:
     explicit FirebaseAiHelper(QObject* parent = nullptr);
 
@@ -63,6 +73,11 @@ public:
     int monthlyLimit() const { return m_monthlyLimit; }
     QString resetAt() const { return m_resetAt; }
     bool isSignedIn() const { return !m_refreshToken.isEmpty(); }
+
+    bool isRuleGenerating() const { return m_ruleGenerating; }
+    int ruleRemaining() const { return m_ruleRemaining; }
+    int ruleMonthlyLimit() const { return m_ruleMonthlyLimit; }
+    QString ruleResetAt() const { return m_ruleResetAt; }
 
     Q_INVOKABLE void generateWordSet(const QString& theme, int fromLanguageId,
                                       int toLanguageId, int wordCount);
@@ -73,6 +88,17 @@ public:
     // first Generate tap of the session. Fails silently (no generationFailed
     // emission) since it's a background convenience, not a user action.
     Q_INVOKABLE void refreshQuota();
+
+    // Rule-set counterparts of the three above.
+    // The four counts are dialed in independently (one +/- control per
+    // question type in CreatingRuleSet.qml) rather than one combined total —
+    // see AiRuleSetShared::TypeCounts. Plain ints (not that struct) here so
+    // this stays a normal QML-invokable signature with no extra metatype
+    // registration.
+    Q_INVOKABLE void generateRuleSet(const QString& theme, int gapCount, int mcCount,
+                                      int comboCount, int dragdropCount);
+    Q_INVOKABLE void cancelRuleGeneration();
+    Q_INVOKABLE void refreshRuleQuota();
 
     // Persists a session obtained elsewhere (GoogleSignInHelper's OAuth
     // flow) — wired via a QML Connections block to that class's
@@ -97,8 +123,15 @@ signals:
     void wordSetGenerated(const QVariantList& words);
     void generationFailed(const QString& error);
 
+    void ruleGeneratingChanged();
+    void ruleQuotaChanged();
+    // {theory:{blocks:[...]}, questions:[...]} — see AiRuleSetShared::parseRuleSet.
+    void ruleSetGenerated(const QVariantMap& ruleSet);
+    void ruleGenerationFailed(const QString& error);
+
 private:
     void setGenerating(bool value);
+    void setRuleGenerating(bool value);
 
     // Reuses a still-valid ID token, or refreshes an expired one — calls
     // `onReady` with (true, idToken), or (false, "not signed in"/an error)
@@ -110,6 +143,9 @@ private:
 
     void postGenerate(const QString& idToken, const QString& theme,
                        int fromLanguageId, int toLanguageId, int wordCount);
+    void applyRuleQuota(const QJsonObject& payload);
+    void postGenerateRule(const QString& idToken, const QString& theme, int gapCount, int mcCount,
+                           int comboCount, int dragdropCount);
 
     QNetworkAccessManager* m_nam;
 
@@ -124,4 +160,16 @@ private:
     int m_remaining = -1;
     int m_monthlyLimit = -1;
     QString m_resetAt;
+
+    // Kept fully separate from the word-set reply/state above so an
+    // in-flight rule-set generation can't be cancelled/overwritten by a
+    // word-set one (or vice versa) if both pages somehow ended up open at
+    // once, and so each dialog's quota line reflects its own feature.
+    QNetworkReply* m_currentRuleReply = nullptr;
+    bool m_ruleCancelled = false;
+    bool m_ruleGenerating = false;
+
+    int m_ruleRemaining = -1;
+    int m_ruleMonthlyLimit = -1;
+    QString m_ruleResetAt;
 };

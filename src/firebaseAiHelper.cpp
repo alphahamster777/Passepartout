@@ -1,5 +1,6 @@
 #include "firebaseAiHelper.h"
 
+#include "aiRuleSetShared.h"
 #include "aiWordSetShared.h"
 #include "firebaseConfig.h"
 #include "languageHelper.h"
@@ -19,8 +20,10 @@ namespace {
 // contains the Pro URL at all, so there's no "I'm pro" flag to fake.
 #if defined(PASSEPARTOUT_TIER_PRO)
 constexpr auto kFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunctions.net/generate_word_set_pro";
+constexpr auto kRuleFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunctions.net/generate_rule_set_pro";
 #else
 constexpr auto kFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunctions.net/generate_word_set_free";
+constexpr auto kRuleFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunctions.net/generate_rule_set_free";
 #endif
 
 constexpr auto kIdTokenSettingsKey = "Firebase/idToken";
@@ -292,4 +295,140 @@ void FirebaseAiHelper::cancelGeneration() {
     if (m_currentReply)
         m_currentReply->abort();
     setGenerating(false);
+}
+
+void FirebaseAiHelper::setRuleGenerating(bool value) {
+    if (m_ruleGenerating == value)
+        return;
+    m_ruleGenerating = value;
+    emit ruleGeneratingChanged();
+}
+
+void FirebaseAiHelper::applyRuleQuota(const QJsonObject& payload) {
+    bool changed = false;
+    if (payload.contains(QStringLiteral("remaining"))) {
+        m_ruleRemaining = payload[QStringLiteral("remaining")].toInt();
+        changed = true;
+    }
+    if (payload.contains(QStringLiteral("limit"))) {
+        m_ruleMonthlyLimit = payload[QStringLiteral("limit")].toInt();
+        changed = true;
+    }
+    if (payload.contains(QStringLiteral("resetAt"))) {
+        m_ruleResetAt = payload[QStringLiteral("resetAt")].toString();
+        changed = true;
+    }
+    if (changed)
+        emit ruleQuotaChanged();
+}
+
+void FirebaseAiHelper::refreshRuleQuota() {
+    ensureSignedIn([this](bool ok, const QString& idTokenOrError) {
+        if (!ok)
+            return; // silent — this is a background convenience, not a user action
+        QNetworkRequest req{QUrl(QLatin1String(kRuleFunctionUrl))};
+        req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+        req.setRawHeader("Authorization", "Bearer " + idTokenOrError.toUtf8());
+        req.setTransferTimeout(15000);
+
+        const QJsonObject body{{QStringLiteral("checkOnly"), true}};
+        auto* reply = m_nam->post(req, QJsonDocument(body).toJson(QJsonDocument::Compact));
+        connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+            reply->deleteLater();
+            if (reply->error() != QNetworkReply::NoError)
+                return;
+            applyRuleQuota(QJsonDocument::fromJson(reply->readAll()).object());
+        });
+    });
+}
+
+void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int mcCount,
+                                        int comboCount, int dragdropCount) {
+    if (theme.trimmed().isEmpty()) {
+        emit ruleGenerationFailed(tr("Enter a theme first."));
+        return;
+    }
+    if (gapCount <= 0 && mcCount <= 0 && comboCount <= 0 && dragdropCount <= 0) {
+        emit ruleGenerationFailed(tr("Set at least one question type above zero."));
+        return;
+    }
+
+    setRuleGenerating(true);
+    m_ruleCancelled = false;
+    ensureSignedIn([this, theme, gapCount, mcCount, comboCount, dragdropCount]
+                   (bool ok, const QString& idTokenOrError) {
+        if (m_ruleCancelled)
+            return;
+        if (!ok) {
+            setRuleGenerating(false);
+            emit ruleGenerationFailed(idTokenOrError);
+            return;
+        }
+        postGenerateRule(idTokenOrError, theme, gapCount, mcCount, comboCount, dragdropCount);
+    });
+}
+
+void FirebaseAiHelper::postGenerateRule(const QString& idToken, const QString& theme, int gapCount,
+                                         int mcCount, int comboCount, int dragdropCount) {
+    const QJsonObject body{
+        {QStringLiteral("theme"), theme.trimmed()},
+        {QStringLiteral("gapCount"), gapCount},
+        {QStringLiteral("mcCount"), mcCount},
+        {QStringLiteral("comboCount"), comboCount},
+        {QStringLiteral("dragdropCount"), dragdropCount}
+    };
+
+    QNetworkRequest req{QUrl(QLatin1String(kRuleFunctionUrl))};
+    req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    req.setRawHeader("Authorization", "Bearer " + idToken.toUtf8());
+    req.setTransferTimeout(30000); // the function itself calls Gemini, so allow more slack
+
+    auto* reply = m_nam->post(req, QJsonDocument(body).toJson(QJsonDocument::Compact));
+    m_currentRuleReply = reply;
+    connect(reply, &QNetworkReply::finished, this,
+            [this, reply, gapCount, mcCount, comboCount, dragdropCount]() {
+        reply->deleteLater();
+        setRuleGenerating(false);
+        if (m_currentRuleReply == reply)
+            m_currentRuleReply = nullptr;
+
+        const bool wasCancelled = m_ruleCancelled;
+        m_ruleCancelled = false;
+        if (wasCancelled)
+            return;
+
+        const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        const QByteArray raw = reply->readAll();
+        const auto payload = QJsonDocument::fromJson(raw).object();
+        applyRuleQuota(payload); // present on both success and the 429/limit-reached error
+
+        if (reply->error() != QNetworkReply::NoError || status != 200) {
+            QString message = payload[QStringLiteral("error")].toString();
+            if (message.isEmpty())
+                message = reply->errorString();
+            if (status == 429)
+                message = tr("Monthly limit reached — try again next month. (%1)").arg(message);
+            else if (status == 401)
+                message = tr("Not signed in — try again. (%1)").arg(message);
+            else if (status == 503)
+                message = tr("The shared AI service is temporarily busy — please try again in a moment. (%1)").arg(message);
+            emit ruleGenerationFailed(message);
+            return;
+        }
+
+        const AiRuleSetShared::TypeCounts counts{gapCount, mcCount, comboCount, dragdropCount};
+        const QVariantMap result = AiRuleSetShared::parseRuleSet(payload, counts);
+        if (result.value(QStringLiteral("questions")).toList().isEmpty()) {
+            emit ruleGenerationFailed(tr("The backend returned no usable questions."));
+            return;
+        }
+        emit ruleSetGenerated(result);
+    });
+}
+
+void FirebaseAiHelper::cancelRuleGeneration() {
+    m_ruleCancelled = true;
+    if (m_currentRuleReply)
+        m_currentRuleReply->abort();
+    setRuleGenerating(false);
 }

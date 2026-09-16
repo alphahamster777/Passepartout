@@ -230,7 +230,7 @@ Page {
             height: 40
             Label {
                 Layout.fillWidth: true
-                text: qsTr("Grammar")
+                text: qsTr("Rule")
                 font.pixelSize: 18
                 font.bold: true
                 color: "white"
@@ -288,7 +288,7 @@ Page {
                 }
                 Label {
                     anchors.centerIn: parent
-                    text: qsTr("💡 Grammar Explanation")
+                    text: qsTr("💡 Rule Explanation")
                     font.pixelSize: 16; font.bold: true; color: "white"
                 }
             }
@@ -415,7 +415,7 @@ Page {
             Layout.alignment: Qt.AlignRight
             visible: ruleTestController.theoryUnlocked
             flat: true
-            text: qsTr("💡 View grammar rule")
+            text: qsTr("💡 View rule")
             onClicked: theoryPopup.open()
         }
 
