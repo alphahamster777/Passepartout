@@ -15,9 +15,13 @@
         <translation>&lt;b&gt;Passepartout&lt;/b&gt;&lt;font color='#1e88e5'&gt; v%1&lt;/font&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutOpenSourcePage.qml" line="56"/>
         <source>Vocabulary trainer for memorizing word sets.</source>
-        <translation>Entrenador de vocabulari per memoritzar conjunts de paraules.</translation>
+        <translation type="vanished">Entrenador de vocabulari per memoritzar conjunts de paraules.</translation>
+    </message>
+    <message>
+        <location filename="../AboutOpenSourcePage.qml" line="56"/>
+        <source>Trainer for vocabulary and grammar.</source>
+        <translation>Entrenador de vocabulari i gramàtica.</translation>
     </message>
     <message>
         <location filename="../AboutOpenSourcePage.qml" line="65"/>

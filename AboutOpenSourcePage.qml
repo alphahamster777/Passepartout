@@ -53,7 +53,7 @@ Page {
             }
 
             Label {
-                text: qsTr("Vocabulary trainer for memorizing word sets.")
+                text: qsTr("Trainer for vocabulary and grammar.")
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
                 Layout.leftMargin: 16
