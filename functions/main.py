@@ -29,6 +29,7 @@ manual port of the same wording/shape.
 
 import json
 import os
+import re
 import time
 from datetime import datetime, timezone
 
@@ -37,6 +38,20 @@ from firebase_admin import auth, firestore, initialize_app
 from firebase_functions import https_fn, options
 
 initialize_app()
+
+# requests' HTTPError (and the bare exception text from a failed call in
+# general) stringifies to the full request URL, which includes the Gemini
+# API key as a "?key=..." query param — this strips it before anything ever
+# reaches print()/Cloud Logging. The client never saw the raw exception to
+# begin with (see the module docstring), but Cloud Logging is readable by
+# anyone with log-viewer access on the project, which is a wider audience
+# than "safe to leak a key to" — so the raw exception must never be logged
+# either.
+_API_KEY_QUERY_RE = re.compile(r"([?&]key=)[^&\s]+")
+
+
+def _redact(text: str) -> str:
+    return _API_KEY_QUERY_RE.sub(r"\1REDACTED", str(text))
 
 FREE_MONTHLY_LIMIT = 2
 PRO_MONTHLY_LIMIT = 30
@@ -213,18 +228,29 @@ def build_rule_schema() -> dict:
     }
 
 
-def _valid_single_blank_count(questions: list) -> int:
+def _valid_single_blank_count(questions: list, require_single_blank: bool = False) -> int:
     """Rough server-side mirror of the client's
     AiRuleSetShared::parseSingleBlankArray — used for mc/combo/dragdrop,
     which all share the {text,options,correctIndex} shape. Just enough to
     judge whether a Gemini response is worth keeping or worth retrying (see
     _handle_generate_rules), not a full port; the client remains the source
-    of truth for what actually gets parsed and saved."""
+    of truth for what actually gets parsed and saved.
+
+    require_single_blank must be True for combo/dragdrop: the client's
+    parseRuleSet additionally drops any combobox/dragdrop item whose "text"
+    doesn't contain exactly one "___" (see aiRuleSetShared.cpp) — mc has no
+    such requirement. Without mirroring that check here, this function could
+    count a combo/dragdrop item as valid that the client discards, which
+    inflates that attempt's score against the other retry attempt and can
+    make _handle_generate_rules keep the worse of the two responses."""
     n = 0
     for q in questions:
         if not isinstance(q, dict):
             continue
-        if not str(q.get("text", "")).strip():
+        text = str(q.get("text", "")).strip()
+        if not text:
+            continue
+        if require_single_blank and text.count("___") != 1:
             continue
         options = q.get("options")
         correct_index = q.get("correctIndex")
@@ -379,11 +405,11 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
         )
     except requests.exceptions.HTTPError as exc:
         # requests' HTTPError stringifies to the full request URL, which
-        # includes the API key as a query param (?key=...) — log the detail
-        # server-side (Cloud Functions captures stdout to Cloud Logging) and
-        # never let {exc} itself reach the client.
+        # includes the API key as a query param (?key=...) — _redact() strips
+        # it before this ever reaches print()/Cloud Logging (never let {exc}
+        # itself reach the client OR the logs).
         status = exc.response.status_code if exc.response is not None else 502
-        print(f"Gemini call failed with status {status}: {exc}")
+        print(f"Gemini call failed with status {status}: {_redact(exc)}")
         if status in (429, 503):
             # Gemini's own rate limit or transient unavailability — distinct
             # from the per-user Firestore cap above, since it affects every
@@ -394,7 +420,7 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
             )
         return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
     except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
-        print(f"Gemini call failed unexpectedly: {exc}")
+        print(f"Gemini call failed unexpectedly: {_redact(exc)}")
         return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
 
     if not words:
@@ -500,7 +526,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
             )
         except requests.exceptions.HTTPError as exc:
             status = exc.response.status_code if exc.response is not None else 502
-            print(f"Gemini call failed with status {status}: {exc}")
+            print(f"Gemini call failed with status {status}: {_redact(exc)}")
             if attempt == 0 and status in (429, 503):
                 continue  # transient/overloaded — worth one more try
             if best_payload is not None:
@@ -512,7 +538,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
                 )
             return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
         except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
-            print(f"Gemini call failed unexpectedly: {exc}")
+            print(f"Gemini call failed unexpectedly: {_redact(exc)}")
             if attempt == 0:
                 continue
             if best_payload is not None:
@@ -521,8 +547,8 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
         else:
             gap_n = _valid_gap_count(candidate.get("gapQuestions") or [])
             mc_n = _valid_single_blank_count(candidate.get("mcQuestions") or [])
-            combo_n = _valid_single_blank_count(candidate.get("comboQuestions") or [])
-            dragdrop_n = _valid_single_blank_count(candidate.get("dragdropQuestions") or [])
+            combo_n = _valid_single_blank_count(candidate.get("comboQuestions") or [], require_single_blank=True)
+            dragdrop_n = _valid_single_blank_count(candidate.get("dragdropQuestions") or [], require_single_blank=True)
             score = (min(gap_n, gap_target) + min(mc_n, mc_target)
                      + min(combo_n, combo_target) + min(dragdrop_n, dragdrop_target))
             if score > best_score:
