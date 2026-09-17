@@ -770,12 +770,20 @@
         <translation>ลงชื่อเข้าใช้ด้วย Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">มีไลบรารีหรือชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>มีชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>มีไลบรารีหรือชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>มีชุดกฎชื่อนี้อยู่แล้วที่นี่</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>เช่น ท่องเที่ยว งาน โรงเรียน…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>มีไลบรารีหรือชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+        <translation type="vanished">มีไลบรารีหรือชุดคำศัพท์ชื่อนี้อยู่แล้วที่นี่</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>มีไลบรารีชื่อนี้อยู่แล้วที่นี่</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

@@ -770,12 +770,20 @@
         <translation>Meld aan met Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">'n Biblioteek of stel met hierdie naam bestaan reeds hier.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>'n Woordstel met hierdie naam bestaan reeds hier.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>'n Biblioteek of stel met hierdie naam bestaan reeds hier.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>'n Reëlstel met hierdie naam bestaan reeds hier.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>bv. Reise, Werk, Skool…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>'n Biblioteek of stel met hierdie naam bestaan reeds hier.</translation>
+        <translation type="vanished">'n Biblioteek of stel met hierdie naam bestaan reeds hier.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>'n Biblioteek met hierdie naam bestaan reeds hier.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

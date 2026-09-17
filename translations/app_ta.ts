@@ -770,12 +770,20 @@
         <translation>Google மூலம் உள்நுழையவும்</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">இந்தப் பெயருடன் ஒரு நூலகம் அல்லது தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>இந்தப் பெயருடன் ஒரு சொல் தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>இந்தப் பெயருடன் ஒரு நூலகம் அல்லது தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>இந்தப் பெயருடன் ஒரு விதிக் குழு ஏற்கனவே இங்கு உள்ளது.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>எ.கா. பயணம், வேலை, பள்ளி…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>இந்தப் பெயருடன் ஒரு நூலகம் அல்லது தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
+        <translation type="vanished">இந்தப் பெயருடன் ஒரு நூலகம் அல்லது தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>இந்தப் பெயருடன் ஒரு நூலகம் ஏற்கனவே இங்கு உள்ளது.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

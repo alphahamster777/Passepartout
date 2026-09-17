@@ -28,9 +28,9 @@ public:
 
     void setRecSetManager(RecSetManager* mgr) { m_recSetManager = mgr; }
 
-    // Set CRUD. createRuleSet/renameRuleSet return -1/false on a
-    // name collision (checked against RecSetManager::isFolderNameTaken,
-    // which already covers libraries + word sets + rule sets).
+    // Set CRUD. createRuleSet/renameRuleSet return -1/false on a name
+    // collision with another rule set in the same folder (checked via
+    // isRuleSetNameTaken below) — a word set or library may share the name.
     Q_INVOKABLE int createRuleSet(const QString& setName, const QString& folderPath);
     Q_INVOKABLE bool deleteRuleSetAt(int idx);
     Q_INVOKABLE bool renameRuleSet(int idx, const QString& setName);

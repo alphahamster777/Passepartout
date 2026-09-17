@@ -770,12 +770,20 @@
         <translation>Hasi saioa Google-rekin</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Izen hori duen liburutegi edo sorta bat badago hemen jada.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Izen hori duen hitz-sorta bat badago hemen jada.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Izen hori duen liburutegi edo sorta bat badago hemen jada.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Izen hori duen arau-multzo bat badago hemen jada.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>adib. Bidaiak, Lana, Eskola…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Izen hori duen liburutegi edo sorta bat badago hemen jada.</translation>
+        <translation type="vanished">Izen hori duen liburutegi edo sorta bat badago hemen jada.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Izen hori duen liburutegi bat badago hemen jada.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

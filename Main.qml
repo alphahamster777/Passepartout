@@ -643,14 +643,14 @@ ApplicationWindow {
                         recSetIdx = mgr.createRecSet(recSetName, recFolderPath)
                         if (recSetIdx === -1) {
                             stackView.currentItem.titleErrorMessage =
-                                qsTr("A library or set with this name already exists here.")
+                                qsTr("A word set with this name already exists here.")
                             stackView.currentItem.titleError = true
                             return
                         }
                     } else {
                         if (!mgr.renameRecSet(recSetIdx, recSetName)) {
                             stackView.currentItem.titleErrorMessage =
-                                qsTr("A library or set with this name already exists here.")
+                                qsTr("A word set with this name already exists here.")
                             stackView.currentItem.titleError = true
                             return
                         }
@@ -714,14 +714,14 @@ ApplicationWindow {
                         setIdx = mgr.createRuleSet(setName, setFolder)
                         if (setIdx === -1) {
                             stackView.currentItem.titleErrorMessage =
-                                qsTr("A library or set with this name already exists here.")
+                                qsTr("A rule set with this name already exists here.")
                             stackView.currentItem.titleError = true
                             return
                         }
                     } else {
                         if (!mgr.renameRuleSet(setIdx, setName)) {
                             stackView.currentItem.titleErrorMessage =
-                                qsTr("A library or set with this name already exists here.")
+                                qsTr("A rule set with this name already exists here.")
                             stackView.currentItem.titleError = true
                             return
                         }

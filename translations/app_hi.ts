@@ -770,12 +770,20 @@
         <translation>Google से साइन इन करें</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">इस नाम की लाइब्रेरी या सेट पहले से ही यहाँ मौजूद है।</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>इस नाम का शब्द सेट पहले से ही यहाँ मौजूद है।</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>इस नाम की लाइब्रेरी या सेट पहले से ही यहाँ मौजूद है।</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>इस नाम का नियम सेट पहले से ही यहाँ मौजूद है।</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>उदा. यात्रा, कार्य, स्कूल…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>इस नाम की लाइब्रेरी या सेट पहले से ही यहाँ मौजूद है।</translation>
+        <translation type="vanished">इस नाम की लाइब्रेरी या सेट पहले से ही यहाँ मौजूद है।</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>इस नाम की लाइब्रेरी पहले से ही यहाँ मौजूद है।</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

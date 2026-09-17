@@ -770,12 +770,20 @@
         <translation>Inicia sessió amb Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Ja existeix aquí una biblioteca o conjunt amb aquest nom.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Ja existeix aquí un conjunt de paraules amb aquest nom.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Ja existeix aquí una biblioteca o conjunt amb aquest nom.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Ja existeix aquí un conjunt de regles amb aquest nom.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>p. ex. Viatges, Feina, Escola…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Ja existeix aquí una biblioteca o conjunt amb aquest nom.</translation>
+        <translation type="vanished">Ja existeix aquí una biblioteca o conjunt amb aquest nom.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Ja existeix aquí una biblioteca amb aquest nom.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

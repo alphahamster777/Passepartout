@@ -770,12 +770,20 @@
         <translation>Bejelentkezés Google-fiókkal</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Már létezik itt egy ilyen nevű könyvtár vagy készlet.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Már létezik itt egy ilyen nevű szókészlet.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Már létezik itt egy ilyen nevű könyvtár vagy készlet.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Már létezik itt egy ilyen nevű szabálykészlet.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>pl. Utazás, Munka, Iskola…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Már létezik itt egy ilyen nevű könyvtár vagy készlet.</translation>
+        <translation type="vanished">Már létezik itt egy ilyen nevű könyvtár vagy készlet.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Már létezik itt egy ilyen nevű könyvtár.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

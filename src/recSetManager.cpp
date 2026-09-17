@@ -57,7 +57,7 @@ int RecSetManager::createRecSet(const QString &setName) {
 }
 
 int RecSetManager::createRecSet(const QString &setName, const QString &folderPath) {
-    if (isFolderNameTaken(folderPath, setName))
+    if (isSetNameTaken(folderPath, setName))
         return -1;
     RecSet rs(setName);
     rs.setFolderPath(folderPath);
@@ -90,7 +90,7 @@ bool RecSetManager::renameRecSet(int i, const QString &setName) {
     const QString folderPath = m_recSetVec.at(i).getFolderPath();
     const QString oldName    = m_recSetVec.at(i).getSetName();
     if (oldName == setName) return true;
-    if (isFolderNameTaken(folderPath, setName))
+    if (isSetNameTaken(folderPath, setName, i))
         return false;
     removeFromOrder(folderPath, "set:" + oldName);
     m_recSetVec[i].setRecSetName(setName);
@@ -315,20 +315,11 @@ bool RecSetManager::isSetNameTaken(const QString& parentPath, const QString& nam
     return false;
 }
 
-bool RecSetManager::isFolderNameTaken(const QString& parentPath, const QString& name,
-                                       const QString& excludeFullPath) const {
-    if (isLibraryNameTaken(parentPath, name, excludeFullPath) || isSetNameTaken(parentPath, name))
-        return true;
-    if (m_ruleSetManager && m_ruleSetManager->isRuleSetNameTaken(parentPath, name))
-        return true;
-    return false;
-}
-
 bool RecSetManager::createFolder(const QString& folderPath) {
     if (folderPath.isEmpty()) return false;
     QString parent = parentOf(folderPath);
     QString name   = folderPath.section('/', -1);
-    if (isFolderNameTaken(parent, name))
+    if (isLibraryNameTaken(parent, name))
         return false;
     // Mark this folder in the parent's order list and ensure it has an entry in the map
     ensureInOrder(parent, "folder:" + folderPath);
@@ -373,7 +364,7 @@ bool RecSetManager::renameFolder(const QString& oldPath, const QString& newPath)
 
     QString newParent = parentOf(newPath);
     QString newName   = newPath.section('/', -1);
-    if (isFolderNameTaken(newParent, newName, oldPath))
+    if (isLibraryNameTaken(newParent, newName, oldPath))
         return false;
 
     // Update all sets whose folderPath starts with oldPath
@@ -428,9 +419,6 @@ bool RecSetManager::moveSetToFolder(int setIdx, const QString& newFolderPath, bo
     QString setName   = m_recSetVec.at(setIdx).getSetName();
     if (oldFolder == newFolderPath) return false;
 
-    // A library with the same name can't be overwritten by a set.
-    if (isLibraryNameTaken(newFolderPath, setName)) return false;
-
     int clashIdx = -1;
     for (int i = 0; i < m_recSetVec.size(); ++i) {
         if (i == setIdx) continue;
@@ -468,11 +456,6 @@ bool RecSetManager::moveFolderToFolder(const QString& folderPath, const QString&
     if (newPath == folderPath) return false;
     // Prevent moving a folder into itself or any of its descendants
     if (newParentPath == folderPath || newParentPath.startsWith(folderPath + "/"))
-        return false;
-    // A set (word or rule) with the same name can't be merged into or
-    // replaced by a library.
-    if (isSetNameTaken(newParentPath, lastName)) return false;
-    if (m_ruleSetManager && m_ruleSetManager->isRuleSetNameTaken(newParentPath, lastName))
         return false;
 
     if (isLibraryNameTaken(newParentPath, lastName, folderPath)) {

@@ -770,12 +770,20 @@
         <translation>使用 Google 登录</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">此处已存在同名的库或单词集。</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>此处已存在同名的单词集。</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>此处已存在同名的库或单词集。</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>此处已存在同名的规则集。</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>例如：旅行、工作、学校……</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>此处已存在同名的库或单词集。</translation>
+        <translation type="vanished">此处已存在同名的库或单词集。</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>此处已存在同名的库。</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

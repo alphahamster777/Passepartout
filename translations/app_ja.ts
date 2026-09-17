@@ -770,12 +770,20 @@
         <translation>Google でサインイン</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">この名前のライブラリまたはセットはすでに存在します。</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>この名前の単語セットはすでに存在します。</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>この名前のライブラリまたはセットはすでに存在します。</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>この名前のルールセットはすでに存在します。</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>例: 旅行、仕事、学校…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>この名前のライブラリまたはセットはすでに存在します。</translation>
+        <translation type="vanished">この名前のライブラリまたはセットはすでに存在します。</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>この名前のライブラリはすでに存在します。</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

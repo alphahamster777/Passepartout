@@ -770,12 +770,20 @@
         <translation>ورود با Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">کتابخانه یا مجموعه‌ای با این نام از قبل اینجا وجود دارد.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>مجموعه واژه‌ای با این نام از قبل اینجا وجود دارد.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>کتابخانه یا مجموعه‌ای با این نام از قبل اینجا وجود دارد.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>مجموعه قوانینی با این نام از قبل اینجا وجود دارد.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>مثلاً: سفر، کار، مدرسه…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>کتابخانه یا مجموعه‌ای با این نام از قبل اینجا وجود دارد.</translation>
+        <translation type="vanished">کتابخانه یا مجموعه‌ای با این نام از قبل اینجا وجود دارد.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>کتابخانه‌ای با این نام از قبل اینجا وجود دارد.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

@@ -770,12 +770,20 @@
         <translation>Google ile oturum açın</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Bu ada sahip bir kütüphane veya set burada zaten mevcut.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Bu ada sahip bir kelime seti burada zaten mevcut.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Bu ada sahip bir kütüphane veya set burada zaten mevcut.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Bu ada sahip bir kural seti burada zaten mevcut.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>örn. Seyahat, İş, Okul…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Bu ada sahip bir kütüphane veya set burada zaten mevcut.</translation>
+        <translation type="vanished">Bu ada sahip bir kütüphane veya set burada zaten mevcut.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Bu ada sahip bir kütüphane burada zaten mevcut.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

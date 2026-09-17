@@ -770,12 +770,20 @@
         <translation>Prisijungti su Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Biblioteka ar rinkinys tokiu pavadinimu jau yra čia.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Žodžių rinkinys tokiu pavadinimu jau yra čia.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Biblioteka ar rinkinys tokiu pavadinimu jau yra čia.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Taisyklių rinkinys tokiu pavadinimu jau yra čia.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>pvz., Kelionės, Darbas, Mokykla…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Biblioteka ar rinkinys tokiu pavadinimu jau yra čia.</translation>
+        <translation type="vanished">Biblioteka ar rinkinys tokiu pavadinimu jau yra čia.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Biblioteka tokiu pavadinimu jau yra čia.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

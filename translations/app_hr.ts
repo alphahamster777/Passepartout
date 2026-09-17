@@ -770,12 +770,20 @@
         <translation>Prijavi se putem Googlea</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Knjižnica ili skup s ovim nazivom već postoji ovdje.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Skup riječi s ovim nazivom već postoji ovdje.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Knjižnica ili skup s ovim nazivom već postoji ovdje.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Skup pravila s ovim nazivom već postoji ovdje.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>npr. Putovanja, Posao, Škola…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Knjižnica ili skup s ovim nazivom već postoji ovdje.</translation>
+        <translation type="vanished">Knjižnica ili skup s ovim nazivom već postoji ovdje.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Knjižnica s ovim nazivom već postoji ovdje.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

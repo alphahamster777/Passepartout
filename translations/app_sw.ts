@@ -770,12 +770,20 @@
         <translation>Ingia kwa Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Maktaba au seti yenye jina hili tayari ipo hapa.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Seti ya maneno yenye jina hili tayari ipo hapa.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Maktaba au seti yenye jina hili tayari ipo hapa.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Seti ya sheria yenye jina hili tayari ipo hapa.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>mfano Safari, Kazi, Shule…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Maktaba au seti yenye jina hili tayari ipo hapa.</translation>
+        <translation type="vanished">Maktaba au seti yenye jina hili tayari ipo hapa.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Maktaba yenye jina hili tayari ipo hapa.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

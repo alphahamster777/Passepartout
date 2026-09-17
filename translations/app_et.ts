@@ -770,12 +770,20 @@
         <translation>Logi sisse Google'iga</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Sellenimeline teek või komplekt on siin juba olemas.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Sellenimeline sõnakomplekt on siin juba olemas.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Sellenimeline teek või komplekt on siin juba olemas.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Sellenimeline reeglistik on siin juba olemas.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>nt Reisimine, Töö, Kool…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Sellenimeline teek või komplekt on siin juba olemas.</translation>
+        <translation type="vanished">Sellenimeline teek või komplekt on siin juba olemas.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Sellenimeline teek on siin juba olemas.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

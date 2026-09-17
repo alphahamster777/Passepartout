@@ -29,7 +29,7 @@ bool isUrl(const QString& s) {
 }
 
 int RuleSetManager::createRuleSet(const QString& setName, const QString& folderPath) {
-    if (m_recSetManager && m_recSetManager->isFolderNameTaken(folderPath, setName))
+    if (isRuleSetNameTaken(folderPath, setName))
         return -1;
     RuleSet gs(setName);
     gs.setFolderPath(folderPath);
@@ -53,7 +53,7 @@ bool RuleSetManager::renameRuleSet(int idx, const QString& setName) {
     const QString folderPath = m_ruleSetVec.at(idx).getFolderPath();
     const QString oldName    = m_ruleSetVec.at(idx).getSetName();
     if (oldName == setName) return true;
-    if (m_recSetManager && m_recSetManager->isFolderNameTaken(folderPath, setName))
+    if (isRuleSetNameTaken(folderPath, setName, idx))
         return false;
     if (m_recSetManager)
         m_recSetManager->unregisterOrderKey(folderPath, "ruleset:" + oldName);
@@ -115,10 +115,6 @@ bool RuleSetManager::moveRuleSetToFolder(int idx, const QString& newFolderPath, 
     QString oldFolder = m_ruleSetVec.at(idx).getFolderPath();
     QString setName   = m_ruleSetVec.at(idx).getSetName();
     if (oldFolder == newFolderPath) return false;
-
-    // A library with the same name can't be overwritten by a set.
-    if (m_recSetManager && m_recSetManager->isLibraryNameTaken(newFolderPath, setName))
-        return false;
 
     int clashIdx = -1;
     for (int i = 0; i < m_ruleSetVec.size(); ++i) {

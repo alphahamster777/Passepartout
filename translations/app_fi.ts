@@ -770,12 +770,20 @@
         <translation>Kirjaudu sisään Googlella</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Tämän niminen kirjasto tai sanasto on jo täällä.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Tämän niminen sanasto on jo täällä.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Tämän niminen kirjasto tai sanasto on jo täällä.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Tämän niminen sääntökokoelma on jo täällä.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>esim. Matkailu, Työ, Koulu…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Tämän niminen kirjasto tai sanasto on jo täällä.</translation>
+        <translation type="vanished">Tämän niminen kirjasto tai sanasto on jo täällä.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Tämän niminen kirjasto on jo täällä.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

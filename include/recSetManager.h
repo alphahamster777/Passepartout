@@ -34,9 +34,10 @@ public:
     // share this class's folder tree (m_folderItemOrder) via "ruleset:"
     // keys, so folder-orchestration methods below (deleteFolder/renameFolder/
     // moveFolderToFolder/mergeFolderInto/findMergeSetConflicts) delegate the
-    // rule-set side of their work here, and isFolderNameTaken() also
-    // checks rule-set names so a folder can't contain a word set and a
-    // rule set with the same name.
+    // rule-set side of their work here. Name uniqueness is enforced only
+    // within a type (isLibraryNameTaken/isSetNameTaken/isRuleSetNameTaken
+    // each check their own type only) — a library, a word set, and a rule
+    // set may all share the same name in the same folder.
     void setRuleSetManager(RuleSetManager* mgr) { m_ruleSetManager = mgr; }
 
     // Public wrappers so RuleSetManager can register/unregister its own
@@ -54,15 +55,16 @@ public:
     RecSetManager& operator=(RecSetManager&& other);
 
     // Set CRUD
-    // Returns the index of the newly created set, or -1 if a library or set already
-    // named `setName` exists directly in `folderPath` (names are unique per-folder,
-    // not app-wide — the same name may exist in different folders).
+    // Returns the index of the newly created set, or -1 if a word set already
+    // named `setName` exists directly in `folderPath` (names are unique per-folder
+    // and per-type, not app-wide — the same name may exist in different folders,
+    // or in the same folder as a rule set or library of that name).
     Q_INVOKABLE int createRecSet(const QString& setName);
     Q_INVOKABLE int createRecSet(const QString& setName, const QString& folderPath);
     Q_INVOKABLE bool deleteRecSet(const QString& setName);
     Q_INVOKABLE bool deleteRecSetAt(int idx);
 
-    // Renames the set at idx; refused if another set/library already has that name
+    // Renames the set at idx; refused if another word set already has that name
     // in the same folder.
     Q_INVOKABLE bool renameRecSet(int i, const QString& setName);
 
@@ -126,17 +128,11 @@ public:
     Q_INVOKABLE bool isLibraryNameTaken(const QString& parentPath, const QString& name,
                                          const QString& excludeFullPath = QString()) const;
 
-    // Returns true if a sibling set already named `name` exists directly under
+    // Returns true if a sibling word set already named `name` exists directly under
     // `parentPath`. Pass the index of the set being moved as `excludeSetIdx` so it
     // doesn't collide with itself.
     Q_INVOKABLE bool isSetNameTaken(const QString& parentPath, const QString& name,
                                      int excludeSetIdx = -1) const;
-
-    // Returns true if a library or set already named `name` exists directly under
-    // `parentPath`. Pass the full path of the library being renamed/moved as
-    // `excludeFullPath` so it doesn't collide with itself.
-    Q_INVOKABLE bool isFolderNameTaken(const QString& parentPath, const QString& name,
-                                        const QString& excludeFullPath = QString()) const;
 
     // Persists a new drag-and-drop ordering for a folder.
     // keys = ordered list of "folder:FULLPATH" or "set:SETNAME" strings.

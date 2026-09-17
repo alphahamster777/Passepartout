@@ -770,12 +770,20 @@
         <translation>Google দিয়ে সাইন ইন করুন</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">এই নামের একটি লাইব্রেরি বা সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>এই নামের একটি শব্দ সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>এই নামের একটি লাইব্রেরি বা সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>এই নামের একটি নিয়ম সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>যেমন: ভ্রমণ, কাজ, স্কুল…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>এই নামের একটি লাইব্রেরি বা সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
+        <translation type="vanished">এই নামের একটি লাইব্রেরি বা সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>এই নামের একটি লাইব্রেরি এখানে ইতিমধ্যে বিদ্যমান।</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

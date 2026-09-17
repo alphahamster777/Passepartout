@@ -770,12 +770,20 @@
         <translation>تسجيل الدخول عبر Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">توجد مكتبة أو مجموعة بهذا الاسم هنا بالفعل.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>توجد مجموعة كلمات بهذا الاسم هنا بالفعل.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>توجد مكتبة أو مجموعة بهذا الاسم هنا بالفعل.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>توجد مجموعة قواعد بهذا الاسم هنا بالفعل.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>مثلًا: السفر، العمل، المدرسة…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>توجد مكتبة أو مجموعة بهذا الاسم هنا بالفعل.</translation>
+        <translation type="vanished">توجد مكتبة أو مجموعة بهذا الاسم هنا بالفعل.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>توجد مكتبة بهذا الاسم هنا بالفعل.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

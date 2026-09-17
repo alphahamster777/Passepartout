@@ -770,12 +770,20 @@
         <translation>Mag-sign in gamit ang Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">May umiiral na nang aklatan o set na may pangalang ito dito.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>May umiiral na nang set ng salita na may pangalang ito dito.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>May umiiral na nang aklatan o set na may pangalang ito dito.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>May umiiral na nang set ng panuntunan na may pangalang ito dito.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>hal. Paglalakbay, Trabaho, Paaralan…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>May umiiral na nang aklatan o set na may pangalang ito dito.</translation>
+        <translation type="vanished">May umiiral na nang aklatan o set na may pangalang ito dito.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>May umiiral na nang aklatan na may pangalang ito dito.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>

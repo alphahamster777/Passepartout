@@ -66,8 +66,6 @@ Page {
         var mgr = AppController.recSetManager
         if (itemType === "set" || itemType === "ruleset") {
             var contentMgr = itemType === "set" ? mgr : AppController.ruleSetManager
-            if (mgr.isLibraryNameTaken(destFolder, name))
-                return // can't drop a set onto a library of the same name
             var nameTaken = itemType === "set"
                 ? mgr.isSetNameTaken(destFolder, name, sourceRef)
                 : contentMgr.isRuleSetNameTaken(destFolder, name, sourceRef)
@@ -85,8 +83,6 @@ Page {
             else
                 contentMgr.moveRuleSetToFolder(sourceRef, destFolder)
         } else {
-            if (mgr.isSetNameTaken(destFolder, name))
-                return // can't merge a library into a set of the same name
             if (mgr.isLibraryNameTaken(destFolder, name, sourceRef)) {
                 moveConflictDialog.mode = "mergeFolder"
                 moveConflictDialog.itemName = name
@@ -244,7 +240,7 @@ Page {
 
         readonly property string trimmedName: folderNameField.text.trim()
         readonly property bool nameTaken: trimmedName !== "" &&
-            AppController.recSetManager.isFolderNameTaken(page.folderPath, trimmedName)
+            AppController.recSetManager.isLibraryNameTaken(page.folderPath, trimmedName)
         readonly property bool nameValid: trimmedName !== "" && !nameTaken
 
         function tryAccept() {
@@ -271,7 +267,7 @@ Page {
             }
             Label {
                 visible: newFolderDialog.nameTaken
-                text: qsTr("A library or set with this name already exists here.")
+                text: qsTr("A library with this name already exists here.")
                 color: "#e74c3c"
                 font.pixelSize: 11
                 wrapMode: Text.WordWrap
@@ -319,7 +315,7 @@ Page {
             ? targetFullPath.substring(0, targetFullPath.lastIndexOf("/"))
             : ""
         readonly property bool nameTaken: trimmedName !== "" &&
-            AppController.recSetManager.isFolderNameTaken(targetParent, trimmedName, targetFullPath)
+            AppController.recSetManager.isLibraryNameTaken(targetParent, trimmedName, targetFullPath)
         readonly property bool nameValid: trimmedName !== "" && !nameTaken
 
         function tryAccept() {
@@ -345,7 +341,7 @@ Page {
             }
             Label {
                 visible: renameFolderDialog.nameTaken
-                text: qsTr("A library or set with this name already exists here.")
+                text: qsTr("A library with this name already exists here.")
                 color: "#e74c3c"
                 font.pixelSize: 11
                 wrapMode: Text.WordWrap

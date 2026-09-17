@@ -770,12 +770,20 @@
         <translation>Pierakstīties ar Google</translation>
     </message>
     <message>
+        <source>A library or set with this name already exists here.</source>
+        <translation type="vanished">Bibliotēka vai kopa ar šādu nosaukumu šeit jau pastāv.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="646"/>
         <location filename="../Main.qml" line="653"/>
+        <source>A word set with this name already exists here.</source>
+        <translation>Vārdu kopa ar šādu nosaukumu šeit jau pastāv.</translation>
+    </message>
+    <message>
         <location filename="../Main.qml" line="717"/>
         <location filename="../Main.qml" line="724"/>
-        <source>A library or set with this name already exists here.</source>
-        <translation>Bibliotēka vai kopa ar šādu nosaukumu šeit jau pastāv.</translation>
+        <source>A rule set with this name already exists here.</source>
+        <translation>Noteikumu kopa ar šādu nosaukumu šeit jau pastāv.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1057,14 @@
         <translation>piem., Ceļojumi, Darbs, Skola…</translation>
     </message>
     <message>
-        <location filename="../SetDirMenu.qml" line="274"/>
-        <location filename="../SetDirMenu.qml" line="348"/>
         <source>A library or set with this name already exists here.</source>
-        <translation>Bibliotēka vai kopa ar šādu nosaukumu šeit jau pastāv.</translation>
+        <translation type="vanished">Bibliotēka vai kopa ar šādu nosaukumu šeit jau pastāv.</translation>
+    </message>
+    <message>
+        <location filename="../SetDirMenu.qml" line="270"/>
+        <location filename="../SetDirMenu.qml" line="344"/>
+        <source>A library with this name already exists here.</source>
+        <translation>Bibliotēka ar šādu nosaukumu šeit jau pastāv.</translation>
     </message>
     <message>
         <location filename="../SetDirMenu.qml" line="281"/>
