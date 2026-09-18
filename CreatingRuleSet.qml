@@ -4,6 +4,7 @@ import QtQuick.Controls.Material
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtMultimedia
+import LanguageHelper
 import AppController
 import FirebaseAiHelper
 
@@ -38,6 +39,20 @@ Page {
     // do this scroll itself.
     property bool pendingScrollToNewCard: false
 
+    // ── AI generator language picker state ──────────────────────────────────
+    // Mirrors CreatingRecSet.qml's aiFromLanguageId/aiToLanguageId: term
+    // language governs the generated question sentences/options/answers
+    // (the language being learned), explanation language governs the
+    // "theory" paragraphs — same split as that file's "Word language"/"Hint
+    // language", reusing the same app-wide "meaning language" default so a
+    // learner can be quizzed in the target language while still reading the
+    // rule explanation in one they understand.
+    property string langPickerTarget: "term"   // "term" or "explanation"
+    property int langPickerCurrentId: -1
+    property int aiTermLanguageId: LanguageHelper.English
+    property int aiExplanationLanguageId: AppController.defaultMeaningLanguage
+    readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
+
     Timer {
         id: mcErrorFlashTimer
         interval: 1200
@@ -64,8 +79,22 @@ Page {
                 ruleSetModel.append(row)
             }
             page.selectedCardIndex = ruleSetModel.count > 0 ? ruleSetModel.count - 1 : 0
-            page.aiError = ""
-            aiGeneratorPopup.close()
+            // A narrow/repetitive topic can make Gemini (or the server's own
+            // validation) come up short of what was asked for even though
+            // the call itself succeeded — see AiRuleSetShared::parseRuleSet's
+            // "requestedCount". The generated questions are still usable and
+            // stay loaded behind the popup, but closing silently in that case
+            // would hide a real shortfall the creator never asked for and
+            // might not otherwise notice, so the popup stays open with a
+            // warning instead — same as a hard failure.
+            var requested = ruleSet.requestedCount || 0
+            if (requested > 0 && questions.length < requested) {
+                page.aiError = qsTr("Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.")
+                    .arg(questions.length).arg(requested)
+            } else {
+                page.aiError = ""
+                aiGeneratorPopup.close()
+            }
         }
         function onRuleGenerationFailed(error) {
             page.aiError = error
@@ -555,12 +584,138 @@ Page {
         }
     }
 
+    // ── AI generator language picker popup ───────────────────────────────────
+    // Same widget as CreatingRecSet.qml's languagePickerPopup, adapted for
+    // this page's two targets ("term"/"explanation") in place of that file's
+    // "card"/"aiFrom"/"aiTo" three — a rule set has no per-card language of
+    // its own to edit, only the generator's two picks.
+    Popup {
+        id: ruleLanguagePickerPopup
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(parent.width - 32, 340)
+        padding: 0
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        onOpened: Qt.callLater(function() {
+            var entries = page.langEntries
+            var currentId = page.langPickerCurrentId
+            for (var i = 0; i < entries.length; ++i) {
+                if (entries[i].id === currentId) {
+                    var itemH = 48
+                    var targetY = i * itemH
+                    var center = targetY - (ruleLangFlick.height - itemH) / 2
+                    ruleLangFlick.contentY = Math.max(0,
+                        Math.min(center, Math.max(0, ruleLangFlick.contentHeight - ruleLangFlick.height)))
+                    break
+                }
+            }
+        })
+
+        background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
+
+        contentItem: Column {
+            Rectangle {
+                width: ruleLanguagePickerPopup.availableWidth
+                height: 52
+                color: "#2c3e50"
+                radius: 14
+                Rectangle {
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                    height: 14; color: "#2c3e50"
+                }
+                Label {
+                    anchors.centerIn: parent
+                    text: page.langPickerTarget === "term" ? qsTr("Grammar Term Language") : qsTr("Explanation Language")
+                    font.pixelSize: 16; font.bold: true; color: "white"
+                }
+            }
+
+            Flickable {
+                id: ruleLangFlick
+                width: ruleLanguagePickerPopup.availableWidth
+                height: Math.min(ruleLangCol.implicitHeight,
+                                 (Overlay.overlay ? Overlay.overlay.height * 0.65 : 380) - 52 - 52)
+                contentHeight: ruleLangCol.implicitHeight
+                clip: true
+
+                Column {
+                    id: ruleLangCol
+                    width: ruleLangFlick.width
+
+                    Repeater {
+                        model: page.langEntries
+                        delegate: ItemDelegate {
+                            width: ruleLangCol.width
+                            height: 48
+                            required property int index
+                            required property var modelData
+
+                            readonly property bool isCurrent: modelData.id === page.langPickerCurrentId
+
+                            background: Rectangle {
+                                color: isCurrent ? "#eaf4fb"
+                                     : parent.pressed ? "#f0f4f8" : "white"
+                                Rectangle {
+                                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                                    height: 1; color: "#ececec"
+                                }
+                            }
+                            contentItem: Item {
+                                RowLayout {
+                                    anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
+                                    spacing: 8
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: modelData.name
+                                        color: isCurrent ? "#3498db" : "#2c3e50"
+                                        font.pixelSize: 15
+                                        font.bold: isCurrent
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Label {
+                                        visible: isCurrent
+                                        text: "✓"
+                                        color: "#3498db"
+                                        font.pixelSize: 14
+                                    }
+                                }
+                            }
+                            onClicked: {
+                                if (page.langPickerTarget === "term") {
+                                    page.aiTermLanguageId = modelData.id
+                                } else {
+                                    page.aiExplanationLanguageId = modelData.id
+                                    AppController.defaultMeaningLanguage = modelData.id
+                                }
+                                ruleLanguagePickerPopup.close()
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle { width: ruleLanguagePickerPopup.availableWidth; height: 1; color: "#ececec" }
+            ItemDelegate {
+                width: ruleLanguagePickerPopup.availableWidth
+                height: 50
+                background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white"; radius: 14 }
+                contentItem: Text {
+                    text: qsTr("Cancel"); color: "#e74c3c"
+                    font.pixelSize: 15; font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: ruleLanguagePickerPopup.close()
+            }
+        }
+    }
+
     // ── AI Rule Set Generator popup ──────────────────────────────────────────
     // Mirrors CreatingRecSet.qml's "AI Word Set Generator" popup closely (same
-    // sizing/keyboard-avoidance approach, same footer/quota-line layout) but
-    // without a language picker — a rule set isn't tied to a language pair the
-    // way a word set is — and one +/- count per question type (AiTypeCountSpin
-    // above) in place of a single "Number of words".
+    // sizing/keyboard-avoidance approach, same footer/quota-line layout, same
+    // language-picker pattern) — one +/- count per question type
+    // (AiTypeCountSpin above) in place of a single "Number of words".
     Popup {
         id: aiGeneratorPopup
         readonly property bool keyboardUp: Qt.inputMethod.visible
@@ -708,6 +863,73 @@ Page {
                         color: aiThemeField.text.length >= aiThemeField.maxLength ? "#e74c3c" : "#b8a9c2"
                     }
 
+                    RowLayout {
+                        width: parent.width
+                        spacing: 10
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+                            Label { text: "🗣️ " + qsTr("Term language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 34
+                                radius: 8
+                                color: "#faf6fc"
+                                border.color: "#e7d5ef"; border.width: 1
+                                RowLayout {
+                                    anchors { fill: parent; leftMargin: 10; rightMargin: 8 }
+                                    spacing: 2
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: LanguageHelper.languageNames()[page.aiTermLanguageId]
+                                        font.pixelSize: 13; color: "#2c3e50"
+                                        elide: Text.ElideRight
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        page.langPickerTarget = "term"
+                                        page.langPickerCurrentId = page.aiTermLanguageId
+                                        ruleLanguagePickerPopup.open()
+                                    }
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+                            Label { text: "💡 " + qsTr("Explanation language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 34
+                                radius: 8
+                                color: "#faf6fc"
+                                border.color: "#e7d5ef"; border.width: 1
+                                RowLayout {
+                                    anchors { fill: parent; leftMargin: 10; rightMargin: 8 }
+                                    spacing: 2
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: LanguageHelper.languageNames()[page.aiExplanationLanguageId]
+                                        font.pixelSize: 13; color: "#2c3e50"
+                                        elide: Text.ElideRight
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        page.langPickerTarget = "explanation"
+                                        page.langPickerCurrentId = page.aiExplanationLanguageId
+                                        ruleLanguagePickerPopup.open()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     Label {
                         width: parent.width
                         text: qsTr("🔢 Questions per type")
@@ -794,7 +1016,8 @@ Page {
                         page.aiError = ""
                         page.aiBackend.generateRuleSet(aiThemeField.text.trim(),
                             aiGapCountSpin.value, aiMcCountSpin.value,
-                            aiComboCountSpin.value, aiDragdropCountSpin.value)
+                            aiComboCountSpin.value, aiDragdropCountSpin.value,
+                            page.aiTermLanguageId, page.aiExplanationLanguageId)
                     }
                 }
             }

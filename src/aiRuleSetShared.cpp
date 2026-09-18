@@ -1,4 +1,5 @@
 #include "aiRuleSetShared.h"
+#include "languageHelper.h"
 
 #include <QJsonArray>
 #include <algorithm>
@@ -61,10 +62,14 @@ QVariantList parseSingleBlankArray(const QJsonObject& payload, const QString& ke
 }
 }
 
-QString buildPrompt(const QString& theme, const TypeCounts& counts) {
+QString buildPrompt(const QString& theme, const TypeCounts& counts,
+                     int termLanguageId, int explanationLanguageId) {
     const TypeCounts c{clampCount(counts.gap), clampCount(counts.mc),
                         clampCount(counts.combobox), clampCount(counts.dragdrop)};
     const QString clippedTheme = theme.trimmed().left(kMaxThemeLength);
+    const QString termLang = LanguageHelper::displayName(static_cast<LanguageHelper::Language>(termLanguageId));
+    const QString explanationLang =
+        LanguageHelper::displayName(static_cast<LanguageHelper::Language>(explanationLanguageId));
 
     // Each instruction line names the exact count (buffered when > 0, "0
     // (leave this array empty)" otherwise) so a type the creator didn't ask
@@ -76,10 +81,12 @@ QString buildPrompt(const QString& theme, const TypeCounts& counts) {
 
     return QStringLiteral(
         "Generate a grammar lesson for a language learner on the topic \"%1\".\n"
-        "First write a short, clear grammar explanation in \"theory\" as 1 to 4 short "
-        "plain-text paragraphs (one paragraph per array entry) — this is the only thing "
-        "you write explaining the rule; do not describe or reference any images or audio.\n"
-        "Then generate exactly this many entries in each of these four arrays:\n"
+        "First write a short, clear grammar explanation in \"theory\", in %6, as 1 to 4 "
+        "short plain-text paragraphs (one paragraph per array entry) — this is the only "
+        "thing you write explaining the rule; do not describe or reference any images or "
+        "audio.\n"
+        "Then generate exactly this many entries in each of these four arrays, writing "
+        "every sentence, option and answer in %7:\n"
         "- \"gapQuestions\": %2 entries, each a sentence in \"text\" with each blank "
         "written as exactly \"___\" (three underscores), and \"answers\" listing the "
         "correct word or short phrase for each blank in order, one entry per blank.\n"
@@ -96,7 +103,8 @@ QString buildPrompt(const QString& theme, const TypeCounts& counts) {
         "Every mcQuestions/comboQuestions/dragdropQuestions entry must include "
         "correctIndex. Keep sentences concise and strictly about \"%1\". Do not repeat "
         "the same sentence.")
-        .arg(clippedTheme, countLine(c.gap), countLine(c.mc), countLine(c.combobox), countLine(c.dragdrop));
+        .arg(clippedTheme, countLine(c.gap), countLine(c.mc), countLine(c.combobox), countLine(c.dragdrop))
+        .arg(explanationLang, termLang);
 }
 
 QJsonObject buildResponseSchema() {
@@ -233,6 +241,13 @@ QVariantMap parseRuleSet(const QJsonObject& payload, const TypeCounts& counts) {
     QVariantMap result;
     result[QStringLiteral("theory")] = theory;
     result[QStringLiteral("questions")] = questions;
+    // Requested counts aren't guaranteed to be met — Gemini can legitimately
+    // come up short on a narrow topic even after the server's own retry (see
+    // functions/main.py's _handle_generate_rules), and every filter above
+    // can further shrink what makes it through. Surfacing what was actually
+    // requested lets the caller warn the creator instead of silently handing
+    // back fewer questions than they asked for.
+    result[QStringLiteral("requestedCount")] = gapTarget + mcTarget + comboTarget + dragdropTarget;
     return result;
 }
 

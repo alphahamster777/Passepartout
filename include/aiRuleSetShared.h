@@ -52,8 +52,14 @@ struct TypeCounts { int gap = 0; int mc = 0; int combobox = 0; int dragdrop = 0;
 // was actually requested instead of coming up short. A type whose count is
 // 0 is explicitly told to come back as an empty array rather than being
 // silently omitted from the prompt, which risked the model inventing some
-// anyway.
-QString buildPrompt(const QString& theme, const TypeCounts& counts);
+// anyway. termLanguageId governs the generated question sentences/options/
+// answers (the language being learned, same role as AiWordSetShared::
+// buildPrompt's fromLanguageId); explanationLanguageId governs the "theory"
+// paragraphs (same role as its toLanguageId) — so a learner can be quizzed
+// in the target language while still reading the rule explanation in one
+// they understand.
+QString buildPrompt(const QString& theme, const TypeCounts& counts,
+                     int termLanguageId, int explanationLanguageId);
 
 // The response JSON schema constraining the model to:
 // {"theory": ["paragraph", ...],
@@ -71,17 +77,23 @@ QJsonObject buildResponseSchema();
 
 // Turns the schema above (already parsed into a QJsonObject) into
 // {"theory": {"blocks": [{"kind":"text","value":...}, ...]},
-//  "questions": [{"type","text",...}, ...]}
-// — the same saved/JSON question shape RuleSetManager::getQuestionFromSetQML
-// and readSetFromZip already return, so callers can feed it straight
-// through the same row-conversion logic used for editing/importing a rule
-// set. Malformed entries (an out-of-range correctIndex, fewer than 2
-// options, a "gap" with no answers, a "gap" whose "answers" count doesn't
-// match its number of "___" blanks) are dropped rather than surfaced as
-// half-broken questions. Each type is capped at `counts`' requested amount
-// (undoing buildPrompt()'s buffer) and the four types are then interleaved
-// (in TypeCounts' declaration order, round-robin) so the result reads as an
-// actual mix throughout rather than every "gap" question first.
+//  "questions": [{"type","text",...}, ...],
+//  "requestedCount": <int>}
+// — "theory"/"questions" use the same saved/JSON question shape
+// RuleSetManager::getQuestionFromSetQML and readSetFromZip already return,
+// so callers can feed it straight through the same row-conversion logic
+// used for editing/importing a rule set. Malformed entries (an out-of-range
+// correctIndex, fewer than 2 options, a "gap" with no answers, a "gap" whose
+// "answers" count doesn't match its number of "___" blanks) are dropped
+// rather than surfaced as half-broken questions. Each type is capped at
+// `counts`' requested amount (undoing buildPrompt()'s buffer) and the four
+// types are then interleaved (in TypeCounts' declaration order, round-robin)
+// so the result reads as an actual mix throughout rather than every "gap"
+// question first. "requestedCount" is the sum of `counts` (i.e. what the
+// creator actually asked for, unbuffered) so a caller can tell a genuine
+// shortfall — fewer items in "questions" than "requestedCount" — from a
+// deliberately-empty type, and warn instead of silently handing back less
+// than requested.
 QVariantMap parseRuleSet(const QJsonObject& payload, const TypeCounts& counts);
 
 }

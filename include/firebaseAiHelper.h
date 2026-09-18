@@ -94,9 +94,16 @@ public:
     // question type in CreatingRuleSet.qml) rather than one combined total —
     // see AiRuleSetShared::TypeCounts. Plain ints (not that struct) here so
     // this stays a normal QML-invokable signature with no extra metatype
-    // registration.
+    // registration. termLanguageId/explanationLanguageId are LanguageHelper::
+    // Language enum values — termLanguageId governs the generated question
+    // sentences/options/answers (the language being learned), same role as
+    // generateWordSet's fromLanguageId; explanationLanguageId governs the
+    // "theory" paragraphs, same role as toLanguageId — so a learner can be
+    // quizzed in the target language while still reading the rule
+    // explanation in one they understand.
     Q_INVOKABLE void generateRuleSet(const QString& theme, int gapCount, int mcCount,
-                                      int comboCount, int dragdropCount);
+                                      int comboCount, int dragdropCount,
+                                      int termLanguageId, int explanationLanguageId);
     Q_INVOKABLE void cancelRuleGeneration();
     Q_INVOKABLE void refreshRuleQuota();
 
@@ -145,7 +152,8 @@ private:
                        int fromLanguageId, int toLanguageId, int wordCount);
     void applyRuleQuota(const QJsonObject& payload);
     void postGenerateRule(const QString& idToken, const QString& theme, int gapCount, int mcCount,
-                           int comboCount, int dragdropCount);
+                           int comboCount, int dragdropCount,
+                           int termLanguageId, int explanationLanguageId);
 
     QNetworkAccessManager* m_nam;
 

@@ -152,8 +152,13 @@ def _clamp_count(count: int) -> int:
 # / aiRuleSetShared.cpp) on the C++ side — keep the wording and shape in sync.
 # The four counts are dialed in independently by the creator (one +/-
 # control per question type in CreatingRuleSet.qml) rather than derived from
-# one combined total.
-def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: int, dragdrop_count: int) -> str:
+# one combined total. term_lang governs the generated question
+# sentences/options/answers (the language being learned); explanation_lang
+# governs the "theory" paragraphs — same split as build_prompt()'s
+# from_lang/to_lang for word sets, so a learner can be quizzed in the target
+# language while still reading the rule explanation in one they understand.
+def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: int, dragdrop_count: int,
+                       term_lang: str, explanation_lang: str) -> str:
     gap_count, mc_count, combo_count, dragdrop_count = (
         _clamp_count(gap_count), _clamp_count(mc_count), _clamp_count(combo_count), _clamp_count(dragdrop_count))
 
@@ -162,10 +167,11 @@ def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: in
 
     return (
         f'Generate a grammar lesson for a language learner on the topic "{theme}".\n'
-        'First write a short, clear grammar explanation in "theory" as 1 to 4 short '
-        "plain-text paragraphs (one paragraph per array entry) — this is the only thing "
-        "you write explaining the rule; do not describe or reference any images or audio.\n"
-        "Then generate exactly this many entries in each of these four arrays:\n"
+        f'First write a short, clear grammar explanation in "theory", in {explanation_lang}, as 1 '
+        "to 4 short plain-text paragraphs (one paragraph per array entry) — this is the only "
+        "thing you write explaining the rule; do not describe or reference any images or audio.\n"
+        f"Then generate exactly this many entries in each of these four arrays, writing every "
+        f"sentence, option and answer in {term_lang}:\n"
         f'- "gapQuestions": {count_line(gap_count)} entries, each a sentence in "text" with '
         'each blank written as exactly "___" (three underscores), and "answers" listing '
         "the correct word or short phrase for each blank in order, one entry per blank.\n"
@@ -271,6 +277,33 @@ def _valid_gap_count(gap_questions: list) -> int:
         if gap_count > 0 and isinstance(answers, list) and len(answers) == gap_count:
             n += 1
     return n
+
+
+def _merge_question_lists(lists: list) -> list:
+    """Concatenates one type's raw items across every retry attempt into a
+    single list, instead of keeping only the single best-scoring attempt
+    wholesale (see _handle_generate_rules). A narrow topic can make Gemini
+    come up short on a *different* type in each attempt — e.g. attempt 1
+    yields enough gap items but too few dropdown ones, attempt 2 the
+    reverse — so combining them gets closer to the requested count than
+    either attempt alone. The client (AiRuleSetShared::parseRuleSet) is
+    still the source of truth for which items are actually valid; this only
+    widens the pool it gets to choose from. Exact re-asks (same normalized
+    text) are dropped so two attempts producing the identical sentence don't
+    waste a slot that could've gone to something new."""
+    merged = []
+    seen = set()
+    for items in lists:
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            key = str(item.get("text", "")).strip().lower()
+            if key:
+                if key in seen:
+                    continue
+                seen.add(key)
+            merged.append(item)
+    return merged
 
 
 def call_gemini_json(prompt: str, schema: dict, api_key: str) -> dict:
@@ -464,6 +497,8 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
         return _json_response({"remaining": remaining, "limit": monthly_limit, "resetAt": reset_at}, 200)
 
     theme = str(body.get("theme", "")).strip()
+    term_lang = str(body.get("termLanguage", "English")).strip() or "English"
+    explanation_lang = str(body.get("explanationLanguage", "English")).strip() or "English"
 
     def _int_field(key: str, default: int) -> int:
         try:
@@ -510,17 +545,20 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
     # internally for a transient HTTP error (see call_gemini_json); this is
     # a separate concept — the call *succeeds* but the *content* falls short
     # of what was asked for — so it gets its own retry, up to two attempts
-    # total, keeping the first one that actually meets the target and
-    # otherwise falling back to whichever attempt did best. This costs at
-    # most one extra Gemini call, never an extra unit of the quota already
-    # charged above.
-    payload = None
-    best_payload = None
-    best_score = -1
+    # total. Rather than keeping only whichever single attempt scored best
+    # (which threw away a perfectly good item just because it happened to
+    # land in the "losing" attempt), every successful attempt's items are
+    # merged per type (see _merge_question_lists) — a narrow topic can make
+    # Gemini fall short on a *different* type each time, so combining
+    # attempts gets closer to the requested counts than either alone. This
+    # costs at most one extra Gemini call, never an extra unit of the quota
+    # already charged above.
+    attempts = []
     for attempt in range(2):
         try:
             candidate = call_gemini_json(
-                build_rule_prompt(theme, gap_target, mc_target, combo_target, dragdrop_target),
+                build_rule_prompt(theme, gap_target, mc_target, combo_target, dragdrop_target,
+                                   term_lang, explanation_lang),
                 build_rule_schema(),
                 os.environ["GEMINI_API_KEY"],
             )
@@ -529,7 +567,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
             print(f"Gemini call failed with status {status}: {_redact(exc)}")
             if attempt == 0 and status in (429, 503):
                 continue  # transient/overloaded — worth one more try
-            if best_payload is not None:
+            if attempts:
                 break  # keep whatever the first attempt produced
             if status in (429, 503):
                 return _json_response(
@@ -541,33 +579,29 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
             print(f"Gemini call failed unexpectedly: {_redact(exc)}")
             if attempt == 0:
                 continue
-            if best_payload is not None:
+            if attempts:
                 break
             return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
         else:
+            attempts.append(candidate)
             gap_n = _valid_gap_count(candidate.get("gapQuestions") or [])
             mc_n = _valid_single_blank_count(candidate.get("mcQuestions") or [])
             combo_n = _valid_single_blank_count(candidate.get("comboQuestions") or [], require_single_blank=True)
             dragdrop_n = _valid_single_blank_count(candidate.get("dragdropQuestions") or [], require_single_blank=True)
-            score = (min(gap_n, gap_target) + min(mc_n, mc_target)
-                     + min(combo_n, combo_target) + min(dragdrop_n, dragdrop_target))
-            if score > best_score:
-                best_payload, best_score = candidate, score
             if (gap_n >= gap_target and mc_n >= mc_target
                     and combo_n >= combo_target and dragdrop_n >= dragdrop_target):
                 break  # good enough — no need to spend a second Gemini call
             print(f"Rule-set generation attempt {attempt + 1} came up short "
                   f"(gap {gap_n}/{gap_target}, mc {mc_n}/{mc_target}, "
                   f"combo {combo_n}/{combo_target}, dragdrop {dragdrop_n}/{dragdrop_target})")
-    payload = best_payload
-    if payload is None:
+    if not attempts:
         return _json_response({"error": "Gemini returned no usable content."}, 502)
 
-    theory = payload.get("theory") or []
-    gap_questions = payload.get("gapQuestions") or []
-    mc_questions = payload.get("mcQuestions") or []
-    combo_questions = payload.get("comboQuestions") or []
-    dragdrop_questions = payload.get("dragdropQuestions") or []
+    theory = next((a.get("theory") for a in attempts if a.get("theory")), []) or []
+    gap_questions = _merge_question_lists([a.get("gapQuestions") or [] for a in attempts])
+    mc_questions = _merge_question_lists([a.get("mcQuestions") or [] for a in attempts])
+    combo_questions = _merge_question_lists([a.get("comboQuestions") or [] for a in attempts])
+    dragdrop_questions = _merge_question_lists([a.get("dragdropQuestions") or [] for a in attempts])
     if not gap_questions and not mc_questions and not combo_questions and not dragdrop_questions:
         return _json_response({"error": "Gemini returned no questions"}, 502)
 

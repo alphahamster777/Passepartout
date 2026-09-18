@@ -343,7 +343,8 @@ void FirebaseAiHelper::refreshRuleQuota() {
 }
 
 void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int mcCount,
-                                        int comboCount, int dragdropCount) {
+                                        int comboCount, int dragdropCount,
+                                        int termLanguageId, int explanationLanguageId) {
     if (theme.trimmed().isEmpty()) {
         emit ruleGenerationFailed(tr("Enter a theme first."));
         return;
@@ -355,7 +356,8 @@ void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int m
 
     setRuleGenerating(true);
     m_ruleCancelled = false;
-    ensureSignedIn([this, theme, gapCount, mcCount, comboCount, dragdropCount]
+    ensureSignedIn([this, theme, gapCount, mcCount, comboCount, dragdropCount,
+                    termLanguageId, explanationLanguageId]
                    (bool ok, const QString& idTokenOrError) {
         if (m_ruleCancelled)
             return;
@@ -364,18 +366,26 @@ void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int m
             emit ruleGenerationFailed(idTokenOrError);
             return;
         }
-        postGenerateRule(idTokenOrError, theme, gapCount, mcCount, comboCount, dragdropCount);
+        postGenerateRule(idTokenOrError, theme, gapCount, mcCount, comboCount, dragdropCount,
+                          termLanguageId, explanationLanguageId);
     });
 }
 
 void FirebaseAiHelper::postGenerateRule(const QString& idToken, const QString& theme, int gapCount,
-                                         int mcCount, int comboCount, int dragdropCount) {
+                                         int mcCount, int comboCount, int dragdropCount,
+                                         int termLanguageId, int explanationLanguageId) {
+    const QString termLang = LanguageHelper::displayName(static_cast<LanguageHelper::Language>(termLanguageId));
+    const QString explanationLang =
+        LanguageHelper::displayName(static_cast<LanguageHelper::Language>(explanationLanguageId));
+
     const QJsonObject body{
         {QStringLiteral("theme"), theme.trimmed()},
         {QStringLiteral("gapCount"), gapCount},
         {QStringLiteral("mcCount"), mcCount},
         {QStringLiteral("comboCount"), comboCount},
-        {QStringLiteral("dragdropCount"), dragdropCount}
+        {QStringLiteral("dragdropCount"), dragdropCount},
+        {QStringLiteral("termLanguage"), termLang},
+        {QStringLiteral("explanationLanguage"), explanationLang}
     };
 
     QNetworkRequest req{QUrl(QLatin1String(kRuleFunctionUrl))};

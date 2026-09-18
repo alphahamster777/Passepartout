@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 2.3.0 LANGUAGES CXX)
+project(Passepartout VERSION 2.3.5 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # FREE vs PRO are separate Play Store listings built from this same source
@@ -473,7 +473,7 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "16"
+        QT_ANDROID_VERSION_CODE "17"
         # Human-readable app version
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 
