@@ -1,3 +1,4 @@
+#include <QRegularExpression>
 #include "aiRuleSetShared.h"
 #include "languageHelper.h"
 
@@ -38,14 +39,23 @@ QJsonObject singleBlankItemSchema() {
     };
 }
 
+// Gemini doesn't always write a blank as exactly "___" (e.g. "____" or
+// "______"), which the substring count in parseRuleSet would read as zero or
+// two blanks and silently drop the item — rewrite blank-like runs first.
+QString normalizeBlanks(QString text) {
+    static const QRegularExpression blankRun(QStringLiteral("_{2,}|\\x{2026}+|\\[\\s*\\]|\\(\\s*\\)"));
+    return text.replace(blankRun, QStringLiteral("___"));
+}
+
 // Parses one of the three {text,options,correctIndex} arrays (mc/combo/
 // dragdrop) out of `payload[key]`, keeping only well-formed entries.
 QVariantList parseSingleBlankArray(const QJsonObject& payload, const QString& key) {
     QVariantList result;
     for (const auto& qv : payload[key].toArray()) {
         const auto qo = qv.toObject();
-        const QString text = qo[QStringLiteral("text")].toString().trimmed();
+        QString text = qo[QStringLiteral("text")].toString().trimmed();
         if (text.isEmpty()) continue;
+        text = normalizeBlanks(text);
         QVariantList options;
         for (const auto& ov : qo[QStringLiteral("options")].toArray())
             options.append(ov.toString());
@@ -163,7 +173,7 @@ QVariantMap parseRuleSet(const QJsonObject& payload, const TypeCounts& counts) {
     QVariantList gapQuestions;
     for (const auto& qv : payload[QStringLiteral("gapQuestions")].toArray()) {
         const auto qo = qv.toObject();
-        const QString text = qo[QStringLiteral("text")].toString().trimmed();
+        const QString text = normalizeBlanks(qo[QStringLiteral("text")].toString().trimmed());
         if (text.isEmpty()) continue;
         const int gapCount = text.count(QStringLiteral("___"));
         if (gapCount == 0) continue;
@@ -205,7 +215,13 @@ QVariantMap parseRuleSet(const QJsonObject& payload, const TypeCounts& counts) {
         q[QStringLiteral("type")] = QStringLiteral("combobox");
         q[QStringLiteral("text")] = text;
         q[QStringLiteral("answers")] = QVariantList{options.at(correctIndex)};
-        q[QStringLiteral("optionsPerGap")] = QVariantList{options};
+        // Built explicitly rather than QVariantList{options}: with a
+        // QVariantList argument that brace-init copies `options` itself
+        // (flat list of strings) instead of wrapping it, so the QML side
+        // saw strings where it expects one option-list per blank.
+        QVariantList optionsPerGap;
+        optionsPerGap.append(QVariant::fromValue(options));
+        q[QStringLiteral("optionsPerGap")] = optionsPerGap;
         comboQuestions.append(q);
     }
 

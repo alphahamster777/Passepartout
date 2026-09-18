@@ -775,16 +775,13 @@ Page {
         TextField {
             id: topTextField
             Layout.fillWidth: true
+            Layout.topMargin: 10
             font.pixelSize: 17
             placeholderText: qsTr("Set title…")
-            background: Rectangle {
-                radius: 8
-                color: "white"
-                border.color: page.titleError ? "#e74c3c"
-                            : topTextField.activeFocus ? "#3498db" : "#dce1e7"
-                border.width: (page.titleError || topTextField.activeFocus) ? 2 : 1
-            }
-            leftPadding: 12
+            // Default Material Outlined container, so the floating
+            // placeholder sits in a gap on the border instead of the border
+            // running through it. Same as CreatingRuleSet.qml's title field.
+            Material.accent: page.titleError ? "#e74c3c" : "#3498db"
             onTextChanged: page.titleError = false
         }
 

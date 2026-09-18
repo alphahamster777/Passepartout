@@ -55,7 +55,7 @@ def _redact(text: str) -> str:
 
 FREE_MONTHLY_LIMIT = 2
 PRO_MONTHLY_LIMIT = 30
-MODEL_NAME = "gemini-3.6-flash"  # keep in sync with AiWordSetShared::kModelName
+MODEL_NAME = "gemini-3.8-flash"  # keep in sync with AiWordSetShared::kModelName
 
 # Cost-control caps — this is the authoritative enforcement point (a modified
 # client could otherwise send anything); keep in sync with
@@ -234,36 +234,54 @@ def build_rule_schema() -> dict:
     }
 
 
+_BLANK_RUN = re.compile(r"_{2,}|\u2026{1,}|\[\s*\]|\(\s*\)")
+
+
+def _clean_single_blank_item(q, require_single_blank: bool = False):
+    """Normalizes one {text,options,correctIndex} item (mc/combo/dragdrop) and
+    returns it, or None if the client's AiRuleSetShared::parseSingleBlankArray
+    / parseRuleSet would discard it. Gemini doesn't always write the blank as
+    exactly "___" (e.g. "____" or "______", which the client's plain
+    substring count treats as zero or two blanks), so blank-like runs are
+    rewritten to "___" first; correctIndex is also coerced when it comes
+    back as a numeric string."""
+    if not isinstance(q, dict):
+        return None
+    text = str(q.get("text", "")).strip()
+    if not text:
+        return None
+    if require_single_blank or "___" in text:
+        text = _BLANK_RUN.sub("___", text)
+    if require_single_blank and text.count("___") != 1:
+        return None
+    options = q.get("options")
+    if not isinstance(options, list):
+        return None
+    options = [str(o) for o in options]
+    correct_index = q.get("correctIndex")
+    if isinstance(correct_index, str) and correct_index.strip().lstrip("-").isdigit():
+        correct_index = int(correct_index.strip())
+    if (len(options) < 2 or isinstance(correct_index, bool) or not isinstance(correct_index, int)
+            or not 0 <= correct_index < len(options)):
+        return None
+    return {**q, "text": text, "options": options, "correctIndex": correct_index}
+
+
+def _clean_single_blank_list(questions: list, require_single_blank: bool = False) -> list:
+    return [c for c in (_clean_single_blank_item(q, require_single_blank) for q in questions) if c]
+
+
 def _valid_single_blank_count(questions: list, require_single_blank: bool = False) -> int:
-    """Rough server-side mirror of the client's
-    AiRuleSetShared::parseSingleBlankArray — used for mc/combo/dragdrop,
-    which all share the {text,options,correctIndex} shape. Just enough to
-    judge whether a Gemini response is worth keeping or worth retrying (see
-    _handle_generate_rules), not a full port; the client remains the source
-    of truth for what actually gets parsed and saved.
+    """Server-side mirror of the client's AiRuleSetShared::parseSingleBlankArray
+    — used for mc/combo/dragdrop, which all share the {text,options,
+    correctIndex} shape. Lets _handle_generate_rules judge whether a Gemini
+    response is worth keeping or worth retrying; the client remains the
+    source of truth for what actually gets parsed and saved.
 
     require_single_blank must be True for combo/dragdrop: the client's
     parseRuleSet additionally drops any combobox/dragdrop item whose "text"
-    doesn't contain exactly one "___" (see aiRuleSetShared.cpp) — mc has no
-    such requirement. Without mirroring that check here, this function could
-    count a combo/dragdrop item as valid that the client discards, which
-    inflates that attempt's score against the other retry attempt and can
-    make _handle_generate_rules keep the worse of the two responses."""
-    n = 0
-    for q in questions:
-        if not isinstance(q, dict):
-            continue
-        text = str(q.get("text", "")).strip()
-        if not text:
-            continue
-        if require_single_blank and text.count("___") != 1:
-            continue
-        options = q.get("options")
-        correct_index = q.get("correctIndex")
-        if (isinstance(options, list) and len(options) >= 2
-                and isinstance(correct_index, int) and 0 <= correct_index < len(options)):
-            n += 1
-    return n
+    doesn't contain exactly one "___" — mc has no such requirement."""
+    return len(_clean_single_blank_list(questions, require_single_blank))
 
 
 def _valid_gap_count(gap_questions: list) -> int:
@@ -594,15 +612,25 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
             print(f"Rule-set generation attempt {attempt + 1} came up short "
                   f"(gap {gap_n}/{gap_target}, mc {mc_n}/{mc_target}, "
                   f"combo {combo_n}/{combo_target}, dragdrop {dragdrop_n}/{dragdrop_target})")
+            for key in ("comboQuestions", "dragdropQuestions"):
+                raw = candidate.get(key) or []
+                if raw:
+                    print(f"  raw {key} sample: {_redact(json.dumps(raw[:2], ensure_ascii=False))[:400]}")
     if not attempts:
         return _json_response({"error": "Gemini returned no usable content."}, 502)
 
     theory = next((a.get("theory") for a in attempts if a.get("theory")), []) or []
     gap_questions = _merge_question_lists([a.get("gapQuestions") or [] for a in attempts])
-    mc_questions = _merge_question_lists([a.get("mcQuestions") or [] for a in attempts])
-    combo_questions = _merge_question_lists([a.get("comboQuestions") or [] for a in attempts])
-    dragdrop_questions = _merge_question_lists([a.get("dragdropQuestions") or [] for a in attempts])
-    if not gap_questions and not mc_questions and not combo_questions and not dragdrop_questions:
+    mc_questions = _clean_single_blank_list(
+        _merge_question_lists([a.get("mcQuestions") or [] for a in attempts]))
+    combo_questions = _clean_single_blank_list(
+        _merge_question_lists([a.get("comboQuestions") or [] for a in attempts]), require_single_blank=True)
+    dragdrop_questions = _clean_single_blank_list(
+        _merge_question_lists([a.get("dragdropQuestions") or [] for a in attempts]), require_single_blank=True)
+    print(f"Rule-set generation result: gap {len(gap_questions)}/{gap_target}, mc {len(mc_questions)}/{mc_target}, "
+          f"combo {len(combo_questions)}/{combo_target}, dragdrop {len(dragdrop_questions)}/{dragdrop_target}")
+    if (not theory and not gap_questions and not mc_questions
+            and not combo_questions and not dragdrop_questions):
         return _json_response({"error": "Gemini returned no questions"}, 502)
 
     return _json_response(

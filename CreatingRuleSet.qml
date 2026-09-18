@@ -74,9 +74,18 @@ Page {
             ruleSetModel.clear()
             var questions = ruleSet.questions || []
             for (var i = 0; i < questions.length; ++i) {
-                var row = page.ruleSetRowFromQuestion(questions[i])
-                row.id = page.nextQuestionId++
-                ruleSetModel.append(row)
+                // A throw here would otherwise abort this whole handler
+                // silently — theory loaded, no questions, popup left open
+                // with no message. Skip the offending question instead and
+                // surface why.
+                try {
+                    var row = page.ruleSetRowFromQuestion(questions[i])
+                    row.id = page.nextQuestionId++
+                    ruleSetModel.append(row)
+                } catch (e) {
+                    console.warn("Rule set question", i, "(", questions[i].type, ") failed:", e)
+                    page.aiError = qsTr("Could not load a %1 question: %2").arg(questions[i].type).arg(String(e))
+                }
             }
             page.selectedCardIndex = ruleSetModel.count > 0 ? ruleSetModel.count - 1 : 0
             // A narrow/repetitive topic can make Gemini (or the server's own
@@ -88,7 +97,9 @@ Page {
             // might not otherwise notice, so the popup stays open with a
             // warning instead — same as a hard failure.
             var requested = ruleSet.requestedCount || 0
-            if (requested > 0 && questions.length < requested) {
+            if (page.aiError !== "") {
+                // A per-question failure above already explained itself.
+            } else if (requested > 0 && questions.length < requested) {
                 page.aiError = qsTr("Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.")
                     .arg(questions.length).arg(requested)
             } else {
@@ -1060,33 +1071,14 @@ Page {
         TextField {
             id: topTextField
             Layout.fillWidth: true
-            Layout.topMargin: 6
+            Layout.topMargin: 10
             font.pixelSize: 17
             placeholderText: qsTr("Set title…")
-            // Material's Outlined TextField (the default container style)
-            // floats its placeholder half-above/half-below the field's top
-            // edge once focused or filled, which needs clip: true plus a
-            // reserved topInset to avoid it being cut off — but Material's
-            // placeholder always centers its *resting* position against the
-            // control's full height (topInset included) rather than against
-            // the visible background box, so with a custom background like
-            // ours (which only fills the box below that inset) the resting
-            // placeholder ends up visibly off-center, sitting above middle.
-            // Filled instead keeps the floating placeholder inside the box
-            // (just above the text, not straddling the top edge), so it
-            // needs no topInset/clip at all — sidestepping the mismatch
-            // entirely. It only affects this padding/placeholder math since
-            // our own "background" below replaces Filled's built-in look.
-            Material.containerStyle: Material.Filled
-            clip: false
-            background: Rectangle {
-                radius: 8
-                color: "white"
-                border.color: page.titleError ? "#e74c3c"
-                            : topTextField.activeFocus ? "#3498db" : "#dce1e7"
-                border.width: (page.titleError || topTextField.activeFocus) ? 2 : 1
-            }
-            leftPadding: 12
+            // Default Material Outlined container (same as the question
+            // fields below), so the placeholder floats onto the border
+            // instead of sitting inside the box. The accent doubles as the
+            // error color — the message label underneath spells it out.
+            Material.accent: page.titleError ? "#e74c3c" : "#3498db"
             onTextChanged: page.titleError = false
         }
 

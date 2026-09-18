@@ -24,7 +24,7 @@ namespace AiRuleSetShared {
 // Same model as AiWordSetShared::kModelName — kept as its own constant
 // (rather than reused) so the two features can move to different models
 // independently later without one accidentally dragging the other along.
-inline constexpr auto kModelName = "gemini-3.6-flash";
+inline constexpr auto kModelName = "gemini-3.8-flash";
 
 // Cost-control caps — both are enforced authoritatively server-side in
 // functions/main.py (MAX_THEME_LENGTH / MAX_QUESTION_COUNT there); mirrored

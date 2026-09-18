@@ -16,7 +16,7 @@ namespace AiWordSetShared {
 // Single source of truth for which Gemini model both backends ask for.
 // Change here if Google renames or retires it. Keep in sync with
 // functions/main.py's MODEL_NAME.
-inline constexpr auto kModelName = "gemini-3.6-flash";
+inline constexpr auto kModelName = "gemini-3.8-flash";
 
 // Cost-control caps — both are enforced authoritatively server-side in
 // functions/main.py (MAX_THEME_LENGTH / MAX_WORD_COUNT there); mirrored here
