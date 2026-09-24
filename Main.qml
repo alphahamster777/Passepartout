@@ -409,6 +409,19 @@ ApplicationWindow {
                     // Push SetPreview without popping the SetDirMenu so that
                     // back-from-test can return to the correct directory.
                     setPreviewController.initialize(AppController.recSetManager, num)
+                    // Reset the shared "active controller" slot away from
+                    // whatever it was last left on (e.g. ruleTestController,
+                    // if a rule set was tested last) before its Choose Test
+                    // Type popup reads getUnfinishedCount() off it for every
+                    // row — ruleTestController doesn't have that method at
+                    // all (doesn't inherit BaseTestController), so each row
+                    // silently evaluated "undefined > 0" as false and showed
+                    // "✓" regardless of actual progress. Any BaseTestController
+                    // subclass works identically here since getUnfinishedCount
+                    // branches on the testType argument, not on which
+                    // instance calls it — onNavigateToTest below repoints
+                    // this to the right one once a row is actually picked.
+                    rootScope.spellingTestController = regularTestController
                     stackView.push(setPreviewMenu)
                 }
                 function onAddRecSet() {
