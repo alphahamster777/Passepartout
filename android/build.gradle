@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        //noinspection AndroidGradlePluginVersion
+        classpath 'com.android.tools.build:gradle:9.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0"
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+apply plugin: qtGradlePluginType
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    //noinspection GradleDependency
+    implementation 'androidx.core:core:1.17.0'
+}
+
+android {
+    /*******************************************************
+     * The following variables:
+     * - androidBuildToolsVersion,
+     * - androidCompileSdkVersion
+     * - qtAndroidDir - holds the path to qt android files
+     *                   needed to build any Qt application
+     *                   on Android.
+     * - qtGradlePluginType - whether to build an app or a library
+     *
+     * are defined in gradle.properties file. This file is
+     * updated by QtCreator and androiddeployqt tools.
+     * Changing them manually might break the compilation!
+     *******************************************************/
+
+    namespace = androidPackageName
+    compileSdkVersion androidCompileSdkVersion
+    buildToolsVersion androidBuildToolsVersion
+    ndkVersion = androidNdkVersion
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = [qtAndroidDir + '/src', 'src', 'java']
+            kotlin.srcDirs = [qtAndroidDir + '/src', 'src', 'kotlin']
+            aidl.srcDirs = [qtAndroidDir + '/src', 'src', 'aidl']
+            res.srcDirs = [qtAndroidDir + '/res', 'res']
+            resources.srcDirs = ['resources']
+            renderscript.srcDirs = ['src']
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs']
+       }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.incremental = true
+        options.compilerArgs += ['-Xlint:all']
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lintOptions {
+        abortOnError = false
+    }
+
+    aaptOptions {
+        // Do not compress Qt binary resources file
+        noCompress 'rcc'
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = legacyPackaging
+        }
+    }
+
+    defaultConfig {
+        resConfig "en"
+        minSdkVersion qtMinSdkVersion
+        targetSdkVersion qtTargetSdkVersion
+        ndk.abiFilters = qtTargetAbiList.split(",")
+    }
+
+    // Added on top of Qt's default template (see its own comment above) to
+    // turn on R8 for release builds — Play Console's App Bundle Explorer
+    // otherwise flags this app for "Low" DEX optimization, near-zero
+    // obfuscation and no R8 metadata at all. proguard-rules.pro keeps
+    // exactly what a Qt app needs surviving shrinking (this app's own
+    // Activity, referenced by name from AndroidManifest.xml; Qt's own JNI
+    // bridge classes; anything with a native method) — see that file's own
+    // comments for why each rule exists.
+    //
+    // shrinkResources is deliberately left off (it's a separate mechanism
+    // from R8/minifyEnabled above — Android's own resource shrinker, driven
+    // by a tools:keep resource file rather than proguard-rules.pro). It was
+    // tried and reverted: Qt's own Java bootstrap (QtLoader/QtNative) looks
+    // up several of its own resources by name via Resources.getIdentifier()
+    // at startup rather than a static R.id.xxx reference, which the
+    // resource shrinker can't see — so it stripped something Qt's loader
+    // needs and the app died on launch ("Invalid resource ID 0x00000000"
+    // followed by System.exit(-1), no exception/stack trace). It wasn't one
+    // of the things Play Console actually flagged (that was all DEX/R8),
+    // so it's not worth chasing down the right tools:keep rules for the
+    // size savings alone.
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
