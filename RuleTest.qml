@@ -250,15 +250,14 @@ Page {
             height: 40
             Label {
                 Layout.fillWidth: true
-                text: qsTr("Rule")
+                // The set's own theme/title rather than the generic "Rule" —
+                // falls back to that only if the name somehow comes back
+                // empty (e.g. mid-load).
+                text: ruleTestController.ruleSetName || qsTr("Rule")
                 font.pixelSize: 18
                 font.bold: true
                 color: "white"
-            }
-            Label {
-                text: ruleTestController.correctAnswers + "/" + ruleTestController.totalQuestions
-                font.pixelSize: 13
-                color: "#3498db"
+                elide: Text.ElideRight
             }
         }
     }
@@ -429,6 +428,16 @@ Page {
         anchors.fill: parent
         anchors.margins: 16
         spacing: 12
+
+        // Centered right under the header — moved here from under the
+        // progress bar per request.
+        Label {
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+            text: qsTr("Question number %1").arg(ruleTestController.currentPosition)
+            font.pixelSize: 20
+            color: "#7f8c8d"
+        }
 
         // Reveal link — invisible until the learner has made a mistake.
         Button {

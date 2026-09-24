@@ -41,6 +41,15 @@ class RuleTestController : public QObject {
     // controller.
     Q_PROPERTY(QVariantMap theory READ theory NOTIFY theoryChanged)
     Q_PROPERTY(bool theoryUnlocked READ theoryUnlocked NOTIFY theoryUnlockedChanged)
+    // The rule set's own name — RuleTest.qml's header shows this instead of
+    // a generic "Rule" title.
+    Q_PROPERTY(QString ruleSetName READ ruleSetName NOTIFY ruleSetNameChanged)
+    // 1-based "question N of totalQuestions" position — see
+    // BaseTestController::currentPosition's comment for why that one
+    // defaults to 0 for Leitner; rule tests are always a fixed linear queue
+    // (see this class's header comment), so this is unconditionally
+    // meaningful here.
+    Q_PROPERTY(int currentPosition READ currentPosition NOTIFY currentPositionChanged)
 
 public:
     // A value distinct from every BaseTestController::TestType (0-6) so
@@ -77,6 +86,8 @@ public:
     QVariantList lastGapResults() const { return m_lastGapResults; }
     QVariantMap theory() const { return m_theory; }
     bool theoryUnlocked() const { return m_theoryUnlocked; }
+    QString ruleSetName() const { return m_ruleSetName; }
+    int currentPosition() const { return m_queuePos + 1; }
 
 signals:
     void totalQuestionsChanged();
@@ -87,6 +98,8 @@ signals:
     void testCompleteChanged();
     void theoryChanged();
     void theoryUnlockedChanged();
+    void ruleSetNameChanged();
+    void currentPositionChanged();
 
 private:
     RuleSetManager* m_ruleSetManager = nullptr;
@@ -112,6 +125,7 @@ private:
     QVariantList m_lastGapResults;
     QVariantMap m_theory;
     bool m_theoryUnlocked = false;
+    QString m_ruleSetName;
 
     void buildQuestionQueue(int questionCount);
     void showQuestion(int position);

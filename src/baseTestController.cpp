@@ -98,6 +98,7 @@ void BaseTestController::showWord(int wordIdx) {
     emit lastAnswerCorrectChanged();
     emit selectedOptionChanged();
     emit optionsChanged();
+    emit currentPositionChanged();
 
     if (m_testType == TypeC_MCFromHint)
         buildMCOptions(wordIdx, true);

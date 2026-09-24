@@ -19,6 +19,7 @@ public:
     void nextQuestion() override;
     bool isTestComplete() const override;
     void saveProgress() override;
+    int  currentPosition() const override { return m_queuePos + 1; }
 
 private:
     QVector<int> m_wordQueue;

@@ -255,6 +255,7 @@ void RuleTestController::showQuestion(int position) {
     emit currentQuestionChanged();
     emit isAnsweredChanged();
     emit lastAnswerCorrectChanged();
+    emit currentPositionChanged();
 }
 
 void RuleTestController::initialize(QObject* manager, int idx) {
@@ -265,6 +266,8 @@ void RuleTestController::initialize(QObject* manager, int idx) {
     const QVariantMap info = m_ruleSetManager->getRuleSetInfoQML(idx);
     m_theory = info.value("theory").toMap();
     emit theoryChanged();
+    m_ruleSetName = info.value("name").toString();
+    emit ruleSetNameChanged();
 
     loadProgress(info.value("questionCount").toInt());
 

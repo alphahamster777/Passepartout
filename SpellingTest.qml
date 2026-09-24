@@ -77,10 +77,8 @@ Page {
 
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.max(wordLabel.implicitHeight, questionCountLabel.implicitHeight)
+                Layout.preferredHeight: wordLabel.implicitHeight
 
-                // Centered across the whole header bar, not just the space left
-                // over next to the counter.
                 Label {
                     id: wordLabel
                     anchors.fill: parent
@@ -101,14 +99,6 @@ Page {
                     maximumLineCount: 2
                 }
 
-                Label {
-                    id: questionCountLabel
-                    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                    text: spellingTestController.correctAnswers + "/" +
-                          spellingTestController.totalQuestions
-                    font.pixelSize: 13
-                    color: "#3498db"
-                }
             }
 
             // Leitner phase indicator
@@ -128,6 +118,18 @@ Page {
         anchors.fill: parent
         anchors.margins: 16
         spacing: 12
+
+        // Centered right under the header — moved here from under the
+        // progress bar per request. Hidden for Leitner (see
+        // currentPosition's doc comment in baseTestController.h).
+        Label {
+            Layout.fillWidth: true
+            visible: !isLeitner
+            horizontalAlignment: Text.AlignHCenter
+            text: qsTr("Question number %1").arg(spellingTestController.currentPosition)
+            font.pixelSize: 20
+            color: "#7f8c8d"
+        }
 
         // Image
         Rectangle {

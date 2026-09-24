@@ -89,7 +89,7 @@ UNLIMITED_UIDS: set[str] = {
 # like UNLIMITED_UIDS above. Sign-in is now mandatory Google sign-in (see
 # firebaseAiHelper.h), so a verified ID token always carries an "email" claim.
 PRO_EMAILS: set[str] = {
-    "some@gmail",
+    "some@gmail",  
 }
 
 

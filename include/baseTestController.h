@@ -61,6 +61,14 @@ public:
     Q_PROPERTY(bool leitnerMCPhase    READ leitnerMCPhase    NOTIFY leitnerProgressChanged)
     Q_PROPERTY(bool testComplete      READ isTestComplete    NOTIFY testCompleteChanged)
     Q_PROPERTY(int  progressVersion   READ progressVersion   NOTIFY progressVersionChanged)
+    // 1-based "question N of totalQuestions" position in a fixed, linear
+    // queue — meaningful for SpellingTestController (which overrides this;
+    // see its m_queuePos), meaningless for Leitner's adaptive spaced-
+    // repetition ordering (no fixed "question N of M" to show), so this
+    // default of 0 is what LeitnerTestController is left with rather than
+    // overriding it itself. SpellingTest.qml hides the UI that reads this
+    // for Leitner test types instead of relying on the value itself.
+    Q_PROPERTY(int  currentPosition   READ currentPosition   NOTIFY currentPositionChanged)
 
     explicit BaseTestController(QObject* parent = nullptr);
     ~BaseTestController() override = default;
@@ -97,6 +105,7 @@ public:
     virtual int  leitnerSet2Count() const { return 0; }
     virtual bool leitnerMCPhase()   const { return false; }
     int          progressVersion()  const { return m_progressVersion; }
+    virtual int  currentPosition()  const { return 0; }
 
 signals:
     void testTypeChanged();
@@ -114,6 +123,7 @@ signals:
     void leitnerProgressChanged();
     void testCompleteChanged();
     void progressVersionChanged();
+    void currentPositionChanged();
 
 protected:
     RecSetManager*    m_recSetManager = nullptr;
