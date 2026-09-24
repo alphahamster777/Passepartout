@@ -1376,16 +1376,6 @@ Tap + Create to add a word set or library.</source>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Оқу ▸ Set1: %1 қалды</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Тестілеу ▸ Set2: меңгеруге %1 қалды</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Кеңесті / аударманы теріңіз…</translation>

@@ -1376,16 +1376,6 @@ Tap + Create to add a word set or library.</source>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>학습 ▸ Set1: %1개 남음</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>테스트 ▸ Set2: %1개 습득 필요</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>힌트 / 번역 입력…</translation>

@@ -1376,16 +1376,6 @@ Toque em + Criar para adicionar um conjunto de palavras ou biblioteca.</translat
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>A aprender ▸ Set1: %1 restante(s)</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>A testar ▸ Set2: %1 a dominar</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Digite a dica / tradução…</translation>

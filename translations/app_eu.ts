@@ -1376,16 +1376,6 @@ Ukitu + Sortu hitz-sorta edo liburutegi bat gehitzeko.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Ikasten ▸ Set1: %1 geratzen dira</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Probatzen ▸ Set2: %1 menderatzeke</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Idatzi pista / itzulpena…</translation>

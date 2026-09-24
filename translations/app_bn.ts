@@ -1376,16 +1376,6 @@ Tap + Create to add a word set or library.</source>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>শেখা ▸ Set1: %1 বাকি</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>পরীক্ষা ▸ Set2: দক্ষতার জন্য %1 বাকি</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>ইঙ্গিত / অনুবাদ টাইপ করুন…</translation>

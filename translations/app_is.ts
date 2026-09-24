@@ -1376,16 +1376,6 @@ Tap + Create to add a word set or library.</source>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Að læra ▸ Sett1: %1 eftir</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Prófa ▸ Sett2: %1 til að ná tökum á</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Sláðu inn vísbendingu / þýðingu…</translation>

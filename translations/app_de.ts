@@ -1376,16 +1376,6 @@ Tippe auf + Erstellen, um ein Wortset oder eine Bibliothek hinzuzufügen.</trans
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Lernen ▸ Set1: %1 verbleibend</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testen ▸ Set2: %1 zu meistern</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Hinweis / Übersetzung eingeben…</translation>

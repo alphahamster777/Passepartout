@@ -1376,16 +1376,6 @@ Napauta + Luo lisätäksesi sanaston tai kirjaston.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Oppiminen ▸ Set1: jäljellä %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testaus ▸ Set2: hallittavana vielä %1</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Kirjoita vihje / käännös…</translation>

@@ -1376,16 +1376,6 @@ Chạm + Tạo để thêm bộ từ hoặc thư viện.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Học ▸ Set1: còn lại %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Kiểm tra ▸ Set2: còn %1 cần thành thạo</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Nhập gợi ý / bản dịch…</translation>

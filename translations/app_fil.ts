@@ -1376,16 +1376,6 @@ Pindutin ang + Gumawa upang magdagdag ng set ng salita o aklatan.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Pagkatuto ▸ Set1: %1 natitira</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Pagsusulit ▸ Set2: %1 pa upang makabisado</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>I-type ang pahiwatig / salin…</translation>

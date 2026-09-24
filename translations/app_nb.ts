@@ -1376,16 +1376,6 @@ Trykk på + Opprett for å legge til et ordsett eller bibliotek.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Lærer ▸ Sett1: %1 igjen</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Tester ▸ Sett2: %1 å mestre</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Skriv hintet / oversettelsen…</translation>

@@ -1376,16 +1376,6 @@ Puuduta + Loo, et lisada sõnakomplekt või teek.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Õppimine ▸ Set1: jäänud %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testimine ▸ Set2: veel %1 omandada</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Trüki vihje / tõlge…</translation>

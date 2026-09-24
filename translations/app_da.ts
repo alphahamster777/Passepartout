@@ -1376,16 +1376,6 @@ Tryk på + Opret for at tilføje et ordsæt eller bibliotek.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Lærer ▸ Sæt1: %1 tilbage</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Tester ▸ Sæt2: %1 at mestre</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Indtast hint / oversættelse…</translation>

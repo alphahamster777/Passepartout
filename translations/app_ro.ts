@@ -1376,16 +1376,6 @@ Atinge + Creează pentru a adăuga un set de cuvinte sau o bibliotecă.</transla
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Învățare ▸ Set1: %1 rămase</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testare ▸ Set2: %1 de stăpânit</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Tastează indiciul / traducerea…</translation>

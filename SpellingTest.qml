@@ -98,17 +98,6 @@ Page {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                 }
-
-            }
-
-            // Leitner phase indicator
-            Label {
-                visible: isLeitner
-                text: spellingTestController.leitnerMCPhase
-                    ? qsTr("Learning ▸ Set1: %1 remaining").arg(spellingTestController.leitnerSet1Count)
-                    : qsTr("Testing ▸ Set2: %1 to master").arg(spellingTestController.leitnerSet2Count)
-                font.pixelSize: 11
-                color: spellingTestController.leitnerMCPhase ? "#f39c12" : "#2ecc71"
             }
         }
     }

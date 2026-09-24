@@ -1376,16 +1376,6 @@ Söz dəsti və ya kitabxana əlavə etmək üçün + Yarat düyməsinə toxunun
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Öyrənmə ▸ Set1: %1 qalıb</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Test ▸ Set2: ustalaşmaq üçün %1 qalıb</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>İpucunu / tərcüməni yazın…</translation>

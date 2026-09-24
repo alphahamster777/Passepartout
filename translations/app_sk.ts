@@ -1376,16 +1376,6 @@ Klepnite na + Vytvoriť pre pridanie sady slov alebo knižnice.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Učenie ▸ Set1: zostáva %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testovanie ▸ Set2: %1 na zvládnutie</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Napíšte pomôcku / preklad…</translation>

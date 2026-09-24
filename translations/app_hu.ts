@@ -1376,16 +1376,6 @@ Koppints a + Létrehozás gombra szókészlet vagy könyvtár hozzáadásához.<
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Tanulás ▸ Set1: %1 hátravan</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Tesztelés ▸ Set2: %1 elsajátítandó</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Írd be a segítséget / fordítást…</translation>

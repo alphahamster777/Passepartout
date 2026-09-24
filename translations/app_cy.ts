@@ -1376,16 +1376,6 @@ Tapiwch + Creu i ychwanegu set eiriau neu lyfrgell.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Dysgu ▸ Set1: %1 yn weddill</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Profi ▸ Set2: %1 i'w meistroli</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Teipiwch yr awgrym / cyfieithiad…</translation>

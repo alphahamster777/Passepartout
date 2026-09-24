@@ -1376,16 +1376,6 @@ Dotaknite se + Ustvari, da dodate nabor besed ali knjižnico.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Učenje ▸ Set1: preostalo %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testiranje ▸ Set2: %1 za obvladati</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Vtipkaj namig / prevod…</translation>

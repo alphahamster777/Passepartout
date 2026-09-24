@@ -1376,16 +1376,6 @@ Pieskarieties + Izveidot, lai pievienotu vārdu kopu vai bibliotēku.</translati
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Mācīšanās ▸ Set1: atlicis %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Testēšana ▸ Set2: jāapgūst vēl %1</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Ierakstiet norādi / tulkojumu…</translation>

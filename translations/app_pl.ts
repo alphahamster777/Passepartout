@@ -1376,16 +1376,6 @@ Dotknij + Utwórz, aby dodać zestaw słów lub bibliotekę.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Nauka ▸ Set1: pozostało %1</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Test ▸ Set2: %1 do opanowania</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Wpisz podpowiedź / tłumaczenie…</translation>

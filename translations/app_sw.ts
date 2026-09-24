@@ -1376,16 +1376,6 @@ Gusa + Unda ili kuongeza seti ya maneno au maktaba.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Kujifunza ▸ Set1: %1 imebaki</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Kujaribu ▸ Set2: %1 zimebaki kubobea</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Andika dokezo / tafsiri…</translation>

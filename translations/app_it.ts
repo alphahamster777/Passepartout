@@ -1376,16 +1376,6 @@ Tocca + Crea per aggiungere un set di parole o una libreria.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Apprendimento ▸ Set1: %1 rimanenti</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Test ▸ Set2: %1 da padroneggiare</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Digita il suggerimento / la traduzione…</translation>

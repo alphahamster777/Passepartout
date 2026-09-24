@@ -1376,16 +1376,6 @@ Kelime seti veya kütüphane eklemek için + Oluştur'a dokunun.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Öğrenme ▸ Set1: %1 kaldı</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Test ▸ Set2: ustalaşmak için %1 kaldı</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>İpucunu / çeviriyi yazın…</translation>

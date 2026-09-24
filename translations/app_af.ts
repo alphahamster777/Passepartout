@@ -1376,16 +1376,6 @@ Tik + Skep om 'n woordstel of biblioteek by te voeg.</translation>
 <context>
     <name>SpellingTest</name>
     <message>
-        <location filename="../SpellingTest.qml" line="118"/>
-        <source>Learning ▸ Set1: %1 remaining</source>
-        <translation>Leer ▸ Stel1: %1 oor</translation>
-    </message>
-    <message>
-        <location filename="../SpellingTest.qml" line="119"/>
-        <source>Testing ▸ Set2: %1 to master</source>
-        <translation>Toets ▸ Stel2: %1 om te bemeester</translation>
-    </message>
-    <message>
         <location filename="../SpellingTest.qml" line="180"/>
         <source>Type the hint / translation…</source>
         <translation>Tik die wenk / vertaling…</translation>
