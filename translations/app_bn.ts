@@ -710,6 +710,36 @@
         <source>💡 Explain grammar</source>
         <translation>💡 ব্যাকরণ ব্যাখ্যা করুন</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="93"/>
+        <source>Could not load a %1 question: %2</source>
+        <translation>%1 প্রশ্ন লোড করা যায়নি: %2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="109"/>
+        <source>Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.</source>
+        <translation>অনুরোধ করা %2 টির মধ্যে মাত্র %1 টি প্রশ্ন তৈরি হয়েছে — একটি বিস্তৃত বিষয় চেষ্টা করুন, অথবা উপরের সংখ্যা কমান।</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Grammar Term Language</source>
+        <translation>ব্যাকরণ পরিভাষার ভাষা</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Explanation Language</source>
+        <translation>ব্যাখ্যার ভাষা</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="933"/>
+        <source>Term language</source>
+        <translation>পরিভাষার ভাষা</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="967"/>
+        <source>Explanation language</source>
+        <translation>ব্যাখ্যার ভাষা</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>
@@ -922,6 +952,21 @@
         <source>Start Test</source>
         <translation>পরীক্ষা শুরু করুন</translation>
     </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Test is completed</source>
+        <translation>পরীক্ষা সম্পন্ন হয়েছে</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="116"/>
+        <source>Next question: #%1</source>
+        <translation>পরবর্তী প্রশ্ন: #%1</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="122"/>
+        <source>Correct: %1 / %2</source>
+        <translation>সঠিক: %1 / %2</translation>
+    </message>
 </context>
 <context>
     <name>RuleTest</name>
@@ -1006,6 +1051,11 @@
         <location filename="../RuleTest.qml" line="1171"/>
         <source>Next →</source>
         <translation>পরবর্তী →</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="437"/>
+        <source>Question number %1</source>
+        <translation>প্রশ্ন নম্বর %1</translation>
     </message>
 </context>
 <context>
@@ -1380,6 +1430,11 @@ Tap + Create to add a word set or library.</source>
         <location filename="../SpellingTest.qml" line="394"/>
         <source>Next →</source>
         <translation>পরবর্তী →</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="129"/>
+        <source>Question number %1</source>
+        <translation>প্রশ্ন নম্বর %1</translation>
     </message>
 </context>
 </TS>

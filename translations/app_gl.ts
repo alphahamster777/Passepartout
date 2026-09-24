@@ -710,6 +710,36 @@
         <source>💡 Explain grammar</source>
         <translation>💡 Explicar a gramática</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="93"/>
+        <source>Could not load a %1 question: %2</source>
+        <translation>Non se puido cargar a pregunta %1: %2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="109"/>
+        <source>Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.</source>
+        <translation>Só se xeraron %1 de %2 preguntas solicitadas — proba un tema máis amplo ou reduce os números de arriba.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Grammar Term Language</source>
+        <translation>Idioma do termo gramatical</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Explanation Language</source>
+        <translation>Idioma da explicación</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="933"/>
+        <source>Term language</source>
+        <translation>Idioma do termo</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="967"/>
+        <source>Explanation language</source>
+        <translation>Idioma da explicación</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>
@@ -922,6 +952,21 @@
         <source>Start Test</source>
         <translation>Iniciar proba</translation>
     </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Test is completed</source>
+        <translation>A proba está completada</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="116"/>
+        <source>Next question: #%1</source>
+        <translation>Seguinte pregunta: #%1</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="122"/>
+        <source>Correct: %1 / %2</source>
+        <translation>Correcto: %1 / %2</translation>
+    </message>
 </context>
 <context>
     <name>RuleTest</name>
@@ -1006,6 +1051,11 @@
         <location filename="../RuleTest.qml" line="1171"/>
         <source>Next →</source>
         <translation>Seguinte →</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="437"/>
+        <source>Question number %1</source>
+        <translation>Pregunta número %1</translation>
     </message>
 </context>
 <context>
@@ -1380,6 +1430,11 @@ Toca + Crear para engadir un conxunto de palabras ou biblioteca.</translation>
         <location filename="../SpellingTest.qml" line="394"/>
         <source>Next →</source>
         <translation>Seguinte →</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="129"/>
+        <source>Question number %1</source>
+        <translation>Pregunta número %1</translation>
     </message>
 </context>
 </TS>

@@ -710,6 +710,36 @@
         <source>💡 Explain grammar</source>
         <translation>💡 Обясни граматиката</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="93"/>
+        <source>Could not load a %1 question: %2</source>
+        <translation>Въпрос %1 не можа да се зареди: %2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="109"/>
+        <source>Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.</source>
+        <translation>Генерирани са само %1 от %2 заявени въпроса — опитайте по-широка тема или намалете броя по-горе.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Grammar Term Language</source>
+        <translation>Език на граматичния термин</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Explanation Language</source>
+        <translation>Език на обяснението</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="933"/>
+        <source>Term language</source>
+        <translation>Език на термина</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="967"/>
+        <source>Explanation language</source>
+        <translation>Език на обяснението</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>
@@ -922,6 +952,21 @@
         <source>Start Test</source>
         <translation>Старт на теста</translation>
     </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Test is completed</source>
+        <translation>Тестът е завършен</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="116"/>
+        <source>Next question: #%1</source>
+        <translation>Следващ въпрос: #%1</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="122"/>
+        <source>Correct: %1 / %2</source>
+        <translation>Правилно: %1 / %2</translation>
+    </message>
 </context>
 <context>
     <name>RuleTest</name>
@@ -1006,6 +1051,11 @@
         <location filename="../RuleTest.qml" line="1171"/>
         <source>Next →</source>
         <translation>Напред →</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="437"/>
+        <source>Question number %1</source>
+        <translation>Номер на въпроса %1</translation>
     </message>
 </context>
 <context>
@@ -1380,6 +1430,11 @@ Tap + Create to add a word set or library.</source>
         <location filename="../SpellingTest.qml" line="394"/>
         <source>Next →</source>
         <translation>Напред →</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="129"/>
+        <source>Question number %1</source>
+        <translation>Номер на въпроса %1</translation>
     </message>
 </context>
 </TS>

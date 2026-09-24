@@ -710,6 +710,36 @@
         <source>💡 Explain grammar</source>
         <translation>💡 व्याकरण स्पष्ट करा</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="93"/>
+        <source>Could not load a %1 question: %2</source>
+        <translation>%1 प्रश्न लोड करता आला नाही: %2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="109"/>
+        <source>Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.</source>
+        <translation>विनंती केलेल्या %2 पैकी फक्त %1 प्रश्न तयार झाले — विस्तृत विषय वापरून पहा, किंवा वरील संख्या कमी करा.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Grammar Term Language</source>
+        <translation>व्याकरण संज्ञेची भाषा</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Explanation Language</source>
+        <translation>स्पष्टीकरणाची भाषा</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="933"/>
+        <source>Term language</source>
+        <translation>संज्ञेची भाषा</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="967"/>
+        <source>Explanation language</source>
+        <translation>स्पष्टीकरणाची भाषा</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>
@@ -922,6 +952,21 @@
         <source>Start Test</source>
         <translation>चाचणी सुरू करा</translation>
     </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Test is completed</source>
+        <translation>चाचणी पूर्ण झाली आहे</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="116"/>
+        <source>Next question: #%1</source>
+        <translation>पुढील प्रश्न: #%1</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="122"/>
+        <source>Correct: %1 / %2</source>
+        <translation>बरोबर: %1 / %2</translation>
+    </message>
 </context>
 <context>
     <name>RuleTest</name>
@@ -1006,6 +1051,11 @@
         <location filename="../RuleTest.qml" line="1171"/>
         <source>Next →</source>
         <translation>पुढे →</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="437"/>
+        <source>Question number %1</source>
+        <translation>प्रश्न क्रमांक %1</translation>
     </message>
 </context>
 <context>
@@ -1380,6 +1430,11 @@ Tap + Create to add a word set or library.</source>
         <location filename="../SpellingTest.qml" line="394"/>
         <source>Next →</source>
         <translation>पुढे →</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="129"/>
+        <source>Question number %1</source>
+        <translation>प्रश्न क्रमांक %1</translation>
     </message>
 </context>
 </TS>

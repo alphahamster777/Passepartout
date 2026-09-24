@@ -710,6 +710,36 @@
         <source>💡 Explain grammar</source>
         <translation>💡 Jelaskan tata bahasa</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="93"/>
+        <source>Could not load a %1 question: %2</source>
+        <translation>Tidak dapat memuat pertanyaan %1: %2</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="109"/>
+        <source>Generated only %1 of %2 requested questions — try a broader topic, or lower the counts above.</source>
+        <translation>Hanya %1 dari %2 pertanyaan yang diminta yang dibuat — coba topik yang lebih luas, atau kurangi jumlah di atas.</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Grammar Term Language</source>
+        <translation>Bahasa istilah tata bahasa</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="646"/>
+        <source>Explanation Language</source>
+        <translation>Bahasa penjelasan</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="933"/>
+        <source>Term language</source>
+        <translation>Bahasa istilah</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="967"/>
+        <source>Explanation language</source>
+        <translation>Bahasa penjelasan</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>
@@ -922,6 +952,21 @@
         <source>Start Test</source>
         <translation>Mulai Tes</translation>
     </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="115"/>
+        <source>Test is completed</source>
+        <translation>Tes telah selesai</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="116"/>
+        <source>Next question: #%1</source>
+        <translation>Pertanyaan berikutnya: #%1</translation>
+    </message>
+    <message>
+        <location filename="../RuleSetPreview.qml" line="122"/>
+        <source>Correct: %1 / %2</source>
+        <translation>Benar: %1 / %2</translation>
+    </message>
 </context>
 <context>
     <name>RuleTest</name>
@@ -1006,6 +1051,11 @@
         <location filename="../RuleTest.qml" line="1171"/>
         <source>Next →</source>
         <translation>Berikutnya →</translation>
+    </message>
+    <message>
+        <location filename="../RuleTest.qml" line="437"/>
+        <source>Question number %1</source>
+        <translation>Nomor pertanyaan %1</translation>
     </message>
 </context>
 <context>
@@ -1380,6 +1430,11 @@ Ketuk + Buat untuk menambahkan set kata atau pustaka.</translation>
         <location filename="../SpellingTest.qml" line="394"/>
         <source>Next →</source>
         <translation>Berikutnya →</translation>
+    </message>
+    <message>
+        <location filename="../SpellingTest.qml" line="129"/>
+        <source>Question number %1</source>
+        <translation>Nomor pertanyaan %1</translation>
     </message>
 </context>
 </TS>

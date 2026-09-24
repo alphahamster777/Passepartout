@@ -110,19 +110,18 @@ Page {
                             // "Next question" while there's still one to
                             // answer, rather than a static total — more
                             // useful when picking this set back up mid-test.
-                            // Falls back to the total once it's done, when
-                            // there's no "next" to point at.
+                            // Once it's done, there's no "next" to point at.
                             text: ruleTestController.testComplete
-                                ? qsTr("%1 questions").arg(page.questionCount)
+                                ? qsTr("Test is completed")
                                 : qsTr("Next question: #%1").arg(ruleTestController.currentPosition)
                             font.pixelSize: 13
                             color: "#7f8c8d"
                         }
                         Label {
                             visible: ruleTestController.totalQuestions > 0
-                            text: ruleTestController.testComplete
-                                ? qsTr("Completed: %1 / %2").arg(ruleTestController.correctAnswers).arg(ruleTestController.totalQuestions)
-                                : qsTr("In progress: %1 / %2").arg(ruleTestController.correctAnswers).arg(ruleTestController.totalQuestions)
+                            text: qsTr("Correct: %1 / %2")
+                                .arg(ruleTestController.correctAnswers)
+                                .arg(ruleTestController.totalQuestions)
                             font.pixelSize: 12
                             color: ruleTestController.testComplete ? "#27ae60" : "#3498db"
                         }
