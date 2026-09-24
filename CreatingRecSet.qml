@@ -28,6 +28,13 @@ Page {
     property int langPickerCardIndex: -1     // card whose language is being picked
     property bool langPickerIsFrom: true     // true = word/expr language, false = hint language
     property int langPickerCurrentId: -1    // enum value of the currently selected language
+    // Captured from the last card just before it's removed (see the Remove
+    // button below), so that removing every word and then adding a new one
+    // still starts from the languages that were in use, instead of "+ Add
+    // word"'s own recSetModel.count > 0 fallback having nothing left in the
+    // model to copy from and resetting to NotSelected.
+    property int lastUsedLanguageFrom: LanguageHelper.NotSelected
+    property int lastUsedLanguageTo: LanguageHelper.NotSelected
     property bool titleError: false
     property string titleErrorMessage: ""
     property string aiError: ""
@@ -1390,8 +1397,11 @@ Page {
                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
-                    var lastLangFrom = LanguageHelper.NotSelected
-                    var lastLangTo   = LanguageHelper.NotSelected
+                    // Falls back to whatever the set's words used last, if
+                    // none remain right now to copy from directly (see
+                    // lastUsedLanguageFrom/To's own comment above).
+                    var lastLangFrom = page.lastUsedLanguageFrom
+                    var lastLangTo   = page.lastUsedLanguageTo
                     if (recSetModel.count > 0) {
                         var last = recSetModel.get(recSetModel.count - 1)
                         lastLangFrom = last.languageFrom
@@ -1421,9 +1431,16 @@ Page {
                 onClicked: {
                     var idx = page.selectedCardIndex
                     if (idx >= 0 && idx < recSetModel.count) {
+                        var removed = recSetModel.get(idx)
                         if (page.currentPlayingPath !== "" &&
-                                recSetModel.get(idx).audioPath === page.currentPlayingPath)
+                                removed.audioPath === page.currentPlayingPath)
                             audioPlayer.stop()
+                        // Remember this pair before the model can go empty —
+                        // see lastUsedLanguageFrom/To's own comment above.
+                        if (recSetModel.count === 1) {
+                            page.lastUsedLanguageFrom = removed.languageFrom
+                            page.lastUsedLanguageTo   = removed.languageTo
+                        }
                         recSetModel.remove(idx)
                         page.selectedCardIndex = Math.min(idx, recSetModel.count - 1)
                     }
