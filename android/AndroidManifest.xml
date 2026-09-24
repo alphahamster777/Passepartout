@@ -5,7 +5,7 @@
     android:versionCode="-- %%INSERT_VERSION_CODE%% --"
     android:versionName="-- %%INSERT_VERSION_NAME%% --">
 
-    <!-- Required for Wikimedia image fetch and any HTTP(S) requests -->
+    <!-- Required for auto-fetched word images (Openverse) and any HTTP(S) requests -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 

@@ -18,68 +18,6 @@
 #include <QCoreApplication>
 #include <QPermission>
 
-// Maps LanguageHelper::Language enum ordinals to Wikipedia language codes
-static QString wikipediaLangCode(int langId) {
-    switch (langId) {
-    case  1: return QStringLiteral("zh");
-    case  2: return QStringLiteral("hi");
-    case  3: return QStringLiteral("es");
-    case  4: return QStringLiteral("fr");
-    case  5: return QStringLiteral("ar");
-    case  6: return QStringLiteral("bn");
-    case  7: return QStringLiteral("ru");
-    case  8: return QStringLiteral("pt");
-    case  9: return QStringLiteral("ur");
-    case 10: return QStringLiteral("de");
-    case 11: return QStringLiteral("ja");
-    case 12: return QStringLiteral("it");
-    case 13: return QStringLiteral("nl");
-    case 14: return QStringLiteral("pl");
-    case 15: return QStringLiteral("vi");
-    case 16: return QStringLiteral("uk");
-    case 17: return QStringLiteral("fa");
-    case 18: return QStringLiteral("sv");
-    case 19: return QStringLiteral("fi");
-    case 20: return QStringLiteral("cs");
-    case 21: return QStringLiteral("hu");
-    case 22: return QStringLiteral("ko");
-    case 23: return QStringLiteral("ro");
-    case 24: return QStringLiteral("no");
-    case 25: return QStringLiteral("tr");
-    case 26: return QStringLiteral("id");
-    case 27: return QStringLiteral("he");
-    case 28: return QStringLiteral("sr");
-    case 29: return QStringLiteral("da");
-    case 30: return QStringLiteral("bg");
-    case 31: return QStringLiteral("ca");
-    case 32: return QStringLiteral("sk");
-    case 33: return QStringLiteral("th");
-    case 34: return QStringLiteral("el");
-    case 35: return QStringLiteral("lt");
-    case 36: return QStringLiteral("hr");
-    case 37: return QStringLiteral("et");
-    case 38: return QStringLiteral("lv");
-    case 39: return QStringLiteral("sq");
-    case 40: return QStringLiteral("ka");
-    case 41: return QStringLiteral("hy");
-    case 42: return QStringLiteral("az");
-    case 43: return QStringLiteral("kk");
-    case 44: return QStringLiteral("be");
-    case 45: return QStringLiteral("eu");
-    case 46: return QStringLiteral("gl");
-    case 47: return QStringLiteral("cy");
-    case 48: return QStringLiteral("ta");
-    case 49: return QStringLiteral("ms");
-    case 50: return QStringLiteral("mr");
-    case 51: return QStringLiteral("sw");
-    case 52: return QStringLiteral("sl");
-    case 53: return QStringLiteral("is");
-    case 54: return QStringLiteral("tl");
-    case 55: return QStringLiteral("af");
-    default: return QStringLiteral("en");
-    }
-}
-
 // Maps LanguageHelper::Language enum ordinals to QLocale
 static QLocale localeFor(int langId) {
     switch (langId) {
@@ -153,34 +91,14 @@ MediaHelper::MediaHelper(QObject* parent)
     });
 }
 
-void MediaHelper::fetchWikimediaImageUrl(const QString& word, int cardIndex, int languageId) {
-    // Wikipedia REST API summary endpoint — returns JSON with a "thumbnail" object
-    const QString lang = wikipediaLangCode(languageId);
-    QString encoded = QString::fromUtf8(QUrl::toPercentEncoding(word));
-    QUrl url(QStringLiteral("https://") + lang + QStringLiteral(".wikipedia.org/api/rest_v1/page/summary/") + encoded);
-    QNetworkRequest req(url);
-    req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("Passepartout/1.0"));
-
-    auto* reply = m_nam->get(req);
-    connect(reply, &QNetworkReply::finished, this, [this, reply, word, cardIndex]() {
-        reply->deleteLater();
-        QString imgUrl;
-        if (reply->error() == QNetworkReply::NoError) {
-            auto obj = QJsonDocument::fromJson(reply->readAll()).object();
-            imgUrl = obj[QStringLiteral("thumbnail")].toObject()
-                         [QStringLiteral("source")].toString();
-        }
-        if (!imgUrl.isEmpty())
-            fetchAndCacheImage(imgUrl, cardIndex);
-        else
-            fetchOpenverseImageUrl(word, cardIndex);
-    });
-}
-
-void MediaHelper::fetchOpenverseImageUrl(const QString& word, int cardIndex) {
+void MediaHelper::fetchImageUrl(const QString& word, int cardIndex, int languageId) {
+    Q_UNUSED(languageId); // kept for call-site compatibility — see header comment
     // No API key required for this volume of traffic (a single lookup per
-    // word, only when Wikipedia had nothing). Every result is CC-licensed or
-    // public domain by construction — that's the whole point of Openverse.
+    // word). Every result is CC-licensed or public domain by construction,
+    // and "mature=false" applies Openverse's own safe-search filter — this
+    // used to be a fallback tried only after Wikipedia's raw, unfiltered
+    // page-summary thumbnail came up empty; that source is gone entirely
+    // now (see header comment) and this is the only one left.
     QString encoded = QString::fromUtf8(QUrl::toPercentEncoding(word));
     QUrl url(QStringLiteral("https://api.openverse.org/v1/images/?q=") + encoded
              + QStringLiteral("&page_size=1&mature=false"));
@@ -273,7 +191,7 @@ void MediaHelper::fetchAndCacheImage(const QString& imgUrl, int cardIndex) {
         if (reply->error() != QNetworkReply::NoError)
             return;
 
-        // Wikipedia's CDN may serve WebP regardless of the URL extension.
+        // The source CDN may serve WebP regardless of the URL extension.
         // Decode with QImageReader (auto-detects format) and re-save as PNG
         // so we always emit a format Qt can display on every platform.
         QByteArray data = reply->readAll();

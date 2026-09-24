@@ -15,11 +15,21 @@ class MediaHelper : public QObject {
 public:
     explicit MediaHelper(QObject* parent = nullptr);
 
-    // Fetch the best Wikimedia/Wikipedia thumbnail URL for a word. Falls back
-    // to Openverse (openly-licensed images — CC/public domain, no API key
-    // needed) when Wikipedia has no article/thumbnail for it.
-    // Emits imageFetched(cardIndex, url) when done; silent on failure.
-    Q_INVOKABLE void fetchWikimediaImageUrl(const QString& word, int cardIndex, int languageId = 0);
+    // Fetch an openly-licensed (CC/public domain) thumbnail for a word via
+    // Openverse, with its own "mature=false" filter applied server-side.
+    // Used to also fall back to Wikipedia's raw page-summary thumbnail when
+    // Openverse had nothing — dropped entirely (not just deprioritized):
+    // Wikipedia is an uncensored encyclopedia with articles (and thumbnails)
+    // on anatomy, art history, sexuality, etc., and its REST summary API has
+    // no safe-search parameter at all, so there was no way to keep it as a
+    // source and close that hole. This is what got the app rejected from
+    // Google Play once already (Sexual Content policy, a nude painting
+    // surfaced as a word's auto-fetched image) — do not reintroduce it.
+    // languageId is accepted for call-site compatibility (it selected which
+    // Wikipedia language edition to query) but unused now; Openverse search
+    // isn't language-scoped. Emits imageFetched(cardIndex, url) when done;
+    // silent on failure.
+    Q_INVOKABLE void fetchImageUrl(const QString& word, int cardIndex, int languageId = 0);
 
     // Text-to-speech — languageId matches LanguageHelper::Language enum values
     Q_INVOKABLE void speak(const QString& text, int languageId);
@@ -52,8 +62,6 @@ signals:
 
 private:
     void fetchAndCacheImage(const QString& imgUrl, int cardIndex);
-    // Fallback used when Wikipedia has nothing for the word.
-    void fetchOpenverseImageUrl(const QString& word, int cardIndex);
 
     QNetworkAccessManager* m_nam;
     QTextToSpeech*         m_tts;

@@ -116,7 +116,7 @@ Page {
         for (var i = 0; i < recSetModel.count; i++) {
             var w = recSetModel.get(i)
             if (w.expression && w.expression.trim() !== "" && w.imagePath === "")
-                MediaHelper.fetchWikimediaImageUrl(w.expression.trim(), i, w.languageFrom)
+                MediaHelper.fetchImageUrl(w.expression.trim(), i, w.languageFrom)
         }
     }
 
@@ -950,7 +950,7 @@ Page {
                                 onEditingFinished: {
                                     recSetModel.set(index, { expression: exprField.text })
                                     if (page.autoMedia && exprField.text.trim() !== "" && imagePath === "")
-                                        MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index, languageFrom)
+                                        MediaHelper.fetchImageUrl(exprField.text.trim(), index, languageFrom)
                                 }
                             }
 
@@ -1106,7 +1106,7 @@ Page {
                                                 }
                                                 onClicked: {
                                                     page.activeCardIndex = index
-                                                    MediaHelper.fetchWikimediaImageUrl(exprField.text.trim(), index, languageFrom)
+                                                    MediaHelper.fetchImageUrl(exprField.text.trim(), index, languageFrom)
                                                 }
                                             }
 
