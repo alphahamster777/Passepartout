@@ -73,7 +73,7 @@ QVariantList parseSingleBlankArray(const QJsonObject& payload, const QString& ke
 }
 
 QString buildPrompt(const QString& theme, const TypeCounts& counts,
-                     int termLanguageId, int explanationLanguageId) {
+                     int termLanguageId, int explanationLanguageId, bool includeTheory) {
     const TypeCounts c{clampCount(counts.gap), clampCount(counts.mc),
                         clampCount(counts.combobox), clampCount(counts.dragdrop)};
     const QString clippedTheme = theme.trimmed().left(kMaxThemeLength);
@@ -89,12 +89,17 @@ QString buildPrompt(const QString& theme, const TypeCounts& counts,
                            : QStringLiteral("0 (leave this array empty)");
     };
 
+    const QString theoryLine = includeTheory
+        ? QStringLiteral(
+              "First write a short, clear grammar explanation in \"theory\", in %1, as 1 to 4 "
+              "short plain-text paragraphs (one paragraph per array entry) — this is the only "
+              "thing you write explaining the rule; do not describe or reference any images or "
+              "audio.\n").arg(explanationLang)
+        : QStringLiteral("Leave \"theory\" as an empty array — no grammar explanation was requested.\n");
+
     return QStringLiteral(
         "Generate a grammar lesson for a language learner on the topic \"%1\".\n"
-        "First write a short, clear grammar explanation in \"theory\", in %6, as 1 to 4 "
-        "short plain-text paragraphs (one paragraph per array entry) — this is the only "
-        "thing you write explaining the rule; do not describe or reference any images or "
-        "audio.\n"
+        "%6"
         "Then generate exactly this many entries in each of these four arrays, writing "
         "every sentence, option and answer in %7:\n"
         "- \"gapQuestions\": %2 entries, each a sentence in \"text\" with each blank "
@@ -107,14 +112,18 @@ QString buildPrompt(const QString& theme, const TypeCounts& counts,
         "blank written as \"___\", 3 to 5 short \"options\" for that blank (to be picked "
         "from a dropdown), and a required zero-based \"correctIndex\".\n"
         "- \"dragdropQuestions\": %5 entries, each a sentence in \"text\" with exactly "
-        "ONE blank written as \"___\", 3 to 5 short \"options\" (draggable word/phrase "
-        "tiles — the correct one plus clearly-wrong decoys), and a required zero-based "
-        "\"correctIndex\" pointing at the correct tile.\n"
+        "ONE blank written as \"___\", and 3 to 5 short \"options\" (draggable tiles): "
+        "the correct one plus wrong-but-plausible decoys. Every option must be its own "
+        "complete, grammatically well-formed word or short phrase that could stand alone "
+        "in the blank on its own (e.g. a different verb, tense, or form) — never two "
+        "options concatenated or merged into one tile, and never a fragment that only "
+        "makes sense pasted next to the sentence. A required zero-based \"correctIndex\" "
+        "points at the correct tile.\n"
         "Every mcQuestions/comboQuestions/dragdropQuestions entry must include "
         "correctIndex. Keep sentences concise and strictly about \"%1\". Do not repeat "
         "the same sentence.")
         .arg(clippedTheme, countLine(c.gap), countLine(c.mc), countLine(c.combobox), countLine(c.dragdrop))
-        .arg(explanationLang, termLang);
+        .arg(theoryLine, termLang);
 }
 
 QJsonObject buildResponseSchema() {

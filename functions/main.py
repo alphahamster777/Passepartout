@@ -157,19 +157,30 @@ def _clamp_count(count: int) -> int:
 # governs the "theory" paragraphs — same split as build_prompt()'s
 # from_lang/to_lang for word sets, so a learner can be quizzed in the target
 # language while still reading the rule explanation in one they understand.
+# include_theory lets the creator opt out of that explanation altogether
+# (CreatingRuleSet.qml's "Explain grammar" toggle, on by default) — Gemini
+# is asked to leave "theory" as an empty array instead of spending output
+# tokens on it. build_rule_schema's "theory" stays required either way since
+# an empty array already satisfies that.
 def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: int, dragdrop_count: int,
-                       term_lang: str, explanation_lang: str) -> str:
+                       term_lang: str, explanation_lang: str, include_theory: bool = True) -> str:
     gap_count, mc_count, combo_count, dragdrop_count = (
         _clamp_count(gap_count), _clamp_count(mc_count), _clamp_count(combo_count), _clamp_count(dragdrop_count))
 
     def count_line(target: int) -> str:
         return f"{target + RULE_PER_TYPE_REQUEST_BUFFER}" if target > 0 else "0 (leave this array empty)"
 
-    return (
-        f'Generate a grammar lesson for a language learner on the topic "{theme}".\n'
+    theory_line = (
         f'First write a short, clear grammar explanation in "theory", in {explanation_lang}, as 1 '
         "to 4 short plain-text paragraphs (one paragraph per array entry) — this is the only "
         "thing you write explaining the rule; do not describe or reference any images or audio.\n"
+        if include_theory else
+        'Leave "theory" as an empty array — no grammar explanation was requested.\n'
+    )
+
+    return (
+        f'Generate a grammar lesson for a language learner on the topic "{theme}".\n'
+        f"{theory_line}"
         f"Then generate exactly this many entries in each of these four arrays, writing every "
         f"sentence, option and answer in {term_lang}:\n"
         f'- "gapQuestions": {count_line(gap_count)} entries, each a sentence in "text" with '
@@ -182,9 +193,13 @@ def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: in
         'with exactly ONE blank written as "___", 3 to 5 short "options" for that blank '
         '(to be picked from a dropdown), and a required zero-based "correctIndex".\n'
         f'- "dragdropQuestions": {count_line(dragdrop_count)} entries, each a sentence in '
-        '"text" with exactly ONE blank written as "___", 3 to 5 short "options" '
-        "(draggable word/phrase tiles — the correct one plus clearly-wrong decoys), and a "
-        'required zero-based "correctIndex" pointing at the correct tile.\n'
+        '"text" with exactly ONE blank written as "___", and 3 to 5 short "options" '
+        "(draggable tiles): the correct one plus wrong-but-plausible decoys. Every option "
+        "must be its own complete, grammatically well-formed word or short phrase that "
+        "could stand alone in the blank on its own (e.g. a different verb, tense, or "
+        "form) — never two options concatenated or merged into one tile, and never a "
+        'fragment that only makes sense pasted next to the sentence. A required '
+        'zero-based "correctIndex" points at the correct tile.\n'
         "Every mcQuestions/comboQuestions/dragdropQuestions entry must include "
         f'correctIndex. Keep sentences concise and strictly about "{theme}". Do not repeat '
         "the same sentence."
@@ -517,6 +532,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
     theme = str(body.get("theme", "")).strip()
     term_lang = str(body.get("termLanguage", "English")).strip() or "English"
     explanation_lang = str(body.get("explanationLanguage", "English")).strip() or "English"
+    include_theory = bool(body.get("includeTheory", True))
 
     def _int_field(key: str, default: int) -> int:
         try:
@@ -576,7 +592,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
         try:
             candidate = call_gemini_json(
                 build_rule_prompt(theme, gap_target, mc_target, combo_target, dragdrop_target,
-                                   term_lang, explanation_lang),
+                                   term_lang, explanation_lang, include_theory),
                 build_rule_schema(),
                 os.environ["GEMINI_API_KEY"],
             )

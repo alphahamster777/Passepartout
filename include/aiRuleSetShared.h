@@ -57,9 +57,12 @@ struct TypeCounts { int gap = 0; int mc = 0; int combobox = 0; int dragdrop = 0;
 // buildPrompt's fromLanguageId); explanationLanguageId governs the "theory"
 // paragraphs (same role as its toLanguageId) — so a learner can be quizzed
 // in the target language while still reading the rule explanation in one
-// they understand.
+// they understand. includeTheory mirrors CreatingRuleSet.qml's "Explain
+// grammar" toggle (on by default) — false asks the model to leave "theory"
+// an empty array instead of writing one, matching functions/main.py's
+// build_rule_prompt(..., include_theory).
 QString buildPrompt(const QString& theme, const TypeCounts& counts,
-                     int termLanguageId, int explanationLanguageId);
+                     int termLanguageId, int explanationLanguageId, bool includeTheory = true);
 
 // The response JSON schema constraining the model to:
 // {"theory": ["paragraph", ...],

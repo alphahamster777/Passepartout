@@ -51,6 +51,12 @@ Page {
     property int langPickerCurrentId: -1
     property int aiTermLanguageId: LanguageHelper.English
     property int aiExplanationLanguageId: AppController.defaultMeaningLanguage
+    // "Explain grammar" toggle below — ticked by default, since most
+    // creators do want the generated "theory" paragraphs. Unticking skips
+    // asking Gemini for them (see FirebaseAiHelper::generateRuleSet's
+    // includeTheory), which also makes the Explanation language picker
+    // moot until it's ticked again.
+    property bool aiIncludeTheory: true
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     Timer {
@@ -911,6 +917,9 @@ Page {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 4
+                            // Moot while "Explain grammar" is off — nothing
+                            // will be generated to translate.
+                            opacity: page.aiIncludeTheory ? 1 : 0.4
                             Label { text: "💡 " + qsTr("Explanation language"); font.pixelSize: 11; color: "#7f8c8d" }
                             Rectangle {
                                 Layout.fillWidth: true
@@ -931,6 +940,7 @@ Page {
                                 }
                                 MouseArea {
                                     anchors.fill: parent
+                                    enabled: page.aiIncludeTheory
                                     onClicked: {
                                         page.langPickerTarget = "explanation"
                                         page.langPickerCurrentId = page.aiExplanationLanguageId
@@ -939,6 +949,14 @@ Page {
                                 }
                             }
                         }
+                    }
+
+                    CheckBox {
+                        id: aiIncludeTheoryCheck
+                        width: parent.width
+                        text: qsTr("💡 Explain grammar")
+                        checked: page.aiIncludeTheory
+                        onToggled: page.aiIncludeTheory = checked
                     }
 
                     Label {
@@ -1028,7 +1046,8 @@ Page {
                         page.aiBackend.generateRuleSet(aiThemeField.text.trim(),
                             aiGapCountSpin.value, aiMcCountSpin.value,
                             aiComboCountSpin.value, aiDragdropCountSpin.value,
-                            page.aiTermLanguageId, page.aiExplanationLanguageId)
+                            page.aiTermLanguageId, page.aiExplanationLanguageId,
+                            page.aiIncludeTheory)
                     }
                 }
             }
@@ -1080,6 +1099,8 @@ Page {
             // error color — the message label underneath spells it out.
             Material.accent: page.titleError ? "#e74c3c" : "#3498db"
             onTextChanged: page.titleError = false
+            // See the per-question Question field's comment further down.
+            onActiveFocusChanged: if (!activeFocus) cursorPosition = 0
         }
 
         Label {
@@ -1435,6 +1456,15 @@ Page {
                                     ? qsTr("e.g. What does she do every day?")
                                     : qsTr("e.g. She ___ to school every day.")
                                 onEditingFinished: ruleSetModel.set(cardRect.cardIndex, { questionText: text })
+                                // TextInput scrolls its viewport to follow the
+                                // cursor while editing, but never scrolls back
+                                // once you tap away — a sentence longer than the
+                                // field stays stuck showing wherever the cursor
+                                // last was (e.g. mid-sentence, clipping the
+                                // start), which reads as broken. Snap the
+                                // cursor to 0 on blur so the field always
+                                // settles back to showing the beginning.
+                                onActiveFocusChanged: if (!activeFocus) cursorPosition = 0
                             }
 
                             // ── Answers, one per gap in order (gap only —
@@ -1460,6 +1490,8 @@ Page {
                                 text: answersText
                                 placeholderText: qsTr("e.g. goes")
                                 onEditingFinished: ruleSetModel.set(cardRect.cardIndex, { answersText: text })
+                                // See the Question field above's comment.
+                                onActiveFocusChanged: if (!activeFocus) cursorPosition = 0
                             }
 
                             // ── Options pool (dropdown choices / draggable tiles) ──
@@ -1494,6 +1526,8 @@ Page {
                                 // per-blank "correct answer" chip groups
                                 // below appear/update as options are typed.
                                 onTextChanged: ruleSetModel.set(cardRect.cardIndex, { poolOptionsText: text })
+                                // See the Question field above's comment.
+                                onActiveFocusChanged: if (!activeFocus) cursorPosition = 0
                             }
 
                             // ── Correct answer per blank (combobox only) —
@@ -1845,6 +1879,8 @@ Page {
                                 // mcOptionsText — appear as each option is
                                 // typed, not only once the field loses focus.
                                 onTextChanged: ruleSetModel.set(cardRect.cardIndex, { mcOptionsText: text })
+                                // See the Question field's comment above.
+                                onActiveFocusChanged: if (!activeFocus) cursorPosition = 0
                             }
                             // Switches the chips below between "tap any
                             // number correct" (checkbox-like) and "tap one,

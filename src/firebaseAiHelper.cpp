@@ -344,7 +344,8 @@ void FirebaseAiHelper::refreshRuleQuota() {
 
 void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int mcCount,
                                         int comboCount, int dragdropCount,
-                                        int termLanguageId, int explanationLanguageId) {
+                                        int termLanguageId, int explanationLanguageId,
+                                        bool includeTheory) {
     if (theme.trimmed().isEmpty()) {
         emit ruleGenerationFailed(tr("Enter a theme first."));
         return;
@@ -357,7 +358,7 @@ void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int m
     setRuleGenerating(true);
     m_ruleCancelled = false;
     ensureSignedIn([this, theme, gapCount, mcCount, comboCount, dragdropCount,
-                    termLanguageId, explanationLanguageId]
+                    termLanguageId, explanationLanguageId, includeTheory]
                    (bool ok, const QString& idTokenOrError) {
         if (m_ruleCancelled)
             return;
@@ -367,13 +368,14 @@ void FirebaseAiHelper::generateRuleSet(const QString& theme, int gapCount, int m
             return;
         }
         postGenerateRule(idTokenOrError, theme, gapCount, mcCount, comboCount, dragdropCount,
-                          termLanguageId, explanationLanguageId);
+                          termLanguageId, explanationLanguageId, includeTheory);
     });
 }
 
 void FirebaseAiHelper::postGenerateRule(const QString& idToken, const QString& theme, int gapCount,
                                          int mcCount, int comboCount, int dragdropCount,
-                                         int termLanguageId, int explanationLanguageId) {
+                                         int termLanguageId, int explanationLanguageId,
+                                         bool includeTheory) {
     const QString termLang = LanguageHelper::displayName(static_cast<LanguageHelper::Language>(termLanguageId));
     const QString explanationLang =
         LanguageHelper::displayName(static_cast<LanguageHelper::Language>(explanationLanguageId));
@@ -385,7 +387,8 @@ void FirebaseAiHelper::postGenerateRule(const QString& idToken, const QString& t
         {QStringLiteral("comboCount"), comboCount},
         {QStringLiteral("dragdropCount"), dragdropCount},
         {QStringLiteral("termLanguage"), termLang},
-        {QStringLiteral("explanationLanguage"), explanationLang}
+        {QStringLiteral("explanationLanguage"), explanationLang},
+        {QStringLiteral("includeTheory"), includeTheory}
     };
 
     QNetworkRequest req{QUrl(QLatin1String(kRuleFunctionUrl))};

@@ -100,10 +100,14 @@ public:
     // generateWordSet's fromLanguageId; explanationLanguageId governs the
     // "theory" paragraphs, same role as toLanguageId — so a learner can be
     // quizzed in the target language while still reading the rule
-    // explanation in one they understand.
+    // explanation in one they understand. includeTheory is CreatingRuleSet.
+    // qml's "Explain grammar" toggle (on by default) — false skips asking
+    // Gemini for "theory" altogether, so ruleSetGenerated's theory comes
+    // back empty instead of a generated explanation.
     Q_INVOKABLE void generateRuleSet(const QString& theme, int gapCount, int mcCount,
                                       int comboCount, int dragdropCount,
-                                      int termLanguageId, int explanationLanguageId);
+                                      int termLanguageId, int explanationLanguageId,
+                                      bool includeTheory = true);
     Q_INVOKABLE void cancelRuleGeneration();
     Q_INVOKABLE void refreshRuleQuota();
 
@@ -153,7 +157,7 @@ private:
     void applyRuleQuota(const QJsonObject& payload);
     void postGenerateRule(const QString& idToken, const QString& theme, int gapCount, int mcCount,
                            int comboCount, int dragdropCount,
-                           int termLanguageId, int explanationLanguageId);
+                           int termLanguageId, int explanationLanguageId, bool includeTheory);
 
     QNetworkAccessManager* m_nam;
 
