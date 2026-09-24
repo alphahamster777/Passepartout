@@ -1290,7 +1290,7 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Жұмсақ</translation>
+        <translation>Жеңіл</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

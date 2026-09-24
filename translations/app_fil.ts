@@ -1275,7 +1275,7 @@ Pindutin ang + Gumawa upang magdagdag ng set ng salita o aklatan.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Higpit ng spelling</translation>
+        <translation>✍️ Higpit ng pagbabaybay</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

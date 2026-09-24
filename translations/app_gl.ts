@@ -1290,7 +1290,7 @@ Toca + Crear para engadir un conxunto de palabras ou biblioteca.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Indulgente</translation>
+        <translation>Flexíbel</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

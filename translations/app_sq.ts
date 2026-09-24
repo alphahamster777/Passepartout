@@ -1275,7 +1275,7 @@ Trokit + Krijo për të shtuar një grup fjalësh ose bibliotekë.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Rreptësia e drejtshkrimit</translation>
+        <translation>✍️ Ashpërsia e drejtshkrimit</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

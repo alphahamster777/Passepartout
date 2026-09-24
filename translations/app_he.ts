@@ -1275,12 +1275,12 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ רמת דקדקנות באיות</translation>
+        <translation>✍️ חומרת איות</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>קפדני</translation>
+        <translation>מחמיר</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>

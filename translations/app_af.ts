@@ -1275,7 +1275,7 @@ Tik + Skep om 'n woordstel of biblioteek by te voeg.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Speltoetsstrengheid</translation>
+        <translation>✍️ Spelstrengheid</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
@@ -1290,7 +1290,7 @@ Tik + Skep om 'n woordstel of biblioteek by te voeg.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Toegeeflik</translation>
+        <translation>Toegewend</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

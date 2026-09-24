@@ -1275,22 +1275,22 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Строгость проверки правописания</translation>
+        <translation>✍️ Строгость орфографии</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Строго</translation>
+        <translation>Строгая</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Обычно</translation>
+        <translation>Обычная</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Снисходительно</translation>
+        <translation>Мягкая</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

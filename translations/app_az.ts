@@ -1275,7 +1275,7 @@ Söz dəsti və ya kitabxana əlavə etmək üçün + Yarat düyməsinə toxunun
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Orfoqrafiya sərtliyi</translation>
+        <translation>✍️ Yazılış sərtliyi</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

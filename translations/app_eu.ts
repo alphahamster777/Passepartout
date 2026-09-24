@@ -1285,7 +1285,7 @@ Ukitu + Sortu hitz-sorta edo liburutegi bat gehitzeko.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Normala</translation>
+        <translation>Arrunta</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>

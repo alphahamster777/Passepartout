@@ -1275,7 +1275,7 @@ Napauta + Luo lisätäksesi sanaston tai kirjaston.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Oikeinkirjoituksen tarkkuus</translation>
+        <translation>✍️ Oikeinkirjoituksen tiukkuus</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

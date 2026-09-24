@@ -1290,7 +1290,7 @@ Gusa + Unda ili kuongeza seti ya maneno au maktaba.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Legevu</translation>
+        <translation>Rahisi</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

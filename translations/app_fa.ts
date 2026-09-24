@@ -1275,7 +1275,7 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ سخت‌گیری املایی</translation>
+        <translation>✍️ سخت‌گیری املا</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
@@ -1290,7 +1290,7 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>ملایم</translation>
+        <translation>آسان‌گیرانه</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

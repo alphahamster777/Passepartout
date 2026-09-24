@@ -1275,7 +1275,7 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Stafsetningarkröfur</translation>
+        <translation>✍️ Stafsetningarstrangleiki</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

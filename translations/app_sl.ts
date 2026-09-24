@@ -1285,12 +1285,12 @@ Dotaknite se + Ustvari, da dodate nabor besed ali knjižnico.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Normalno</translation>
+        <translation>Običajno</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Popustljivo</translation>
+        <translation>Prizanesljivo</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

@@ -1275,7 +1275,7 @@ Chạm + Tạo để thêm bộ từ hoặc thư viện.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Mức độ nghiêm ngặt về chính tả</translation>
+        <translation>✍️ Độ nghiêm ngặt chính tả</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

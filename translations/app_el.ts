@@ -1280,17 +1280,17 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Αυστηρό</translation>
+        <translation>Αυστηρή</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Κανονικό</translation>
+        <translation>Κανονική</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Επιεικές</translation>
+        <translation>Ελαστική</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

@@ -1280,17 +1280,17 @@ Klepnite na + Vytvoriť pre pridanie sady slov alebo knižnice.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Prísne</translation>
+        <translation>Prísna</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Normálne</translation>
+        <translation>Normálna</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Zhovievavé</translation>
+        <translation>Mierna</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

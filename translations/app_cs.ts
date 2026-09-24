@@ -1280,7 +1280,7 @@ Klepněte na + Vytvořit pro přidání sady slov nebo knihovny.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Přísné</translation>
+        <translation>Přísná</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
@@ -1290,7 +1290,7 @@ Klepněte na + Vytvořit pro přidání sady slov nebo knihovny.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Shovívavé</translation>
+        <translation>Mírná</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

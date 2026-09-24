@@ -1280,17 +1280,17 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Строга</translation>
+        <translation>Строгі</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Звычайна</translation>
+        <translation>Звычайны</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Паблажліва</translation>
+        <translation>Мяккі</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

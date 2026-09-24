@@ -1275,7 +1275,7 @@ Ketuk + Buat untuk menambahkan set kata atau pustaka.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Ketelitian ejaan</translation>
+        <translation>✍️ Ketegasan ejaan</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

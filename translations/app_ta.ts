@@ -1285,12 +1285,12 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>சாதாரணமானது</translation>
+        <translation>இயல்பானது</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>மென்மையானது</translation>
+        <translation>தளர்வானது</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

@@ -1290,7 +1290,7 @@ Trykk på + Opprett for å legge til et ordsett eller bibliotek.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Overbærende</translation>
+        <translation>Mild</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

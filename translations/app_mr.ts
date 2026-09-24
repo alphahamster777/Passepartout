@@ -1275,7 +1275,7 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ शुद्धलेखन कठोरता</translation>
+        <translation>✍️ स्पेलिंग कठोरता</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

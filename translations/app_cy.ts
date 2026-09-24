@@ -1275,7 +1275,7 @@ Tapiwch + Creu i ychwanegu set eiriau neu lyfrgell.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Llymder sillafu</translation>
+        <translation>✍️ Trylwyredd sillafu</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>

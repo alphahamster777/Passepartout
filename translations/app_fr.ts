@@ -1290,7 +1290,7 @@ Touchez + Créer pour ajouter un ensemble de mots ou une bibliothèque.</transla
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Indulgente</translation>
+        <translation>Souple</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

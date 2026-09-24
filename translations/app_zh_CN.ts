@@ -1285,7 +1285,7 @@ Tap + Create to add a word set or library.</source>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>普通</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>

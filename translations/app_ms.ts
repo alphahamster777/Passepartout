@@ -1285,7 +1285,7 @@ Ketik + Cipta untuk menambah set perkataan atau pustaka.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Normal</translation>
+        <translation>Biasa</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>

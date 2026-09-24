@@ -1275,12 +1275,12 @@ Toca + Crear para añadir un conjunto de palabras o una biblioteca.</translation
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Rigor ortográfico</translation>
+        <translation>✍️ Rigurosidad ortográfica</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Estricto</translation>
+        <translation>Estricta</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
@@ -1290,7 +1290,7 @@ Toca + Crear para añadir un conjunto de palabras o una biblioteca.</translation
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Indulgente</translation>
+        <translation>Flexible</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

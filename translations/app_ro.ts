@@ -1275,22 +1275,22 @@ Atinge + Creează pentru a adăuga un set de cuvinte sau o bibliotecă.</transla
     <message>
         <location filename="../SetPreviewMenu.qml" line="237"/>
         <source>✍️ Spelling strictness</source>
-        <translation>✍️ Rigoare ortografică</translation>
+        <translation>✍️ Strictețea ortografică</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Strict</translation>
+        <translation>Strictă</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Normal</translation>
+        <translation>Normală</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Indulgent</translation>
+        <translation>Permisivă</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

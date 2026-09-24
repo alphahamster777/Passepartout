@@ -1280,17 +1280,17 @@ Pieskarieties + Izveidot, lai pievienotu vārdu kopu vai bibliotēku.</translati
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Stingrs</translation>
+        <translation>Stingra</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
         <source>Normal</source>
-        <translation>Parasts</translation>
+        <translation>Parasta</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Iecietīgs</translation>
+        <translation>Iecietīga</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

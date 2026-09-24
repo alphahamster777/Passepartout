@@ -1280,7 +1280,7 @@ Tryck på + Skapa för att lägga till ett ordset eller bibliotek.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Strikt</translation>
+        <translation>Sträng</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
@@ -1290,7 +1290,7 @@ Tryck på + Skapa för att lägga till ett ordset eller bibliotek.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="249"/>
         <source>Lenient</source>
-        <translation>Överseende</translation>
+        <translation>Mild</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="281"/>

@@ -1280,7 +1280,7 @@ Dotknij + Utwórz, aby dodać zestaw słów lub bibliotekę.</translation>
     <message>
         <location filename="../SetPreviewMenu.qml" line="247"/>
         <source>Strict</source>
-        <translation>Surowy</translation>
+        <translation>Rygorystyczny</translation>
     </message>
     <message>
         <location filename="../SetPreviewMenu.qml" line="248"/>
