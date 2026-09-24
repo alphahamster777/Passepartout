@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>A cím megadása kötelező</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Nyelvtan magyarázata</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

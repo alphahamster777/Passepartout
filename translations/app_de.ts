@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Titel ist erforderlich</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Grammatik erklären</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

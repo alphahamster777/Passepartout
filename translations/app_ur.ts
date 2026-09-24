@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>عنوان درکار ہے</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 گرامر کی وضاحت کریں</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

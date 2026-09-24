@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Název je povinný</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Vysvětlit gramatiku</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

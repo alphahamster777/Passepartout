@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Cần có tiêu đề</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Giải thích ngữ pháp</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

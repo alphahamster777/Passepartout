@@ -20,6 +20,26 @@ Page {
         return maxW
     }
 
+    // Sum of every visible wheel's own width (same formula as each
+    // wheelFrame's Layout.preferredWidth below) plus the spacing between
+    // them — used to size comboWheelFlow to fit them all on one line
+    // instead of stacking one per line. Deliberately not read off the
+    // Flow's own implicitWidth: a Flow's implicitWidth is derived from
+    // wherever it just placed its children *at its current width*, so
+    // binding width to Math.min(implicitWidth, ...) is circular — it
+    // bottoms out with every child wrapped onto its own line (the
+    // narrowest stable point) instead of the single-line width actually
+    // wanted here.
+    function totalComboWheelsWidth(optionsPerGap) {
+        var total = 0, visibleCount = 0
+        for (var i = 0; i < optionsPerGap.length; ++i) {
+            if (optionsPerGap[i].length === 0) continue // matches comboGroup's "visible" below
+            total += Math.max(90, root.widestOptionWidth(optionsPerGap[i].concat([qsTr("null")])) + 44)
+            visibleCount++
+        }
+        return total + Math.max(0, visibleCount - 1) * 14
+    }
+
     // Shared "active test controller" slot — Main.qml repoints it at the
     // rule controller before pushing this page (see onStartRuleTest),
     // the same slot SpellingTest.qml/FlashCard.qml/Results.qml already read.
@@ -421,6 +441,7 @@ Page {
 
         // ── Fill-in-the-gap question ─────────────────────────────────────────
         Flow {
+            id: gapFlow
             Layout.fillWidth: true
             spacing: 6
             visible: (question.type || "gap") === "gap"
@@ -449,6 +470,15 @@ Page {
                         font.pixelSize: 17
                         color: "#2c3e50"
                         wrapMode: Text.WordWrap
+                        // Flow can only wrap *between* whole Rows, never
+                        // inside one, so an unbounded-width Label here let a
+                        // long sentence push gapField off the right edge of
+                        // the screen, cropped. Capping it to the Flow's own
+                        // width (minus room for the field beside it) lets it
+                        // wrap onto its own lines instead, keeping the whole
+                        // Row within the visible width.
+                        width: Math.max(40, Math.min(implicitWidth,
+                            gapFlow.width - (gapRow.isGap ? 130 : 0)))
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
@@ -486,6 +516,7 @@ Page {
             visible: question.type === "combobox"
 
             Flow {
+                id: comboSegFlow
                 Layout.fillWidth: true
                 spacing: 6
 
@@ -503,6 +534,10 @@ Page {
                             font.pixelSize: 17
                             color: "#2c3e50"
                             wrapMode: Text.WordWrap
+                            // See the "gap" Flow's identical Label comment
+                            // above — same crop bug, same fix.
+                            width: Math.max(40, Math.min(implicitWidth,
+                                comboSegFlow.width - (comboRow.isGap ? comboBlank.width + 20 : 0)))
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -555,13 +590,26 @@ Page {
             // One wheel picker per blank, side by side — width follows the
             // longest option in that particular blank's list so a wheel of
             // short words (e.g. "a, an") isn't as wide as one full of long
-            // ones (e.g. "unbelievably, undeniably").
-            Flow {
+            // ones (e.g. "unbelievably, undeniably"). Wrapped in a
+            // full-width Item so the Flow itself can shrink to its actual
+            // content width and sit horizontally centered rather than
+            // hugging the left edge — Flow alone has no "centered" content
+            // alignment, only "positioned from the top-left, wrap when it
+            // doesn't fit."
+            Item {
                 Layout.fillWidth: true
-                spacing: 14
+                implicitHeight: comboWheelFlow.implicitHeight
 
-                Repeater {
-                    model: question.type === "combobox" ? root.comboOptionsPerGap : []
+                Flow {
+                    id: comboWheelFlow
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: Math.min(
+                        question.type === "combobox" ? root.totalComboWheelsWidth(root.comboOptionsPerGap) : 0,
+                        parent.width)
+                    spacing: 14
+
+                    Repeater {
+                        model: question.type === "combobox" ? root.comboOptionsPerGap : []
 
                     delegate: ColumnLayout {
                         id: comboGroup
@@ -716,6 +764,7 @@ Page {
                         }
                     }
                 }
+                }
             }
         }
 
@@ -727,6 +776,7 @@ Page {
 
             // The sentence, with each numbered blank shown as a drop target.
             Flow {
+                id: ddSegFlow
                 Layout.fillWidth: true
                 spacing: 6
 
@@ -745,6 +795,10 @@ Page {
                             font.pixelSize: 17
                             color: "#2c3e50"
                             wrapMode: Text.WordWrap
+                            // See the "gap" Flow's identical Label comment
+                            // further up — same crop bug, same fix.
+                            width: Math.max(40, Math.min(implicitWidth,
+                                ddSegFlow.width - (ddRow.isBlank ? ddBlank.width + 20 : 0)))
                             anchors.verticalCenter: parent.verticalCenter
                         }
 

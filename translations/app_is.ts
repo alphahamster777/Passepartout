@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Titill er nauðsynlegur</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Útskýra málfræði</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

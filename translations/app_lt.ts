@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Būtinas pavadinimas</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Paaiškinti gramatiką</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

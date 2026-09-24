@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Izenburua beharrezkoa da</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Azaldu gramatika</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

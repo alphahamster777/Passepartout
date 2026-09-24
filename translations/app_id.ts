@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Judul wajib diisi</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Jelaskan tata bahasa</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

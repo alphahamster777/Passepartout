@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>শিরোনাম আবশ্যক</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 ব্যাকরণ ব্যাখ্যা করুন</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

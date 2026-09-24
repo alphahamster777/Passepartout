@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Ο τίτλος είναι υποχρεωτικός</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Εξήγηση γραμματικής</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

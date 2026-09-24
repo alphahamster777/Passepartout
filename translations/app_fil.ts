@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Kinakailangan ang pamagat</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Ipaliwanag ang gramatika</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

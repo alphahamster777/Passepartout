@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>제목이 필요합니다</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 문법 설명</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

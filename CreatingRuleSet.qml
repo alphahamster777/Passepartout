@@ -737,12 +737,31 @@ Page {
         id: aiGeneratorPopup
         readonly property bool keyboardUp: Qt.inputMethod.visible
         readonly property real overlayHeight: Overlay.overlay ? Overlay.overlay.height : 640
-        readonly property real visibleAreaHeight: keyboardUp ? overlayHeight * 0.55 : overlayHeight * 0.92
+        // Read from the enclosing Page (not this Popup itself — positioning
+        // a item from its own SafeArea is a binding loop, see Qt's SafeArea
+        // docs and this same trick elsewhere, e.g. SetDirMenu.qml).
+        readonly property real safeOverlayHeight:
+            overlayHeight - page.SafeArea.margins.top - page.SafeArea.margins.bottom
+        readonly property real visibleAreaHeight: keyboardUp ? safeOverlayHeight * 0.55 : safeOverlayHeight * 0.92
 
-        x: Overlay.overlay ? (Overlay.overlay.width - width) / 2 : 0
-        y: keyboardUp ? 16 : Math.max(20, (overlayHeight - height) / 2)
+        // Centered via the same anchor RuleTest.qml's theoryPopup already
+        // centers itself with successfully. Popup only supports this one
+        // anchor line — no horizontalCenter/verticalCenter/*Offset
+        // sub-properties; assigning anchors.verticalCenterOffset here
+        // crashed the whole app at load with "Cannot assign to non-existent
+        // property" — so there's no way to bias the center toward the safe
+        // area specifically the way a hand-rolled "y" (this popup's earlier
+        // approach, which didn't actually land centered on-device either)
+        // would. It centers on the full overlay's middle instead; the
+        // height cap below (visibleAreaHeight, built from the safe area) is
+        // what actually keeps it clear of system chrome.
+        anchors.centerIn: Overlay.overlay
         width: Math.min(parent.width - 32, 380)
-        height: Math.min(implicitHeight, visibleAreaHeight)
+        // Driven directly off the inner Column's own implicitHeight rather
+        // than this Popup's (indirectly derived through the ScrollView
+        // contentItem) — more reliable than trusting that to propagate
+        // correctly, and it's what actually needs to fit/overflow here.
+        height: Math.min(aiPopupColumn.implicitHeight, visibleAreaHeight)
         padding: 0
         modal: true
         // No automatic close: a plain CloseOnPressOutside let a scroll/drag
@@ -771,6 +790,21 @@ Page {
         onClosed: if (page.aiGenerating) page.aiBackend.cancelRuleGeneration()
         onOpened: FirebaseAiHelper.refreshRuleQuota()
 
+        // While the keyboard is up, anchors.centerIn above would put the
+        // popup right behind it — pin it near the top instead. A Binding
+        // (rather than a second "y:" declared directly alongside
+        // anchors.centerIn, which QML would just let one of the two
+        // permanently win, with no way back once the other's condition
+        // changes) is the documented way to temporarily override a property
+        // an anchor already drives: it cleanly restores anchors.centerIn's
+        // own position the moment the keyboard goes back down.
+        Binding {
+            target: aiGeneratorPopup
+            property: "y"
+            value: page.SafeArea.margins.top + 16
+            when: aiGeneratorPopup.keyboardUp
+        }
+
         background: Rectangle {
             radius: 18
             color: "white"
@@ -783,8 +817,18 @@ Page {
             id: aiPopupScrollView
             clip: true
             contentWidth: availableWidth
+            // ScrollView doesn't measure a positioner-style child's
+            // scrollable extent on its own — without an explicit
+            // contentHeight it can't tell its content is taller than the
+            // popup, so nothing here actually scrolled and this popup's own
+            // height/implicitHeight (see aiGeneratorPopup's "height" binding
+            // below) came out wrong, letting the whole dialog render taller
+            // than the screen with its Generate/Cancel row overflowing off
+            // the bottom instead of being reachable by scrolling.
+            contentHeight: aiPopupColumn.implicitHeight
 
             Column {
+            id: aiPopupColumn
             width: aiPopupScrollView.availableWidth
 
             // ── Gradient header ──────────────────────────────────────────────
@@ -1693,6 +1737,7 @@ Page {
                                 // drop target — same layout idea as the gap/
                                 // combobox previews above.
                                 Flow {
+                                    id: ddAuthorFlow
                                     Layout.fillWidth: true
                                     spacing: 6
 
@@ -1710,6 +1755,15 @@ Page {
                                                 font.pixelSize: 15
                                                 color: "#2c3e50"
                                                 wrapMode: Text.WordWrap
+                                                // Flow only wraps between whole
+                                                // Rows, never inside one, so an
+                                                // unbounded-width Label here let
+                                                // a long sentence push its drop
+                                                // target off the right edge,
+                                                // cropped. Cap it to the Flow's
+                                                // own width instead.
+                                                width: Math.max(40, Math.min(implicitWidth,
+                                                    ddAuthorFlow.width - (ddAuthorRow.isBlank ? ddAuthorBlank.width + 20 : 0)))
                                                 anchors.verticalCenter: parent.verticalCenter
                                             }
 

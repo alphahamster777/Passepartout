@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Mae angen teitl</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Esbonio gramadeg</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>

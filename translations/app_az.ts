@@ -705,6 +705,11 @@
         <source>Title is required</source>
         <translation>Başlıq tələb olunur</translation>
     </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="957"/>
+        <source>💡 Explain grammar</source>
+        <translation>💡 Qrammatikanı izah et</translation>
+    </message>
 </context>
 <context>
     <name>FlashCard</name>
