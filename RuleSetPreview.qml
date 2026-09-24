@@ -85,29 +85,65 @@ Page {
             width: parent.width
             spacing: 12
 
-            RowLayout {
+            // ── Progress + Reset — same white rounded card, row style
+            // (ItemDelegate with a pressed-state fill, a 1px "#ececec"
+            // separator) as Choose Test Type's popup uses for its list rows
+            // and Cancel button. ─────────────────────────────────────────
+            Rectangle {
                 Layout.fillWidth: true
-                Label {
-                    Layout.fillWidth: true
-                    text: qsTr("%1 questions").arg(page.questionCount)
-                    font.pixelSize: 13
-                    color: "#7f8c8d"
-                }
-                Label {
-                    visible: ruleTestController.totalQuestions > 0
-                    text: ruleTestController.testComplete
-                        ? qsTr("Completed: %1 / %2").arg(ruleTestController.correctAnswers).arg(ruleTestController.totalQuestions)
-                        : qsTr("In progress: %1 / %2").arg(ruleTestController.correctAnswers).arg(ruleTestController.totalQuestions)
-                    font.pixelSize: 12
-                    color: ruleTestController.testComplete ? "#27ae60" : "#3498db"
-                }
-            }
+                Layout.preferredHeight: progressCardColumn.implicitHeight
+                radius: 14
+                color: "white"
+                border.color: "#dce1e7"
+                clip: true
 
-            Button {
-                Layout.fillWidth: true
-                text: qsTr("← Reset")
-                flat: true
-                onClicked: resetConfirmDialog.open()
+                ColumnLayout {
+                    id: progressCardColumn
+                    width: parent.width
+                    spacing: 0
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.margins: 14
+                        Label {
+                            Layout.fillWidth: true
+                            // "Next question" while there's still one to
+                            // answer, rather than a static total — more
+                            // useful when picking this set back up mid-test.
+                            // Falls back to the total once it's done, when
+                            // there's no "next" to point at.
+                            text: ruleTestController.testComplete
+                                ? qsTr("%1 questions").arg(page.questionCount)
+                                : qsTr("Next question: #%1").arg(ruleTestController.currentPosition)
+                            font.pixelSize: 13
+                            color: "#7f8c8d"
+                        }
+                        Label {
+                            visible: ruleTestController.totalQuestions > 0
+                            text: ruleTestController.testComplete
+                                ? qsTr("Completed: %1 / %2").arg(ruleTestController.correctAnswers).arg(ruleTestController.totalQuestions)
+                                : qsTr("In progress: %1 / %2").arg(ruleTestController.correctAnswers).arg(ruleTestController.totalQuestions)
+                            font.pixelSize: 12
+                            color: ruleTestController.testComplete ? "#27ae60" : "#3498db"
+                        }
+                    }
+
+                    Rectangle { Layout.fillWidth: true; height: 1; color: "#ececec" }
+
+                    ItemDelegate {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 50
+                        background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white" }
+                        contentItem: Text {
+                            text: qsTr("← Reset")
+                            color: "#e74c3c"
+                            font.pixelSize: 15; font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: resetConfirmDialog.open()
+                    }
+                }
             }
 
             Label {
@@ -121,7 +157,7 @@ Page {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: theoryColumn.implicitHeight + 24
-                radius: 10
+                radius: 14
                 color: "white"
                 border.color: "#dce1e7"
 
@@ -211,38 +247,53 @@ Page {
 
             // ── Spelling strictness — same global setting word-set tests use,
             // since rule's answer-checking reuses the same fuzzy-match
-            // logic and strictness level. ─────────────────────────────────
-            Label {
-                text: qsTr("✍️ Spelling strictness")
-                font.pixelSize: 12; font.bold: true; color: "#2c3e50"
-            }
-            Row {
+            // logic and strictness level. Same white rounded card + 16px-
+            // margin Column as Choose Test Type's own strictnessBlock. ─────
+            Rectangle {
                 Layout.fillWidth: true
-                spacing: 6
+                Layout.preferredHeight: strictnessColumn.implicitHeight + 32
+                radius: 14
+                color: "white"
+                border.color: "#dce1e7"
 
-                Repeater {
-                    model: [
-                        { value: 0, label: qsTr("Strict") },
-                        { value: 1, label: qsTr("Normal") },
-                        { value: 2, label: qsTr("Lenient") }
-                    ]
-                    delegate: ItemDelegate {
-                        width: (page.width - 32 - 12) / 3
-                        height: 32
-                        readonly property bool selected: AppController.spellingStrictness === modelData.value
-                        background: Rectangle {
-                            radius: 8
-                            color: selected ? "#3498db" : "#f0f4f8"
+                Column {
+                    id: strictnessColumn
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 16 }
+                    spacing: 8
+
+                    Label {
+                        text: qsTr("✍️ Spelling strictness")
+                        font.pixelSize: 12; font.bold: true; color: "#2c3e50"
+                    }
+                    Row {
+                        width: parent.width
+                        spacing: 6
+
+                        Repeater {
+                            model: [
+                                { value: 0, label: qsTr("Strict") },
+                                { value: 1, label: qsTr("Normal") },
+                                { value: 2, label: qsTr("Lenient") }
+                            ]
+                            delegate: ItemDelegate {
+                                width: (strictnessColumn.width - 12) / 3
+                                height: 32
+                                readonly property bool selected: AppController.spellingStrictness === modelData.value
+                                background: Rectangle {
+                                    radius: 8
+                                    color: selected ? "#3498db" : "#f0f4f8"
+                                }
+                                contentItem: Text {
+                                    text: modelData.label
+                                    color: selected ? "white" : "#2c3e50"
+                                    font.pixelSize: 12
+                                    font.bold: selected
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: AppController.spellingStrictness = modelData.value
+                            }
                         }
-                        contentItem: Text {
-                            text: modelData.label
-                            color: selected ? "white" : "#2c3e50"
-                            font.pixelSize: 12
-                            font.bold: selected
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: AppController.spellingStrictness = modelData.value
                     }
                 }
             }
