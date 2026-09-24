@@ -111,8 +111,14 @@ Page {
     // "combobox" question: one tap-to-choose option group per blank.
     // question.optionsPerGap is [[opt,opt,...], [opt,opt,...], ...] — one
     // array per blank, in order (see CreatingRuleSet.qml's ";"/","-split
-    // authoring field).
-    readonly property var comboOptionsPerGap: question.optionsPerGap || []
+    // authoring field). Clamped to the sentence's actual "___" count —
+    // Main.qml's save path already drops any group beyond that, but this
+    // is a defensive backstop against an extra, uncompletable "cylinder"
+    // ever getting shown (or counted toward comboSelectionsComplete()/
+    // submission below) for data that somehow ends up saved anyway, e.g.
+    // a hand-edited or older export.
+    readonly property var comboOptionsPerGap:
+        (question.optionsPerGap || []).slice(0, Math.max(0, root.segments.length - 1))
     // The value picked for each blank so far, null where unpicked. null
     // (not "") is the "unpicked" sentinel specifically so an authored
     // deliberately-blank option ("" — see CreatingRuleSet.qml's "\_"

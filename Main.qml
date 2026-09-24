@@ -777,7 +777,18 @@ ApplicationWindow {
                             // "::" separates one blank's option group from
                             // the next, "," separates choices within a
                             // group — see CreatingRuleSet.qml's Options hint.
+                            // Sliced to the sentence's actual "___" count
+                            // *before* parsing each group (same idea as
+                            // dragdrop's ddGapCount below) — a trailing "::"
+                            // group typed with no corresponding blank has
+                            // nothing to answer for, so it's dropped instead
+                            // of saved as an uncompletable extra "cylinder"
+                            // (see RuleTest.qml's comboOptionsPerGap, which
+                            // also clamps defensively in case one somehow
+                            // ends up saved anyway, e.g. via an older file).
+                            var comboGapCount = (q.questionText || "").split("___").length - 1
                             var optionsPerGap = rootScope.splitEscaped(q.poolOptionsText || "", "::")
+                                .slice(0, comboGapCount)
                                 .map(function(group) {
                                     return rootScope.splitEscaped(group, ",")
                                         .map(function(a) { return a.trim() })
@@ -785,7 +796,7 @@ ApplicationWindow {
                                         .map(rootScope.decodeBlankMarker)
                                 })
                                 .filter(function(group) { return group.length > 0 })
-                            if (optionsPerGap.length === 0) continue
+                            if (optionsPerGap.length === 0 || comboGapCount === 0) continue
                             // The answer for each blank is whichever chip
                             // was tapped in that blank's group (see
                             // CreatingRuleSet.qml's comboCorrectIndicesText),
