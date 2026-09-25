@@ -722,23 +722,23 @@
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="646"/>
-        <source>Grammar Term Language</source>
-        <translation>Dilbilgisi terimi dili</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="646"/>
         <source>Explanation Language</source>
         <translation>Açıklama dili</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="933"/>
-        <source>Term language</source>
-        <translation>Terim dili</translation>
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="967"/>
         <source>Explanation language</source>
         <translation>Açıklama dili</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="659"/>
+        <source>Topic Language</source>
+        <translation>Konu dili</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="965"/>
+        <source>Topic language</source>
+        <translation>Konu dili</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1425,14 @@ Kelime seti veya kütüphane eklemek için + Oluştur'a dokunun.</translation>
         <location filename="../SpellingTest.qml" line="129"/>
         <source>Question number %1</source>
         <translation>Soru numarası %1</translation>
+    </message>
+</context>
+<context>
+    <name>LanguageHelper</name>
+    <message>
+        <location filename="../src/languageHelper.cpp" line="33"/>
+        <source>Not selected</source>
+        <translation>Seçilmedi</translation>
     </message>
 </context>
 </TS>

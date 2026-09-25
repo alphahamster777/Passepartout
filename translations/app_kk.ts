@@ -722,23 +722,23 @@
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="646"/>
-        <source>Grammar Term Language</source>
-        <translation>Грамматикалық термин тілі</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="646"/>
         <source>Explanation Language</source>
         <translation>Түсіндірме тілі</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="933"/>
-        <source>Term language</source>
-        <translation>Термин тілі</translation>
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="967"/>
         <source>Explanation language</source>
         <translation>Түсіндірме тілі</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="659"/>
+        <source>Topic Language</source>
+        <translation>Тақырып тілі</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="965"/>
+        <source>Topic language</source>
+        <translation>Тақырып тілі</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1425,14 @@ Tap + Create to add a word set or library.</source>
         <location filename="../SpellingTest.qml" line="129"/>
         <source>Question number %1</source>
         <translation>Сұрақ нөмірі %1</translation>
+    </message>
+</context>
+<context>
+    <name>LanguageHelper</name>
+    <message>
+        <location filename="../src/languageHelper.cpp" line="33"/>
+        <source>Not selected</source>
+        <translation>Таңдалмаған</translation>
     </message>
 </context>
 </TS>

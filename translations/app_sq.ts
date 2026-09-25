@@ -722,23 +722,23 @@
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="646"/>
-        <source>Grammar Term Language</source>
-        <translation>Gjuha e termit gramatikor</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="646"/>
         <source>Explanation Language</source>
         <translation>Gjuha e shpjegimit</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="933"/>
-        <source>Term language</source>
-        <translation>Gjuha e termit</translation>
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="967"/>
         <source>Explanation language</source>
         <translation>Gjuha e shpjegimit</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="659"/>
+        <source>Topic Language</source>
+        <translation>Gjuha e temës</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="965"/>
+        <source>Topic language</source>
+        <translation>Gjuha e temës</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1425,14 @@ Trokit + Krijo për të shtuar një grup fjalësh ose bibliotekë.</translation>
         <location filename="../SpellingTest.qml" line="129"/>
         <source>Question number %1</source>
         <translation>Numri i pyetjes %1</translation>
+    </message>
+</context>
+<context>
+    <name>LanguageHelper</name>
+    <message>
+        <location filename="../src/languageHelper.cpp" line="33"/>
+        <source>Not selected</source>
+        <translation>Nuk është zgjedhur</translation>
     </message>
 </context>
 </TS>

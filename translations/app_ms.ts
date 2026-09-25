@@ -722,23 +722,23 @@
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="646"/>
-        <source>Grammar Term Language</source>
-        <translation>Bahasa istilah tatabahasa</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="646"/>
         <source>Explanation Language</source>
         <translation>Bahasa penerangan</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="933"/>
-        <source>Term language</source>
-        <translation>Bahasa istilah</translation>
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="967"/>
         <source>Explanation language</source>
         <translation>Bahasa penerangan</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="659"/>
+        <source>Topic Language</source>
+        <translation>Bahasa topik</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="965"/>
+        <source>Topic language</source>
+        <translation>Bahasa topik</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1425,14 @@ Ketik + Cipta untuk menambah set perkataan atau pustaka.</translation>
         <location filename="../SpellingTest.qml" line="129"/>
         <source>Question number %1</source>
         <translation>Nombor soalan %1</translation>
+    </message>
+</context>
+<context>
+    <name>LanguageHelper</name>
+    <message>
+        <location filename="../src/languageHelper.cpp" line="33"/>
+        <source>Not selected</source>
+        <translation>Tidak dipilih</translation>
     </message>
 </context>
 </TS>

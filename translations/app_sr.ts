@@ -722,23 +722,23 @@
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="646"/>
-        <source>Grammar Term Language</source>
-        <translation>Језик граматичког термина</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="646"/>
         <source>Explanation Language</source>
         <translation>Језик објашњења</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="933"/>
-        <source>Term language</source>
-        <translation>Језик термина</translation>
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="967"/>
         <source>Explanation language</source>
         <translation>Језик објашњења</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="659"/>
+        <source>Topic Language</source>
+        <translation>Језик теме</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="965"/>
+        <source>Topic language</source>
+        <translation>Језик теме</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1425,14 @@ Tap + Create to add a word set or library.</source>
         <location filename="../SpellingTest.qml" line="129"/>
         <source>Question number %1</source>
         <translation>Питање број %1</translation>
+    </message>
+</context>
+<context>
+    <name>LanguageHelper</name>
+    <message>
+        <location filename="../src/languageHelper.cpp" line="33"/>
+        <source>Not selected</source>
+        <translation>Није изабрано</translation>
     </message>
 </context>
 </TS>

@@ -619,7 +619,7 @@ Page {
             var currentId = page.langPickerCurrentId
             for (var i = 0; i < entries.length; ++i) {
                 if (entries[i].id === currentId) {
-                    var itemH = 48
+                    var itemH = 52
                     var targetY = i * itemH
                     var center = targetY - (ruleLangFlick.height - itemH) / 2
                     ruleLangFlick.contentY = Math.max(0,
@@ -632,6 +632,12 @@ Page {
         background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
 
         contentItem: Column {
+            // Same styling as CreatingRecSet.qml's languagePickerPopup (and,
+            // in turn, SetDirMenu.qml's interfaceLanguagePopup) — RTL
+            // language names kept left-to-right ordered against the flag/
+            // checkmark regardless.
+            LayoutMirroring.enabled: false
+            LayoutMirroring.childrenInherit: true
             Rectangle {
                 width: ruleLanguagePickerPopup.availableWidth
                 height: 52
@@ -643,7 +649,14 @@ Page {
                 }
                 Label {
                     anchors.centerIn: parent
-                    text: page.langPickerTarget === "term" ? qsTr("Grammar Term Language") : qsTr("Explanation Language")
+                    // "Topic Language" — the language of the grammar topic
+                    // being practiced (the generated sentences/options/
+                    // answers), not to be confused with "Explanation
+                    // Language" (the theory paragraphs' own language). Was
+                    // "Grammar Term Language", which read as "the language
+                    // of a single vocabulary term" rather than what this
+                    // actually governs.
+                    text: page.langPickerTarget === "term" ? qsTr("Topic Language") : qsTr("Explanation Language")
                     font.pixelSize: 16; font.bold: true; color: "white"
                 }
             }
@@ -664,7 +677,7 @@ Page {
                         model: page.langEntries
                         delegate: ItemDelegate {
                             width: ruleLangCol.width
-                            height: 48
+                            height: 52
                             required property int index
                             required property var modelData
 
@@ -678,24 +691,49 @@ Page {
                                     height: 1; color: "#ececec"
                                 }
                             }
-                            contentItem: Item {
-                                RowLayout {
-                                    anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
-                                    spacing: 8
-                                    Label {
-                                        Layout.fillWidth: true
-                                        text: modelData.name
-                                        color: isCurrent ? "#3498db" : "#2c3e50"
-                                        font.pixelSize: 15
-                                        font.bold: isCurrent
-                                        verticalAlignment: Text.AlignVCenter
+                            contentItem: RowLayout {
+                                anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
+                                spacing: 10
+                                // See CreatingRecSet.qml's languagePickerPopup
+                                // for why this is an Image/Label pair rather
+                                // than a plain Label.
+                                Item {
+                                    implicitWidth: 24; implicitHeight: 20
+                                    Image {
+                                        anchors.fill: parent
+                                        visible: modelData.flagImage !== ""
+                                        source: modelData.flagImage
+                                        fillMode: Image.PreserveAspectFit
                                     }
                                     Label {
-                                        visible: isCurrent
-                                        text: "✓"
-                                        color: "#3498db"
-                                        font.pixelSize: 14
+                                        anchors.centerIn: parent
+                                        visible: modelData.flagImage === ""
+                                        text: modelData.flag
+                                        font.pixelSize: 20
                                     }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    // Each language's own name for itself —
+                                    // see CreatingRecSet.qml's
+                                    // languagePickerPopup for the same
+                                    // "Not selected" exception (it isn't a
+                                    // language; displayName() would return
+                                    // its untranslated English literal).
+                                    text: modelData.id === LanguageHelper.NotSelected
+                                        ? modelData.name
+                                        : LanguageHelper.displayName(modelData.id)
+                                    color: isCurrent ? "#3498db" : "#2c3e50"
+                                    font.pixelSize: 15
+                                    font.bold: isCurrent
+                                    horizontalAlignment: Text.AlignLeft
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Label {
+                                    visible: isCurrent
+                                    text: "✓"
+                                    color: "#3498db"
+                                    font.pixelSize: 14
                                 }
                             }
                             onClicked: {
@@ -930,7 +968,7 @@ Page {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 4
-                            Label { text: "🗣️ " + qsTr("Term language"); font.pixelSize: 11; color: "#7f8c8d" }
+                            Label { text: "🗣️ " + qsTr("Topic language"); font.pixelSize: 11; color: "#7f8c8d" }
                             Rectangle {
                                 Layout.fillWidth: true
                                 implicitHeight: 34
@@ -942,7 +980,7 @@ Page {
                                     spacing: 2
                                     Label {
                                         Layout.fillWidth: true
-                                        text: LanguageHelper.languageNames()[page.aiTermLanguageId]
+                                        text: LanguageHelper.displayName(page.aiTermLanguageId)
                                         font.pixelSize: 13; color: "#2c3e50"
                                         elide: Text.ElideRight
                                         verticalAlignment: Text.AlignVCenter
@@ -976,7 +1014,7 @@ Page {
                                     spacing: 2
                                     Label {
                                         Layout.fillWidth: true
-                                        text: LanguageHelper.languageNames()[page.aiExplanationLanguageId]
+                                        text: LanguageHelper.displayName(page.aiExplanationLanguageId)
                                         font.pixelSize: 13; color: "#2c3e50"
                                         elide: Text.ElideRight
                                         verticalAlignment: Text.AlignVCenter

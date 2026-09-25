@@ -408,11 +408,30 @@ Page {
                 spacing: 0
 
                 ToolButton {
-                    contentItem: Label {
-                        text: LanguageHelper.flagEmoji(AppController.interfaceLanguage)
-                        font.pixelSize: 20
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                    id: interfaceFlagButton
+                    // A bundled image for languages whose flag doesn't
+                    // render reliably as live emoji text (currently just
+                    // Welsh — see LanguageHelper::flagImageSource's own
+                    // comment); the plain-text glyph every other language
+                    // uses otherwise.
+                    readonly property string flagImage:
+                        LanguageHelper.flagImageSource(AppController.interfaceLanguage)
+                    contentItem: Item {
+                        implicitWidth: 24; implicitHeight: 20
+                        Image {
+                            anchors.fill: parent
+                            visible: interfaceFlagButton.flagImage !== ""
+                            source: interfaceFlagButton.flagImage
+                            fillMode: Image.PreserveAspectFit
+                        }
+                        Label {
+                            anchors.centerIn: parent
+                            visible: interfaceFlagButton.flagImage === ""
+                            text: LanguageHelper.flagEmoji(AppController.interfaceLanguage)
+                            font.pixelSize: 20
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
                     }
                     background: Item {}
                     onClicked: interfaceLanguagePopup.open()
@@ -988,9 +1007,23 @@ Page {
                             contentItem: RowLayout {
                                 anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
                                 spacing: 10
-                                Label {
-                                    text: modelData.flag
-                                    font.pixelSize: 20
+                                // See the header flag button's own comment
+                                // above for why this is an Image/Label pair
+                                // rather than a plain Label.
+                                Item {
+                                    implicitWidth: 24; implicitHeight: 20
+                                    Image {
+                                        anchors.fill: parent
+                                        visible: modelData.flagImage !== ""
+                                        source: modelData.flagImage
+                                        fillMode: Image.PreserveAspectFit
+                                    }
+                                    Label {
+                                        anchors.centerIn: parent
+                                        visible: modelData.flagImage === ""
+                                        text: modelData.flag
+                                        font.pixelSize: 20
+                                    }
                                 }
                                 Label {
                                     Layout.fillWidth: true

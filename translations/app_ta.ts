@@ -722,23 +722,23 @@
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="646"/>
-        <source>Grammar Term Language</source>
-        <translation>இலக்கணச் சொல் மொழி</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="646"/>
         <source>Explanation Language</source>
         <translation>விளக்க மொழி</translation>
-    </message>
-    <message>
-        <location filename="../CreatingRuleSet.qml" line="933"/>
-        <source>Term language</source>
-        <translation>சொல் மொழி</translation>
     </message>
     <message>
         <location filename="../CreatingRuleSet.qml" line="967"/>
         <source>Explanation language</source>
         <translation>விளக்க மொழி</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="659"/>
+        <source>Topic Language</source>
+        <translation>தலைப்பு மொழி</translation>
+    </message>
+    <message>
+        <location filename="../CreatingRuleSet.qml" line="965"/>
+        <source>Topic language</source>
+        <translation>தலைப்பு மொழி</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1425,14 @@ Tap + Create to add a word set or library.</source>
         <location filename="../SpellingTest.qml" line="129"/>
         <source>Question number %1</source>
         <translation>கேள்வி எண் %1</translation>
+    </message>
+</context>
+<context>
+    <name>LanguageHelper</name>
+    <message>
+        <location filename="../src/languageHelper.cpp" line="33"/>
+        <source>Not selected</source>
+        <translation>தேர்ந்தெடுக்கப்படவில்லை</translation>
     </message>
 </context>
 </TS>

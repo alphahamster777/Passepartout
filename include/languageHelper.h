@@ -13,64 +13,65 @@ class LanguageHelper : public QObject
     QML_ELEMENT
     QML_SINGLETON
 public:
-    enum Language {
-        English         =  0,
-        MandarinChinese =  1,
-        Hindi           =  2,
-        Spanish         =  3,
-        French          =  4,
-        StandardArabic  =  5,
-        Bengali         =  6,
-        Russian         =  7,
-        Portuguese      =  8,
-        Urdu            =  9,
-        German          = 10,
-        Japanese        = 11,
-        Italian         = 12,
-        Dutch           = 13,
-        Polish          = 14,
-        Vietnamese      = 15,
-        Ukrainian       = 16,
-        Persian         = 17,
-        Swedish         = 18,
-        Finnish         = 19,
-        Czech           = 20,
-        Hungarian       = 21,
-        Korean          = 22,
-        Romanian        = 23,
-        Norwegian       = 24,
-        Turkish         = 25,
-        Indonesian      = 26,
-        Hebrew          = 27,
-        Serbian         = 28,
-        Danish          = 29,
-        Bulgarian       = 30,
-        Catalan         = 31,
-        Slovak          = 32,
-        Thai            = 33,
-        Greek           = 34,
-        Lithuanian      = 35,
-        Croatian        = 36,
-        Estonian        = 37,
-        Latvian         = 38,
-        Albanian        = 39,
-        Georgian        = 40,
-        Armenian        = 41,
-        Azerbaijani     = 42,
-        Kazakh          = 43,
-        Belarusian      = 44,
-        Basque          = 45,
-        Galician        = 46,
-        Welsh           = 47,
-        Tamil           = 48,
-        Malay           = 49,
-        Marathi         = 50,
-        Swahili         = 51,
-        Slovenian       = 52,
-        Icelandic       = 53,
-        Filipino        = 54,
-        Afrikaans       = 55,
-        NotSelected     = -1
+    enum Language
+    {
+        English = 0,
+        MandarinChinese = 1,
+        Hindi = 2,
+        Spanish = 3,
+        French = 4,
+        StandardArabic = 5,
+        Bengali = 6,
+        Russian = 7,
+        Portuguese = 8,
+        Urdu = 9,
+        German = 10,
+        Japanese = 11,
+        Italian = 12,
+        Dutch = 13,
+        Polish = 14,
+        Vietnamese = 15,
+        Ukrainian = 16,
+        Persian = 17,
+        Swedish = 18,
+        Finnish = 19,
+        Czech = 20,
+        Hungarian = 21,
+        Korean = 22,
+        Romanian = 23,
+        Norwegian = 24,
+        Turkish = 25,
+        Indonesian = 26,
+        Hebrew = 27,
+        Serbian = 28,
+        Danish = 29,
+        Bulgarian = 30,
+        Catalan = 31,
+        Slovak = 32,
+        Thai = 33,
+        Greek = 34,
+        Lithuanian = 35,
+        Croatian = 36,
+        Estonian = 37,
+        Latvian = 38,
+        Albanian = 39,
+        Georgian = 40,
+        Armenian = 41,
+        Azerbaijani = 42,
+        Kazakh = 43,
+        Belarusian = 44,
+        Basque = 45,
+        Galician = 46,
+        Welsh = 47,
+        Tamil = 48,
+        Malay = 49,
+        Marathi = 50,
+        Swahili = 51,
+        Slovenian = 52,
+        Icelandic = 53,
+        Filipino = 54,
+        Afrikaans = 55,
+        NotSelected = -1
     };
     Q_ENUM(Language)
 
@@ -81,7 +82,8 @@ public:
     Q_INVOKABLE static QVariantList sortedLanguageEntries();
 
     // Returns display names indexed by enum value (index == enum ordinal).
-    Q_INVOKABLE static QStringList languageNames() {
+    Q_INVOKABLE static QStringList languageNames()
+    {
         return {
             "English",          //  0
             "Mandarin Chinese", //  1
@@ -142,130 +144,190 @@ public:
         };
     }
 
-    Q_INVOKABLE static Language languageFromString(const QString &name) {
+    Q_INVOKABLE static Language languageFromString(const QString &name)
+    {
         static const QHash<QString, Language> mapping = {
-            {"English",          English},
+            {"English", English},
             {"Mandarin Chinese", MandarinChinese},
-            {"Hindi",            Hindi},
-            {"Spanish",          Spanish},
-            {"French",           French},
-            {"Standard Arabic",  StandardArabic},
-            {"Bengali",          Bengali},
-            {"Russian",          Russian},
-            {"Portuguese",       Portuguese},
-            {"Urdu",             Urdu},
-            {"Not selected",     NotSelected},
-            {"German",           German},
-            {"Japanese",         Japanese},
-            {"Italian",          Italian},
-            {"Dutch",            Dutch},
-            {"Polish",           Polish},
-            {"Vietnamese",       Vietnamese},
-            {"Ukrainian",        Ukrainian},
-            {"Persian",          Persian},
-            {"Swedish",          Swedish},
-            {"Finnish",          Finnish},
-            {"Czech",            Czech},
-            {"Hungarian",        Hungarian},
-            {"Korean",           Korean},
-            {"Romanian",         Romanian},
-            {"Norwegian",        Norwegian},
-            {"Turkish",          Turkish},
-            {"Indonesian",       Indonesian},
-            {"Hebrew",           Hebrew},
-            {"Serbian",          Serbian},
-            {"Danish",           Danish},
-            {"Bulgarian",        Bulgarian},
-            {"Catalan",          Catalan},
-            {"Slovak",           Slovak},
-            {"Thai",             Thai},
-            {"Greek",            Greek},
-            {"Lithuanian",       Lithuanian},
-            {"Croatian",         Croatian},
-            {"Estonian",         Estonian},
-            {"Latvian",          Latvian},
-            {"Albanian",         Albanian},
-            {"Georgian",         Georgian},
-            {"Armenian",         Armenian},
-            {"Azerbaijani",      Azerbaijani},
-            {"Kazakh",           Kazakh},
-            {"Belarusian",       Belarusian},
-            {"Basque",           Basque},
-            {"Galician",         Galician},
-            {"Welsh",            Welsh},
-            {"Tamil",            Tamil},
-            {"Malay",            Malay},
-            {"Marathi",          Marathi},
-            {"Swahili",          Swahili},
-            {"Slovenian",        Slovenian},
-            {"Icelandic",        Icelandic},
-            {"Filipino",         Filipino},
-            {"Afrikaans",        Afrikaans}
-        };
+            {"Hindi", Hindi},
+            {"Spanish", Spanish},
+            {"French", French},
+            {"Standard Arabic", StandardArabic},
+            {"Bengali", Bengali},
+            {"Russian", Russian},
+            {"Portuguese", Portuguese},
+            {"Urdu", Urdu},
+            {"Not selected", NotSelected},
+            {"German", German},
+            {"Japanese", Japanese},
+            {"Italian", Italian},
+            {"Dutch", Dutch},
+            {"Polish", Polish},
+            {"Vietnamese", Vietnamese},
+            {"Ukrainian", Ukrainian},
+            {"Persian", Persian},
+            {"Swedish", Swedish},
+            {"Finnish", Finnish},
+            {"Czech", Czech},
+            {"Hungarian", Hungarian},
+            {"Korean", Korean},
+            {"Romanian", Romanian},
+            {"Norwegian", Norwegian},
+            {"Turkish", Turkish},
+            {"Indonesian", Indonesian},
+            {"Hebrew", Hebrew},
+            {"Serbian", Serbian},
+            {"Danish", Danish},
+            {"Bulgarian", Bulgarian},
+            {"Catalan", Catalan},
+            {"Slovak", Slovak},
+            {"Thai", Thai},
+            {"Greek", Greek},
+            {"Lithuanian", Lithuanian},
+            {"Croatian", Croatian},
+            {"Estonian", Estonian},
+            {"Latvian", Latvian},
+            {"Albanian", Albanian},
+            {"Georgian", Georgian},
+            {"Armenian", Armenian},
+            {"Azerbaijani", Azerbaijani},
+            {"Kazakh", Kazakh},
+            {"Belarusian", Belarusian},
+            {"Basque", Basque},
+            {"Galician", Galician},
+            {"Welsh", Welsh},
+            {"Tamil", Tamil},
+            {"Malay", Malay},
+            {"Marathi", Marathi},
+            {"Swahili", Swahili},
+            {"Slovenian", Slovenian},
+            {"Icelandic", Icelandic},
+            {"Filipino", Filipino},
+            {"Afrikaans", Afrikaans}};
         return mapping.value(name, NotSelected);
     }
 
     // Native script display name for each language.
-    Q_INVOKABLE static QString displayName(Language lang) {
-        switch (lang) {
-        case English:          return QStringLiteral("English");
-        case MandarinChinese:  return QStringLiteral("普通话");
-        case Hindi:            return QStringLiteral("हिन्दी");
-        case Spanish:          return QStringLiteral("Español");
-        case French:           return QStringLiteral("Français");
-        case StandardArabic:   return QStringLiteral("العربية");
-        case Bengali:          return QStringLiteral("বাংলা");
-        case Russian:          return QStringLiteral("Русский");
-        case Portuguese:       return QStringLiteral("Português");
-        case Urdu:             return QStringLiteral("اردو");
-        case German:           return QStringLiteral("Deutsch");
-        case Japanese:         return QStringLiteral("日本語");
-        case Italian:          return QStringLiteral("Italiano");
-        case Dutch:            return QStringLiteral("Nederlands");
-        case Polish:           return QStringLiteral("Polski");
-        case Vietnamese:       return QStringLiteral("Tiếng Việt");
-        case Ukrainian:        return QStringLiteral("Українська");
-        case Persian:          return QStringLiteral("فارسی");
-        case Swedish:          return QStringLiteral("Svenska");
-        case Finnish:          return QStringLiteral("Suomi");
-        case Czech:            return QStringLiteral("Čeština");
-        case Hungarian:        return QStringLiteral("Magyar");
-        case Korean:           return QStringLiteral("한국어");
-        case Romanian:         return QStringLiteral("Română");
-        case Norwegian:        return QStringLiteral("Norsk");
-        case Turkish:          return QStringLiteral("Türkçe");
-        case Indonesian:       return QStringLiteral("Bahasa Indonesia");
-        case Hebrew:           return QStringLiteral("עברית");
-        case Serbian:          return QStringLiteral("Српски");
-        case Danish:           return QStringLiteral("Dansk");
-        case Bulgarian:        return QStringLiteral("Български");
-        case Catalan:          return QStringLiteral("Català");
-        case Slovak:           return QStringLiteral("Slovenčina");
-        case Thai:             return QStringLiteral("ภาษาไทย");
-        case Greek:            return QStringLiteral("Ελληνικά");
-        case Lithuanian:       return QStringLiteral("Lietuvių");
-        case Croatian:         return QStringLiteral("Hrvatski");
-        case Estonian:         return QStringLiteral("Eesti");
-        case Latvian:          return QStringLiteral("Latviešu");
-        case Albanian:         return QStringLiteral("Shqip");
-        case Georgian:         return QStringLiteral("ქართული");
-        case Armenian:         return QStringLiteral("Հայերեն");
-        case Azerbaijani:      return QStringLiteral("Azərbaycanca");
-        case Kazakh:           return QStringLiteral("Қазақша");
-        case Belarusian:       return QStringLiteral("Беларуская");
-        case Basque:           return QStringLiteral("Euskara");
-        case Galician:         return QStringLiteral("Galego");
-        case Welsh:            return QStringLiteral("Cymraeg");
-        case Tamil:            return QStringLiteral("தமிழ்");
-        case Malay:            return QStringLiteral("Bahasa Melayu");
-        case Marathi:          return QStringLiteral("मराठी");
-        case Swahili:          return QStringLiteral("Kiswahili");
-        case Slovenian:        return QStringLiteral("Slovenščina");
-        case Icelandic:        return QStringLiteral("Íslenska");
-        case Filipino:         return QStringLiteral("Filipino");
-        case Afrikaans:        return QStringLiteral("Afrikaans");
-        case NotSelected:      return QStringLiteral("Not selected");
-        default:               return QStringLiteral("Other");
+    Q_INVOKABLE static QString displayName(Language lang)
+    {
+        switch (lang)
+        {
+        case English:
+            return QStringLiteral("English");
+        case MandarinChinese:
+            return QStringLiteral("普通话");
+        case Hindi:
+            return QStringLiteral("हिन्दी");
+        case Spanish:
+            return QStringLiteral("Español");
+        case French:
+            return QStringLiteral("Français");
+        case StandardArabic:
+            return QStringLiteral("العربية");
+        case Bengali:
+            return QStringLiteral("বাংলা");
+        case Russian:
+            return QStringLiteral("Русский");
+        case Portuguese:
+            return QStringLiteral("Português");
+        case Urdu:
+            return QStringLiteral("اردو");
+        case German:
+            return QStringLiteral("Deutsch");
+        case Japanese:
+            return QStringLiteral("日本語");
+        case Italian:
+            return QStringLiteral("Italiano");
+        case Dutch:
+            return QStringLiteral("Nederlands");
+        case Polish:
+            return QStringLiteral("Polski");
+        case Vietnamese:
+            return QStringLiteral("Tiếng Việt");
+        case Ukrainian:
+            return QStringLiteral("Українська");
+        case Persian:
+            return QStringLiteral("فارسی");
+        case Swedish:
+            return QStringLiteral("Svenska");
+        case Finnish:
+            return QStringLiteral("Suomi");
+        case Czech:
+            return QStringLiteral("Čeština");
+        case Hungarian:
+            return QStringLiteral("Magyar");
+        case Korean:
+            return QStringLiteral("한국어");
+        case Romanian:
+            return QStringLiteral("Română");
+        case Norwegian:
+            return QStringLiteral("Norsk");
+        case Turkish:
+            return QStringLiteral("Türkçe");
+        case Indonesian:
+            return QStringLiteral("Bahasa Indonesia");
+        case Hebrew:
+            return QStringLiteral("עברית");
+        case Serbian:
+            return QStringLiteral("Српски");
+        case Danish:
+            return QStringLiteral("Dansk");
+        case Bulgarian:
+            return QStringLiteral("Български");
+        case Catalan:
+            return QStringLiteral("Català");
+        case Slovak:
+            return QStringLiteral("Slovenčina");
+        case Thai:
+            return QStringLiteral("ภาษาไทย");
+        case Greek:
+            return QStringLiteral("Ελληνικά");
+        case Lithuanian:
+            return QStringLiteral("Lietuvių");
+        case Croatian:
+            return QStringLiteral("Hrvatski");
+        case Estonian:
+            return QStringLiteral("Eesti");
+        case Latvian:
+            return QStringLiteral("Latviešu");
+        case Albanian:
+            return QStringLiteral("Shqip");
+        case Georgian:
+            return QStringLiteral("ქართული");
+        case Armenian:
+            return QStringLiteral("Հայերեն");
+        case Azerbaijani:
+            return QStringLiteral("Azərbaycanca");
+        case Kazakh:
+            return QStringLiteral("Қазақша");
+        case Belarusian:
+            return QStringLiteral("Беларуская");
+        case Basque:
+            return QStringLiteral("Euskara");
+        case Galician:
+            return QStringLiteral("Galego");
+        case Welsh:
+            return QStringLiteral("Cymraeg");
+        case Tamil:
+            return QStringLiteral("தமிழ்");
+        case Malay:
+            return QStringLiteral("Bahasa Melayu");
+        case Marathi:
+            return QStringLiteral("मराठी");
+        case Swahili:
+            return QStringLiteral("Kiswahili");
+        case Slovenian:
+            return QStringLiteral("Slovenščina");
+        case Icelandic:
+            return QStringLiteral("Íslenska");
+        case Filipino:
+            return QStringLiteral("Filipino");
+        case Afrikaans:
+            return QStringLiteral("Afrikaans");
+        case NotSelected:
+            return QStringLiteral("Not selected");
+        default:
+            return QStringLiteral("Other");
         }
     }
 
@@ -275,65 +337,65 @@ public:
     // this from displayName()/QLocale::languageToCode() — several of these
     // (Standard Arabic, Mandarin Chinese, Filipino) need a specific script
     // or region variant that the generic mapping wouldn't reliably pick.
-    Q_INVOKABLE static QString localeCode(Language lang) {
+    Q_INVOKABLE static QString localeCode(Language lang)
+    {
         static const QHash<Language, QString> mapping = {
-            {English,          QStringLiteral("en")},
-            {MandarinChinese,  QStringLiteral("zh_CN")},
-            {Hindi,            QStringLiteral("hi")},
-            {Spanish,          QStringLiteral("es")},
-            {French,           QStringLiteral("fr")},
-            {StandardArabic,   QStringLiteral("ar")},
-            {Bengali,          QStringLiteral("bn")},
-            {Russian,          QStringLiteral("ru")},
-            {Portuguese,       QStringLiteral("pt")},
-            {Urdu,             QStringLiteral("ur")},
-            {German,           QStringLiteral("de")},
-            {Japanese,         QStringLiteral("ja")},
-            {Italian,          QStringLiteral("it")},
-            {Dutch,            QStringLiteral("nl")},
-            {Polish,           QStringLiteral("pl")},
-            {Vietnamese,       QStringLiteral("vi")},
-            {Ukrainian,        QStringLiteral("uk")},
-            {Persian,          QStringLiteral("fa")},
-            {Swedish,          QStringLiteral("sv")},
-            {Finnish,          QStringLiteral("fi")},
-            {Czech,            QStringLiteral("cs")},
-            {Hungarian,        QStringLiteral("hu")},
-            {Korean,           QStringLiteral("ko")},
-            {Romanian,         QStringLiteral("ro")},
-            {Norwegian,        QStringLiteral("nb")},
-            {Turkish,          QStringLiteral("tr")},
-            {Indonesian,       QStringLiteral("id")},
-            {Hebrew,           QStringLiteral("he")},
-            {Serbian,          QStringLiteral("sr")},
-            {Danish,           QStringLiteral("da")},
-            {Bulgarian,        QStringLiteral("bg")},
-            {Catalan,          QStringLiteral("ca")},
-            {Slovak,           QStringLiteral("sk")},
-            {Thai,             QStringLiteral("th")},
-            {Greek,            QStringLiteral("el")},
-            {Lithuanian,       QStringLiteral("lt")},
-            {Croatian,         QStringLiteral("hr")},
-            {Estonian,         QStringLiteral("et")},
-            {Latvian,          QStringLiteral("lv")},
-            {Albanian,         QStringLiteral("sq")},
-            {Georgian,         QStringLiteral("ka")},
-            {Armenian,         QStringLiteral("hy")},
-            {Azerbaijani,      QStringLiteral("az")},
-            {Kazakh,           QStringLiteral("kk")},
-            {Belarusian,       QStringLiteral("be")},
-            {Basque,           QStringLiteral("eu")},
-            {Galician,         QStringLiteral("gl")},
-            {Welsh,            QStringLiteral("cy")},
-            {Tamil,            QStringLiteral("ta")},
-            {Malay,            QStringLiteral("ms")},
-            {Marathi,          QStringLiteral("mr")},
-            {Swahili,          QStringLiteral("sw")},
-            {Slovenian,        QStringLiteral("sl")},
-            {Icelandic,        QStringLiteral("is")},
-            {Filipino,         QStringLiteral("fil")},
-            {Afrikaans,        QStringLiteral("af")}
-        };
+            {English, QStringLiteral("en")},
+            {MandarinChinese, QStringLiteral("zh_CN")},
+            {Hindi, QStringLiteral("hi")},
+            {Spanish, QStringLiteral("es")},
+            {French, QStringLiteral("fr")},
+            {StandardArabic, QStringLiteral("ar")},
+            {Bengali, QStringLiteral("bn")},
+            {Russian, QStringLiteral("ru")},
+            {Portuguese, QStringLiteral("pt")},
+            {Urdu, QStringLiteral("ur")},
+            {German, QStringLiteral("de")},
+            {Japanese, QStringLiteral("ja")},
+            {Italian, QStringLiteral("it")},
+            {Dutch, QStringLiteral("nl")},
+            {Polish, QStringLiteral("pl")},
+            {Vietnamese, QStringLiteral("vi")},
+            {Ukrainian, QStringLiteral("uk")},
+            {Persian, QStringLiteral("fa")},
+            {Swedish, QStringLiteral("sv")},
+            {Finnish, QStringLiteral("fi")},
+            {Czech, QStringLiteral("cs")},
+            {Hungarian, QStringLiteral("hu")},
+            {Korean, QStringLiteral("ko")},
+            {Romanian, QStringLiteral("ro")},
+            {Norwegian, QStringLiteral("nb")},
+            {Turkish, QStringLiteral("tr")},
+            {Indonesian, QStringLiteral("id")},
+            {Hebrew, QStringLiteral("he")},
+            {Serbian, QStringLiteral("sr")},
+            {Danish, QStringLiteral("da")},
+            {Bulgarian, QStringLiteral("bg")},
+            {Catalan, QStringLiteral("ca")},
+            {Slovak, QStringLiteral("sk")},
+            {Thai, QStringLiteral("th")},
+            {Greek, QStringLiteral("el")},
+            {Lithuanian, QStringLiteral("lt")},
+            {Croatian, QStringLiteral("hr")},
+            {Estonian, QStringLiteral("et")},
+            {Latvian, QStringLiteral("lv")},
+            {Albanian, QStringLiteral("sq")},
+            {Georgian, QStringLiteral("ka")},
+            {Armenian, QStringLiteral("hy")},
+            {Azerbaijani, QStringLiteral("az")},
+            {Kazakh, QStringLiteral("kk")},
+            {Belarusian, QStringLiteral("be")},
+            {Basque, QStringLiteral("eu")},
+            {Galician, QStringLiteral("gl")},
+            {Welsh, QStringLiteral("cy")},
+            {Tamil, QStringLiteral("ta")},
+            {Malay, QStringLiteral("ms")},
+            {Marathi, QStringLiteral("mr")},
+            {Swahili, QStringLiteral("sw")},
+            {Slovenian, QStringLiteral("sl")},
+            {Icelandic, QStringLiteral("is")},
+            {Filipino, QStringLiteral("fil")},
+            {Afrikaans, QStringLiteral("af")}};
         return mapping.value(lang, QStringLiteral("en"));
     }
 
@@ -343,66 +405,106 @@ public:
     // no flag emoji for a language as such, only for places, so this picks
     // the country the language is named after/originates from, same choice
     // most language pickers (Duolingo etc.) settle on for the same reason.
-    Q_INVOKABLE static QString flagEmoji(Language lang) {
+    Q_INVOKABLE static QString flagEmoji(Language lang)
+    {
         static const QHash<Language, QString> mapping = {
-            {English,          QStringLiteral("🇬🇧")},
-            {MandarinChinese,  QStringLiteral("🇨🇳")},
-            {Hindi,            QStringLiteral("🇮🇳")},
-            {Spanish,          QStringLiteral("🇪🇸")},
-            {French,           QStringLiteral("🇫🇷")},
-            {StandardArabic,   QStringLiteral("🇸🇦")},
-            {Bengali,          QStringLiteral("🇧🇩")},
-            {Russian,          QStringLiteral("🇷🇺")},
-            {Portuguese,       QStringLiteral("🇵🇹")},
-            {Urdu,             QStringLiteral("🇵🇰")},
-            {German,           QStringLiteral("🇩🇪")},
-            {Japanese,         QStringLiteral("🇯🇵")},
-            {Italian,          QStringLiteral("🇮🇹")},
-            {Dutch,            QStringLiteral("🇳🇱")},
-            {Polish,           QStringLiteral("🇵🇱")},
-            {Vietnamese,       QStringLiteral("🇻🇳")},
-            {Ukrainian,        QStringLiteral("🇺🇦")},
-            {Persian,          QStringLiteral("🇮🇷")},
-            {Swedish,          QStringLiteral("🇸🇪")},
-            {Finnish,          QStringLiteral("🇫🇮")},
-            {Czech,            QStringLiteral("🇨🇿")},
-            {Hungarian,        QStringLiteral("🇭🇺")},
-            {Korean,           QStringLiteral("🇰🇷")},
-            {Romanian,         QStringLiteral("🇷🇴")},
-            {Norwegian,        QStringLiteral("🇳🇴")},
-            {Turkish,          QStringLiteral("🇹🇷")},
-            {Indonesian,       QStringLiteral("🇮🇩")},
-            {Hebrew,           QStringLiteral("🇮🇱")},
-            {Serbian,          QStringLiteral("🇷🇸")},
-            {Danish,           QStringLiteral("🇩🇰")},
-            {Bulgarian,        QStringLiteral("🇧🇬")},
-            {Catalan,          QStringLiteral("🇪🇸")},
-            {Slovak,           QStringLiteral("🇸🇰")},
-            {Thai,             QStringLiteral("🇹🇭")},
-            {Greek,            QStringLiteral("🇬🇷")},
-            {Lithuanian,       QStringLiteral("🇱🇹")},
-            {Croatian,         QStringLiteral("🇭🇷")},
-            {Estonian,         QStringLiteral("🇪🇪")},
-            {Latvian,          QStringLiteral("🇱🇻")},
-            {Albanian,         QStringLiteral("🇦🇱")},
-            {Georgian,         QStringLiteral("🇬🇪")},
-            {Armenian,         QStringLiteral("🇦🇲")},
-            {Azerbaijani,      QStringLiteral("🇦🇿")},
-            {Kazakh,           QStringLiteral("🇰🇿")},
-            {Belarusian,       QStringLiteral("🇧🇾")},
-            {Basque,           QStringLiteral("🇪🇸")},
-            {Galician,         QStringLiteral("🇪🇸")},
-            {Welsh,            QStringLiteral("🇬🇧")},
-            {Tamil,            QStringLiteral("🇮🇳")},
-            {Malay,            QStringLiteral("🇲🇾")},
-            {Marathi,          QStringLiteral("🇮🇳")},
-            {Swahili,          QStringLiteral("🇹🇿")},
-            {Slovenian,        QStringLiteral("🇸🇮")},
-            {Icelandic,        QStringLiteral("🇮🇸")},
-            {Filipino,         QStringLiteral("🇵🇭")},
-            {Afrikaans,        QStringLiteral("🇿🇦")}
-        };
+            {English, QStringLiteral("🇬🇧")},
+            {MandarinChinese, QStringLiteral("🇨🇳")},
+            {Hindi, QStringLiteral("🇮🇳")},
+            {Spanish, QStringLiteral("🇪🇸")},
+            {French, QStringLiteral("🇫🇷")},
+            {StandardArabic, QStringLiteral("🇸🇦")},
+            {Bengali, QStringLiteral("🇧🇩")},
+            {Russian, QStringLiteral("🇷🇺")},
+            {Portuguese, QStringLiteral("🇵🇹")},
+            {Urdu, QStringLiteral("🇵🇰")},
+            {German, QStringLiteral("🇩🇪")},
+            {Japanese, QStringLiteral("🇯🇵")},
+            {Italian, QStringLiteral("🇮🇹")},
+            {Dutch, QStringLiteral("🇳🇱")},
+            {Polish, QStringLiteral("🇵🇱")},
+            {Vietnamese, QStringLiteral("🇻🇳")},
+            {Ukrainian, QStringLiteral("🇺🇦")},
+            {Persian, QStringLiteral("🇮🇷")},
+            {Swedish, QStringLiteral("🇸🇪")},
+            {Finnish, QStringLiteral("🇫🇮")},
+            {Czech, QStringLiteral("🇨🇿")},
+            {Hungarian, QStringLiteral("🇭🇺")},
+            {Korean, QStringLiteral("🇰🇷")},
+            {Romanian, QStringLiteral("🇷🇴")},
+            {Norwegian, QStringLiteral("🇳🇴")},
+            {Turkish, QStringLiteral("🇹🇷")},
+            {Indonesian, QStringLiteral("🇮🇩")},
+            {Hebrew, QStringLiteral("🇮🇱")},
+            {Serbian, QStringLiteral("🇷🇸")},
+            {Danish, QStringLiteral("🇩🇰")},
+            {Bulgarian, QStringLiteral("🇧🇬")},
+            {Catalan, QStringLiteral("🇪🇸")},
+            {Slovak, QStringLiteral("🇸🇰")},
+            {Thai, QStringLiteral("🇹🇭")},
+            {Greek, QStringLiteral("🇬🇷")},
+            {Lithuanian, QStringLiteral("🇱🇹")},
+            {Croatian, QStringLiteral("🇭🇷")},
+            {Estonian, QStringLiteral("🇪🇪")},
+            {Latvian, QStringLiteral("🇱🇻")},
+            {Albanian, QStringLiteral("🇦🇱")},
+            {Georgian, QStringLiteral("🇬🇪")},
+            {Armenian, QStringLiteral("🇦🇲")},
+            {Azerbaijani, QStringLiteral("🇦🇿")},
+            {Kazakh, QStringLiteral("🇰🇿")},
+            {Belarusian, QStringLiteral("🇧🇾")},
+            {Basque, QStringLiteral("🇪🇸")},
+            {Galician, QStringLiteral("🇪🇸")},
+            // Wales' own subdivision flag (a 7-codepoint Unicode tag
+            // sequence, GB-WLS) was tried here and reverted — Android's
+            // Noto Color Emoji renders it noticeably smaller than a regular
+            // 2-codepoint flag even at the same font size, and worse, it
+            // doesn't position the actual artwork consistently within its
+            // own glyph box (three different font-size/cropping attempts
+            // on-device each failed a different way: too small, mostly
+            // cropped off, then overflowing/bottom-heavy), so there's no
+            // reliable way to compensate for it in QML. Sharing the UK's
+            // flag, same as every other language here that doesn't have one
+            // clearly its own, renders correctly and needs no special
+            // handling — not worth continuing to fight the platform's
+            // rendering of the "real" flag for this.
+            // {Welsh, QStringLiteral("🏴󠁧󠁢󠁷󠁬󠁳󠁿")},
+            {Welsh, QStringLiteral(
+                        "\U0001F3F4" // Black flag
+                        "\U000E0067" // Tag g
+                        "\U000E0062" // Tag b
+                        "\U000E0077" // Tag w
+                        "\U000E006C" // Tag l
+                        "\U000E0073" // Tag s
+                        "\U000E007F" // End tag
+                        )},
+            {Tamil, QStringLiteral("🇮🇳")},
+            {Malay, QStringLiteral("🇲🇾")},
+            {Marathi, QStringLiteral("🇮🇳")},
+            {Swahili, QStringLiteral("🇹🇿")},
+            {Slovenian, QStringLiteral("🇸🇮")},
+            {Icelandic, QStringLiteral("🇮🇸")},
+            {Filipino, QStringLiteral("🇵🇭")},
+            {Afrikaans, QStringLiteral("🇿🇦")}};
         return mapping.value(lang, QStringLiteral("🏳️"));
+    }
+
+    // A bundled bitmap for languages whose flagEmoji() result doesn't render
+    // reliably as live text — currently just Welsh. Its flag is a 7-codepoint
+    // Unicode subdivision-flag tag sequence rather than an ordinary
+    // 2-codepoint regional-indicator flag, and Android's Noto Color Emoji has
+    // a documented history of positioning that artwork inconsistently within
+    // its own glyph box (confirmed here across three separate on-device
+    // attempts to compensate for it in QML: too small, then mostly cropped
+    // off, then overflowing). Rendering wales.png (extracted from a
+    // desktop-browser render of the same sequence, where it's correct) via
+    // an Image instead of a Text glyph sidesteps the on-device font entirely.
+    // Empty for every language that renders fine as plain text — callers
+    // fall back to flagEmoji() in that case.
+    Q_INVOKABLE static QString flagImageSource(Language lang) {
+        if (lang == Welsh)
+            return QStringLiteral("qrc:/images/flags/wales.png");
+        return QString();
     }
 
     // Best-effort match from the system/UI locale to one of our supported
@@ -410,7 +512,8 @@ public:
     // has ever chosen one explicitly. Matches on bare language code (e.g.
     // "pt_BR" and "pt_PT" both match Portuguese) since we don't distinguish
     // regional variants; falls back to English when nothing matches.
-    Q_INVOKABLE static Language fromLocale(const QLocale &locale) {
+    Q_INVOKABLE static Language fromLocale(const QLocale &locale)
+    {
         const QString code = locale.name().section('_', 0, 0);
         static const QHash<QString, Language> mapping = {
             {QStringLiteral("zh"), MandarinChinese},
@@ -471,8 +574,7 @@ public:
             {QStringLiteral("is"), Icelandic},
             {QStringLiteral("fil"), Filipino},
             {QStringLiteral("tl"), Filipino},
-            {QStringLiteral("af"), Afrikaans}
-        };
+            {QStringLiteral("af"), Afrikaans}};
         return mapping.value(code, English);
     }
 
@@ -481,7 +583,7 @@ public:
     // pointer, but naming it correctly avoids silently falling back to
     // default construction (see AppController::create for a case where
     // that fallback broke real behavior).
-    static QObject* create(QQmlEngine*, QJSEngine*)
+    static QObject *create(QQmlEngine *, QJSEngine *)
     {
         return new LanguageHelper();
     }

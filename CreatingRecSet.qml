@@ -233,7 +233,7 @@ Page {
             var currentId = page.langPickerCurrentId
             for (var i = 0; i < entries.length; ++i) {
                 if (entries[i].id === currentId) {
-                    var itemH = 48
+                    var itemH = 52
                     var targetY = i * itemH
                     var center = targetY - (langFlick.height - itemH) / 2
                     langFlick.contentY = Math.max(0,
@@ -246,6 +246,14 @@ Page {
         background: Rectangle { radius: 14; color: "white"; layer.enabled: true }
 
         contentItem: Column {
+            // Several entries in this list are RTL languages (Hebrew, Arabic,
+            // Urdu, Persian) — keep flag/name/checkmark in a fixed left-to-right
+            // order regardless, so layout doesn't mirror on top of the name
+            // Label's own RTL text shaping (handled by its horizontalAlignment)
+            // — same as SetDirMenu.qml's interfaceLanguagePopup, which this is
+            // styled to match.
+            LayoutMirroring.enabled: false
+            LayoutMirroring.childrenInherit: true
             Rectangle {
                 width: languagePickerPopup.availableWidth
                 height: 52
@@ -278,7 +286,7 @@ Page {
                         model: page.langEntries
                         delegate: ItemDelegate {
                             width: langCol.width
-                            height: 48
+                            height: 52
                             required property int index
                             required property var modelData
 
@@ -292,24 +300,54 @@ Page {
                                     height: 1; color: "#ececec"
                                 }
                             }
-                            contentItem: Item {
-                                RowLayout {
-                                    anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
-                                    spacing: 8
-                                    Label {
-                                        Layout.fillWidth: true
-                                        text: modelData.name
-                                        color: isCurrent ? "#3498db" : "#2c3e50"
-                                        font.pixelSize: 15
-                                        font.bold: isCurrent
-                                        verticalAlignment: Text.AlignVCenter
+                            contentItem: RowLayout {
+                                anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
+                                spacing: 10
+                                // A bundled image for languages whose flag
+                                // doesn't render reliably as live emoji text
+                                // (currently just Welsh — see LanguageHelper::
+                                // flagImageSource's comment); the plain-text
+                                // glyph every other language uses otherwise.
+                                Item {
+                                    implicitWidth: 24; implicitHeight: 20
+                                    Image {
+                                        anchors.fill: parent
+                                        visible: modelData.flagImage !== ""
+                                        source: modelData.flagImage
+                                        fillMode: Image.PreserveAspectFit
                                     }
                                     Label {
-                                        visible: isCurrent
-                                        text: "✓"
-                                        color: "#3498db"
-                                        font.pixelSize: 14
+                                        anchors.centerIn: parent
+                                        visible: modelData.flagImage === ""
+                                        text: modelData.flag
+                                        font.pixelSize: 20
                                     }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    // Each language's own name for itself
+                                    // (e.g. "Français", "Deutsch") — same as
+                                    // SetDirMenu.qml's interfaceLanguagePopup
+                                    // — except for "Not selected" itself,
+                                    // which isn't a language: displayName()
+                                    // would return its untranslated English
+                                    // literal, unlike modelData.name here,
+                                    // which is properly tr()'d (see
+                                    // LanguageHelper::sortedLanguageEntries()).
+                                    text: modelData.id === LanguageHelper.NotSelected
+                                        ? modelData.name
+                                        : LanguageHelper.displayName(modelData.id)
+                                    color: isCurrent ? "#3498db" : "#2c3e50"
+                                    font.pixelSize: 15
+                                    font.bold: isCurrent
+                                    horizontalAlignment: Text.AlignLeft
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Label {
+                                    visible: isCurrent
+                                    text: "✓"
+                                    color: "#3498db"
+                                    font.pixelSize: 14
                                 }
                             }
                             onClicked: {
@@ -519,7 +557,7 @@ Page {
                                     spacing: 2
                                     Label {
                                         Layout.fillWidth: true
-                                        text: LanguageHelper.languageNames()[page.aiFromLanguageId]
+                                        text: LanguageHelper.displayName(page.aiFromLanguageId)
                                         font.pixelSize: 13; color: "#2c3e50"
                                         elide: Text.ElideRight
                                         verticalAlignment: Text.AlignVCenter
@@ -552,7 +590,7 @@ Page {
                                     spacing: 2
                                     Label {
                                         Layout.fillWidth: true
-                                        text: LanguageHelper.languageNames()[page.aiToLanguageId]
+                                        text: LanguageHelper.displayName(page.aiToLanguageId)
                                         font.pixelSize: 13; color: "#2c3e50"
                                         elide: Text.ElideRight
                                         verticalAlignment: Text.AlignVCenter
@@ -922,7 +960,7 @@ Page {
                                         spacing: 2
                                         Label {
                                             Layout.fillWidth: true
-                                            text: languageFrom >= 0 ? LanguageHelper.languageNames()[languageFrom]
+                                            text: languageFrom >= 0 ? LanguageHelper.displayName(languageFrom)
                                                                     : qsTr("Not selected")
                                             font.pixelSize: 11; color: "#2c3e50"
                                             elide: Text.ElideRight
@@ -982,7 +1020,7 @@ Page {
                                         spacing: 2
                                         Label {
                                             Layout.fillWidth: true
-                                            text: languageTo >= 0 ? LanguageHelper.languageNames()[languageTo]
+                                            text: languageTo >= 0 ? LanguageHelper.displayName(languageTo)
                                                                   : qsTr("Not selected")
                                             font.pixelSize: 11; color: "#2c3e50"
                                             elide: Text.ElideRight

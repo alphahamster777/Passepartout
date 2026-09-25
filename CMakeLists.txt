@@ -385,6 +385,15 @@ qt_add_resources(appPassepartout "license_resources"
         licenses/qt_notice.txt
 )
 
+# Wales' flag as a bundled bitmap rather than its live Unicode emoji glyph —
+# see LanguageHelper::flagImageSource()'s comment for why (Android's Noto
+# Color Emoji doesn't render that specific sequence reliably on-device).
+qt_add_resources(appPassepartout "flag_resources"
+    PREFIX "/"
+    FILES
+        images/flags/wales.png
+)
+
 # One .ts per LanguageHelper language except English (the qsTr() source
 # language itself, so it needs no translation file — AppController::
 # applyInterfaceLanguage() leaves no translator installed for it and the

@@ -15,7 +15,8 @@ QVariantList LanguageHelper::sortedLanguageEntries()
             {"name", names[i]},
             {"id",   i},
             {"code", localeCode(lang)},
-            {"flag", flagEmoji(lang)}
+            {"flag", flagEmoji(lang)},
+            {"flagImage", flagImageSource(lang)}
         });
     }
 
@@ -25,7 +26,12 @@ QVariantList LanguageHelper::sortedLanguageEntries()
     });
 
     entries.append(QVariantMap{
-        {"name", QStringLiteral("Not selected")},
+        // tr(), not QStringLiteral — this is the only entry sortedLanguageEntries()
+        // returns that isn't itself a language name (those come from
+        // languageNames()/displayName(), each translated on the QML side per
+        // caller instead). Static tr() still resolves against this class's own
+        // "LanguageHelper" translation context since it's a QObject.
+        {"name", tr("Not selected")},
         {"id",   static_cast<int>(NotSelected)},
         {"code", QStringLiteral("")},
         {"flag", QStringLiteral("")}
