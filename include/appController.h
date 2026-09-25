@@ -40,6 +40,30 @@ class AppController: public QObject
     // later interface-language change.
     Q_PROPERTY(int defaultMeaningLanguage READ defaultMeaningLanguage WRITE setDefaultMeaningLanguage NOTIFY defaultMeaningLanguageChanged)
 
+    // Remembers CreatingRecSet.qml's last-used word language across
+    // sessions — shared by both its AI generator dialog and a brand-new
+    // set's first (or next, after "+ Add word") manually-typed word, since
+    // both are "what language are these words in" for the same set. No
+    // "follows interfaceLanguage" behavior the way defaultMeaningLanguage
+    // (used for the hint language default, below and in the AI dialog
+    // alike) has — it's a plain remembered value, defaulting to English on
+    // a clean launch. No NOTIFY here or on aiWordSetWordCount — each is
+    // only ever read once, at its control's own creation, and written back
+    // when that control changes; nothing else needs to react live to them.
+    Q_PROPERTY(int lastWordLanguage READ lastWordLanguage WRITE setLastWordLanguage)
+    Q_PROPERTY(int aiWordSetWordCount READ aiWordSetWordCount WRITE setAiWordSetWordCount)
+
+    // Same idea, for the AI Rule Set Generator (CreatingRuleSet.qml). Its
+    // Explanation Language already reuses defaultMeaningLanguage above (same
+    // "hint/meaning language" concept); Topic Language gets its own plain
+    // remembered value here, same shape as lastWordLanguage.
+    Q_PROPERTY(int aiRuleSetTopicLanguage READ aiRuleSetTopicLanguage WRITE setAiRuleSetTopicLanguage)
+    Q_PROPERTY(bool aiRuleSetIncludeTheory READ aiRuleSetIncludeTheory WRITE setAiRuleSetIncludeTheory)
+    Q_PROPERTY(int aiRuleSetGapCount READ aiRuleSetGapCount WRITE setAiRuleSetGapCount)
+    Q_PROPERTY(int aiRuleSetMcCount READ aiRuleSetMcCount WRITE setAiRuleSetMcCount)
+    Q_PROPERTY(int aiRuleSetComboCount READ aiRuleSetComboCount WRITE setAiRuleSetComboCount)
+    Q_PROPERTY(int aiRuleSetDragdropCount READ aiRuleSetDragdropCount WRITE setAiRuleSetDragdropCount)
+
 public:
     // No default argument, deliberately: Qt's QML_SINGLETON registration
     // checks std::is_default_constructible<T> BEFORE it looks for a custom
@@ -70,6 +94,24 @@ public:
 
     int defaultMeaningLanguage() const;
     void setDefaultMeaningLanguage(int languageId);
+
+    int lastWordLanguage() const;
+    void setLastWordLanguage(int languageId);
+    int aiWordSetWordCount() const;
+    void setAiWordSetWordCount(int count);
+
+    int aiRuleSetTopicLanguage() const;
+    void setAiRuleSetTopicLanguage(int languageId);
+    bool aiRuleSetIncludeTheory() const;
+    void setAiRuleSetIncludeTheory(bool value);
+    int aiRuleSetGapCount() const;
+    void setAiRuleSetGapCount(int count);
+    int aiRuleSetMcCount() const;
+    void setAiRuleSetMcCount(int count);
+    int aiRuleSetComboCount() const;
+    void setAiRuleSetComboCount(int count);
+    int aiRuleSetDragdropCount() const;
+    void setAiRuleSetDragdropCount(int count);
 
     // Reads the persisted interface-language choice, falling back to the
     // system locale's closest match (without persisting that guess) when

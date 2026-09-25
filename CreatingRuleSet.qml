@@ -49,14 +49,21 @@ Page {
     // rule explanation in one they understand.
     property string langPickerTarget: "term"   // "term" or "explanation"
     property int langPickerCurrentId: -1
-    property int aiTermLanguageId: LanguageHelper.English
+    // Remembers the AI Rule Set Generator's last-used topic language across
+    // sessions (see AppController::aiRuleSetTopicLanguage's own comment); a
+    // clean launch reads back its own default of English. Explanation
+    // language already gets this behavior for free from
+    // defaultMeaningLanguage, which also defaults a fresh launch to the
+    // interface language.
+    property int aiTermLanguageId: AppController.aiRuleSetTopicLanguage
     property int aiExplanationLanguageId: AppController.defaultMeaningLanguage
     // "Explain grammar" toggle below — ticked by default, since most
     // creators do want the generated "theory" paragraphs. Unticking skips
     // asking Gemini for them (see FirebaseAiHelper::generateRuleSet's
     // includeTheory), which also makes the Explanation language picker
-    // moot until it's ticked again.
-    property bool aiIncludeTheory: true
+    // moot until it's ticked again. Remembered across sessions the same way
+    // as the language/count settings above/below.
+    property bool aiIncludeTheory: AppController.aiRuleSetIncludeTheory
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
     Timer {
@@ -546,6 +553,12 @@ Page {
         id: countRow
         property alias label: countLabel.text
         property alias value: countSpin.value
+        // Property aliases (value, above) proxy the underlying property
+        // itself, including its own valueChanged, but not a differently-
+        // named signal like the inner SpinBox's valueModified — forwarded
+        // explicitly so callers can persist only user-driven changes, not
+        // the initial value binding settling in.
+        signal valueModified()
         width: parent ? parent.width : implicitWidth
         spacing: 10
 
@@ -557,6 +570,7 @@ Page {
         SpinBox {
             id: countSpin
             from: 0; to: 20
+            onValueModified: countRow.valueModified()
             editable: true
             font.pixelSize: 14
             implicitWidth: 140
@@ -739,6 +753,7 @@ Page {
                             onClicked: {
                                 if (page.langPickerTarget === "term") {
                                     page.aiTermLanguageId = modelData.id
+                                    AppController.aiRuleSetTopicLanguage = modelData.id
                                 } else {
                                     page.aiExplanationLanguageId = modelData.id
                                     AppController.defaultMeaningLanguage = modelData.id
@@ -1038,7 +1053,10 @@ Page {
                         width: parent.width
                         text: qsTr("💡 Explain grammar")
                         checked: page.aiIncludeTheory
-                        onToggled: page.aiIncludeTheory = checked
+                        onToggled: {
+                            page.aiIncludeTheory = checked
+                            AppController.aiRuleSetIncludeTheory = checked
+                        }
                     }
 
                     Label {
@@ -1046,10 +1064,30 @@ Page {
                         text: qsTr("🔢 Questions per type")
                         font.pixelSize: 12; font.bold: true; color: "#2c3e50"
                     }
-                    AiTypeCountSpin { id: aiGapCountSpin; label: qsTr("📝 Fill in the Gap"); value: 5 }
-                    AiTypeCountSpin { id: aiMcCountSpin; label: qsTr("🔘 Multiple Choice"); value: 5 }
-                    AiTypeCountSpin { id: aiComboCountSpin; label: qsTr("🔽 Dropdown Choice"); value: 0 }
-                    AiTypeCountSpin { id: aiDragdropCountSpin; label: qsTr("🫳 Drag & Drop"); value: 0 }
+                    AiTypeCountSpin {
+                        id: aiGapCountSpin
+                        label: qsTr("📝 Fill in the Gap")
+                        value: AppController.aiRuleSetGapCount
+                        onValueModified: AppController.aiRuleSetGapCount = value
+                    }
+                    AiTypeCountSpin {
+                        id: aiMcCountSpin
+                        label: qsTr("🔘 Multiple Choice")
+                        value: AppController.aiRuleSetMcCount
+                        onValueModified: AppController.aiRuleSetMcCount = value
+                    }
+                    AiTypeCountSpin {
+                        id: aiComboCountSpin
+                        label: qsTr("🔽 Dropdown Choice")
+                        value: AppController.aiRuleSetComboCount
+                        onValueModified: AppController.aiRuleSetComboCount = value
+                    }
+                    AiTypeCountSpin {
+                        id: aiDragdropCountSpin
+                        label: qsTr("🫳 Drag & Drop")
+                        value: AppController.aiRuleSetDragdropCount
+                        onValueModified: AppController.aiRuleSetDragdropCount = value
+                    }
 
                     Label {
                         width: parent.width

@@ -13,6 +13,18 @@ constexpr auto kInterfaceLanguageKey = "interfaceLanguage";
 // deliberately picked a hint language for a new set" from "still following
 // interfaceLanguage" — see defaultMeaningLanguage()/setDefaultMeaningLanguage().
 constexpr auto kMeaningLanguageOverrideKey = "meaningLanguageOverride";
+
+// "Remember last used" keys — see the Q_PROPERTY declarations' own comment
+// in appController.h for why these have no NOTIFY. lastWordLanguage's own
+// key name predates it being shared with manual (non-AI) word entry too.
+constexpr auto kLastWordLanguageKey   = "WordSet/lastLanguage";
+constexpr auto kAiWordSetWordCountKey = "AiWordSet/wordCount";
+constexpr auto kAiRuleSetTopicLanguageKey = "AiRuleSet/topicLanguage";
+constexpr auto kAiRuleSetIncludeTheoryKey = "AiRuleSet/includeTheory";
+constexpr auto kAiRuleSetGapCountKey      = "AiRuleSet/gapCount";
+constexpr auto kAiRuleSetMcCountKey       = "AiRuleSet/mcCount";
+constexpr auto kAiRuleSetComboCountKey    = "AiRuleSet/comboCount";
+constexpr auto kAiRuleSetDragdropCountKey = "AiRuleSet/dragdropCount";
 }
 
 AppController::AppController(QObject *parent) {
@@ -125,4 +137,70 @@ void AppController::setDefaultMeaningLanguage(int languageId) {
         return;
     QSettings().setValue(QLatin1String(kMeaningLanguageOverrideKey), languageId);
     emit defaultMeaningLanguageChanged();
+}
+
+int AppController::lastWordLanguage() const {
+    return QSettings().value(QLatin1String(kLastWordLanguageKey),
+                              static_cast<int>(LanguageHelper::English)).toInt();
+}
+
+void AppController::setLastWordLanguage(int languageId) {
+    QSettings().setValue(QLatin1String(kLastWordLanguageKey), languageId);
+}
+
+int AppController::aiWordSetWordCount() const {
+    return QSettings().value(QLatin1String(kAiWordSetWordCountKey), 10).toInt();
+}
+
+void AppController::setAiWordSetWordCount(int count) {
+    QSettings().setValue(QLatin1String(kAiWordSetWordCountKey), count);
+}
+
+int AppController::aiRuleSetTopicLanguage() const {
+    return QSettings().value(QLatin1String(kAiRuleSetTopicLanguageKey),
+                              static_cast<int>(LanguageHelper::English)).toInt();
+}
+
+void AppController::setAiRuleSetTopicLanguage(int languageId) {
+    QSettings().setValue(QLatin1String(kAiRuleSetTopicLanguageKey), languageId);
+}
+
+bool AppController::aiRuleSetIncludeTheory() const {
+    return QSettings().value(QLatin1String(kAiRuleSetIncludeTheoryKey), true).toBool();
+}
+
+void AppController::setAiRuleSetIncludeTheory(bool value) {
+    QSettings().setValue(QLatin1String(kAiRuleSetIncludeTheoryKey), value);
+}
+
+int AppController::aiRuleSetGapCount() const {
+    return QSettings().value(QLatin1String(kAiRuleSetGapCountKey), 5).toInt();
+}
+
+void AppController::setAiRuleSetGapCount(int count) {
+    QSettings().setValue(QLatin1String(kAiRuleSetGapCountKey), count);
+}
+
+int AppController::aiRuleSetMcCount() const {
+    return QSettings().value(QLatin1String(kAiRuleSetMcCountKey), 5).toInt();
+}
+
+void AppController::setAiRuleSetMcCount(int count) {
+    QSettings().setValue(QLatin1String(kAiRuleSetMcCountKey), count);
+}
+
+int AppController::aiRuleSetComboCount() const {
+    return QSettings().value(QLatin1String(kAiRuleSetComboCountKey), 0).toInt();
+}
+
+void AppController::setAiRuleSetComboCount(int count) {
+    QSettings().setValue(QLatin1String(kAiRuleSetComboCountKey), count);
+}
+
+int AppController::aiRuleSetDragdropCount() const {
+    return QSettings().value(QLatin1String(kAiRuleSetDragdropCountKey), 0).toInt();
+}
+
+void AppController::setAiRuleSetDragdropCount(int count) {
+    QSettings().setValue(QLatin1String(kAiRuleSetDragdropCountKey), count);
 }

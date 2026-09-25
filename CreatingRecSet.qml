@@ -58,7 +58,13 @@ Page {
     }
     // "card" = languagePickerPopup edits recSetModel[langPickerCardIndex]; "aiFrom"/"aiTo" = it edits the AI dialog's own selection instead.
     property string langPickerTarget: "card"
-    property int aiFromLanguageId: LanguageHelper.English
+    // Remembers the last-used word language across sessions (see
+    // AppController::lastWordLanguage's own comment — shared with manual,
+    // non-AI word entry below); a clean launch reads back its own default
+    // of English. Hint language already gets this behavior for free from
+    // defaultMeaningLanguage, which also defaults a fresh launch to the
+    // interface language.
+    property int aiFromLanguageId: AppController.lastWordLanguage
     property int aiToLanguageId: AppController.defaultMeaningLanguage
     readonly property var langEntries: LanguageHelper.sortedLanguageEntries()
 
@@ -353,6 +359,7 @@ Page {
                             onClicked: {
                                 if (page.langPickerTarget === "aiFrom") {
                                     page.aiFromLanguageId = modelData.id
+                                    AppController.lastWordLanguage = modelData.id
                                 } else if (page.langPickerTarget === "aiTo") {
                                     page.aiToLanguageId = modelData.id
                                     AppController.defaultMeaningLanguage = modelData.id
@@ -361,6 +368,10 @@ Page {
                                     if (cardIdx >= 0) {
                                         if (page.langPickerIsFrom) {
                                             recSetModel.set(cardIdx, { languageFrom: modelData.id })
+                                            // Same "only a brand-new set" rule as the
+                                            // hint language below.
+                                            if (page.recSetIdx === -1)
+                                                AppController.lastWordLanguage = modelData.id
                                         } else {
                                             recSetModel.set(cardIdx, { languageTo: modelData.id })
                                             // Only a brand-new set's hint language sticks as the
@@ -620,7 +631,12 @@ Page {
                         }
                         SpinBox {
                             id: aiCountSpin
-                            from: 1; to: 20; value: 10
+                            from: 1; to: 20
+                            value: AppController.aiWordSetWordCount
+                            // Not valueChanged — that would also fire (and
+                            // persist) while the value binding above is
+                            // just settling to its initial read.
+                            onValueModified: AppController.aiWordSetWordCount = value
                             editable: true
                             font.pixelSize: 14
                             implicitWidth: 140
@@ -1414,7 +1430,12 @@ Page {
 
             Component.onCompleted: {
                 recSetModel.append({
-                    languageFrom: LanguageHelper.English,
+                    // Same "last used, else English" / "last used, else
+                    // interface language" split as the AI dialog's own
+                    // defaults — this row only survives for a genuinely new
+                    // set; editing an existing one clears and reloads this
+                    // model right after (see Main.qml's onEditRecSet).
+                    languageFrom: AppController.lastWordLanguage,
                     languageTo:   AppController.defaultMeaningLanguage,
                     expression: "", hint: "", audioPath: "", imagePath: "", exampleUsage: ""
                 })
