@@ -1,8 +1,11 @@
 """Cloud Functions backing Passepartout's AI word-set and rule-set generators.
 
-Four deployed functions, one pair per feature:
+Five deployed functions — one pair per feature, plus content reporting:
 - generate_word_set_free / generate_word_set_pro share _handle_generate().
 - generate_rule_set_free / generate_rule_set_pro share _handle_generate_rules().
+- report_ai_content (_handle_report) — in-app flagging of generated content,
+  required by Google Play's AI-Generated Content policy. See the "Content
+  safety" section below for how generation itself is kept policy-compliant.
 Each pair differs only in monthly quota. There's no client-supplied "I'm pro"
 flag to fake: which limit applies is decided by which URL the calling app
 was built with (see FirebaseAiHelper's PASSEPARTOUT_TIER build option), and
@@ -31,6 +34,7 @@ import json
 import os
 import re
 import time
+import unicodedata
 from datetime import datetime, timezone
 
 import requests
@@ -52,6 +56,118 @@ _API_KEY_QUERY_RE = re.compile(r"([?&]key=)[^&\s]+")
 
 def _redact(text: str) -> str:
     return _API_KEY_QUERY_RE.sub(r"\1REDACTED", str(text))
+
+
+# ── Content safety (Google Play Sexual Content / AI-Generated Content) ──────
+#
+# Play requires AI generators to prevent the generation of restricted
+# content, so there are four layers here, cheapest first:
+# 1. _contains_restricted(theme) refuses an obviously restricted theme before
+#    any quota is charged or Gemini is called.
+# 2. CONTENT_RULES tells Gemini itself what's off-limits (and to return
+#    nothing instead) — also in the C++ prompts (aiWordSetShared.cpp /
+#    aiRuleSetShared.cpp), keep the wording in sync.
+# 3. SAFETY_SETTINGS has Gemini's own classifiers block at the strictest
+#    threshold; a blocked response raises ContentBlockedError.
+# 4. Every generated item is re-checked with _contains_restricted and dropped
+#    if it matches, in case anything slipped past 1-3.
+# Users can additionally flag anything that still gets through, in-app, via
+# report_ai_content below (also a Play requirement for AI generators).
+
+CONTENT_RULES = (
+    "All content must be suitable for learners of all ages: never include sexual or "
+    "sexually suggestive content, nudity, profanity, slurs, insults, hate, harassment, "
+    "graphic violence or drugs."
+)
+
+CONTENT_REFUSED_MESSAGE = (
+    "This theme can't be generated. Passepartout's AI only creates content suitable for all "
+    "ages — sexual, profane or offensive topics aren't supported. Try a different theme."
+)
+
+SAFETY_SETTINGS = [
+    {"category": category, "threshold": "BLOCK_LOW_AND_ABOVE"}
+    for category in (
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "HARM_CATEGORY_HARASSMENT",
+        "HARM_CATEGORY_HATE_SPEECH",
+        "HARM_CATEGORY_DANGEROUS_CONTENT",
+    )
+]
+
+_BLOCKED_FINISH_REASONS = {"SAFETY", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII"}
+
+
+class ContentBlockedError(Exception):
+    """Gemini's own safety filters refused the prompt or the response."""
+
+
+# Same file CMake embeds into the app for ContentFilter (contentFilter.cpp) —
+# the one shared list. Only the "Strict" scope (words/phrases/stems) is used
+# here; "image_only_words" are too ambiguous to refuse text over.
+_LEET = str.maketrans({"0": "o", "1": "i", "3": "e", "4": "a", "@": "a", "5": "s", "$": "s"})
+
+
+def _normalize_tokens(text: str) -> list[str]:
+    """Mirrors ContentFilter's normalizedTokens() in contentFilter.cpp — keep
+    both identical, or the shared term list will match differently on each
+    side: NFKD, drop combining marks, casefold (which also turns ß into ss),
+    map a few leetspeak characters, then split on anything that isn't a
+    letter/digit."""
+    decomposed = unicodedata.normalize("NFKD", str(text))
+    folded = "".join(c for c in decomposed if unicodedata.category(c) != "Mn").casefold()
+    folded = folded.translate(_LEET)
+    tokens, current = [], []
+    for c in folded:
+        if c.isalnum():
+            current.append(c)
+        elif current:
+            tokens.append("".join(current))
+            current = []
+    if current:
+        tokens.append("".join(current))
+    return tokens
+
+
+def _load_restricted_terms():
+    with open(os.path.join(os.path.dirname(__file__), "restricted_terms.json"), encoding="utf-8") as f:
+        raw = json.load(f)
+    words = {t for w in raw["words"] for t in _normalize_tokens(w)}
+    phrases = [f" {' '.join(toks)} " for p in raw["phrases"] if (toks := _normalize_tokens(p))]
+    stems = [s for s in ("".join(_normalize_tokens(s)) for s in raw["stems"]) if s]
+    return words, phrases, stems
+
+
+_RESTRICTED_WORDS, _RESTRICTED_PHRASES, _RESTRICTED_STEMS = _load_restricted_terms()
+
+
+def _contains_restricted(text: str) -> bool:
+    tokens = _normalize_tokens(text)
+    if not tokens:
+        return False
+    if any(t in _RESTRICTED_WORDS for t in tokens):
+        return True
+    joined = f" {' '.join(tokens)} "
+    return (any(p in joined for p in _RESTRICTED_PHRASES)
+            or any(s in joined for s in _RESTRICTED_STEMS))
+
+
+def _item_is_restricted(item) -> bool:
+    """True if any string anywhere inside a generated item (a word dict, a
+    question dict with its options/answers lists, a theory paragraph) is
+    restricted."""
+    if isinstance(item, dict):
+        return any(_item_is_restricted(v) for v in item.values())
+    if isinstance(item, list):
+        return any(_item_is_restricted(v) for v in item)
+    return isinstance(item, str) and _contains_restricted(item)
+
+
+def _drop_restricted(items: list) -> list:
+    kept = [i for i in items if not _item_is_restricted(i)]
+    if len(kept) != len(items):
+        print(f"Content filter dropped {len(items) - len(kept)} generated item(s)")
+    return kept
 
 FREE_MONTHLY_LIMIT = 2
 PRO_MONTHLY_LIMIT = 30
@@ -109,7 +225,8 @@ def build_prompt(theme: str, from_lang: str, to_lang: str, word_count: int) -> s
         f'"expression" must be a single word or short phrase in {from_lang}.\n'
         f'"hint" must be its translation or definition in {to_lang}.\n'
         f'"exampleUsage" must be one short example sentence in {from_lang} that uses the expression.\n'
-        "Do not repeat words. Keep entries concise."
+        "Do not repeat words. Keep entries concise.\n"
+        f"{CONTENT_RULES} If the theme asks for any of that, return an empty \"words\" array instead."
     )
 
 
@@ -202,7 +319,8 @@ def build_rule_prompt(theme: str, gap_count: int, mc_count: int, combo_count: in
         'zero-based "correctIndex" points at the correct tile.\n'
         "Every mcQuestions/comboQuestions/dragdropQuestions entry must include "
         f'correctIndex. Keep sentences concise and strictly about "{theme}". Do not repeat '
-        "the same sentence."
+        "the same sentence.\n"
+        f"{CONTENT_RULES} If the topic asks for any of that, return every array empty instead."
     )
 
 
@@ -343,6 +461,7 @@ def call_gemini_json(prompt: str, schema: dict, api_key: str) -> dict:
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent"
     body = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "safetySettings": SAFETY_SETTINGS,
         "generationConfig": {
             "responseMimeType": "application/json",
             "responseSchema": schema,
@@ -364,9 +483,17 @@ def call_gemini_json(prompt: str, schema: dict, api_key: str) -> dict:
         resp.raise_for_status()
     data = resp.json()
 
+    block_reason = (data.get("promptFeedback") or {}).get("blockReason")
+    if block_reason:
+        print(f"Gemini blocked the prompt: {block_reason}")
+        raise ContentBlockedError(block_reason)
     candidates = data.get("candidates") or []
     if not candidates:
         raise RuntimeError("Gemini returned no result.")
+    finish_reason = candidates[0].get("finishReason")
+    if finish_reason in _BLOCKED_FINISH_REASONS:
+        print(f"Gemini blocked the response: {finish_reason}")
+        raise ContentBlockedError(finish_reason)
     parts = candidates[0].get("content", {}).get("parts") or []
     if not parts:
         raise RuntimeError("Gemini returned an empty response.")
@@ -440,6 +567,8 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
         return _json_response({"error": "Theme is required"}, 400)
     if len(theme) > MAX_THEME_LENGTH:
         return _json_response({"error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
+    if _contains_restricted(theme):
+        return _json_response({"error": CONTENT_REFUSED_MESSAGE}, 422)
 
     if unlimited:
         remaining = -1
@@ -485,12 +614,19 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
                 503,
             )
         return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
+    except ContentBlockedError:
+        return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+                               "limit": monthly_limit, "resetAt": reset_at}, 422)
     except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
         print(f"Gemini call failed unexpectedly: {_redact(exc)}")
         return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
 
+    # CONTENT_RULES asks Gemini to return an empty list for a restricted
+    # theme, so an empty result is most likely a refusal, not a malfunction.
+    words = _drop_restricted(words)
     if not words:
-        return _json_response({"error": "Gemini returned no words"}, 502)
+        return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+                               "limit": monthly_limit, "resetAt": reset_at}, 422)
 
     return _json_response(
         {"words": words, "remaining": remaining, "limit": monthly_limit, "resetAt": reset_at}, 200
@@ -550,6 +686,8 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
         return _json_response({"error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
     if gap_target == 0 and mc_target == 0 and combo_target == 0 and dragdrop_target == 0:
         return _json_response({"error": "Set at least one question type above zero"}, 400)
+    if _contains_restricted(theme):
+        return _json_response({"error": CONTENT_REFUSED_MESSAGE}, 422)
 
     if unlimited:
         remaining = -1
@@ -609,6 +747,11 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
                     503,
                 )
             return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
+        except ContentBlockedError:
+            # A deliberate refusal, not a transient failure — retrying the
+            # same prompt would only get refused again.
+            return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+                                   "limit": monthly_limit, "resetAt": reset_at}, 422)
         except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
             print(f"Gemini call failed unexpectedly: {_redact(exc)}")
             if attempt == 0:
@@ -635,19 +778,21 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
     if not attempts:
         return _json_response({"error": "Gemini returned no usable content."}, 502)
 
-    theory = next((a.get("theory") for a in attempts if a.get("theory")), []) or []
-    gap_questions = _merge_question_lists([a.get("gapQuestions") or [] for a in attempts])
-    mc_questions = _clean_single_blank_list(
-        _merge_question_lists([a.get("mcQuestions") or [] for a in attempts]))
-    combo_questions = _clean_single_blank_list(
-        _merge_question_lists([a.get("comboQuestions") or [] for a in attempts]), require_single_blank=True)
-    dragdrop_questions = _clean_single_blank_list(
-        _merge_question_lists([a.get("dragdropQuestions") or [] for a in attempts]), require_single_blank=True)
+    theory = _drop_restricted(next((a.get("theory") for a in attempts if a.get("theory")), []) or [])
+    gap_questions = _drop_restricted(_merge_question_lists([a.get("gapQuestions") or [] for a in attempts]))
+    mc_questions = _drop_restricted(_clean_single_blank_list(
+        _merge_question_lists([a.get("mcQuestions") or [] for a in attempts])))
+    combo_questions = _drop_restricted(_clean_single_blank_list(
+        _merge_question_lists([a.get("comboQuestions") or [] for a in attempts]), require_single_blank=True))
+    dragdrop_questions = _drop_restricted(_clean_single_blank_list(
+        _merge_question_lists([a.get("dragdropQuestions") or [] for a in attempts]), require_single_blank=True))
     print(f"Rule-set generation result: gap {len(gap_questions)}/{gap_target}, mc {len(mc_questions)}/{mc_target}, "
           f"combo {len(combo_questions)}/{combo_target}, dragdrop {len(dragdrop_questions)}/{dragdrop_target}")
     if (not theory and not gap_questions and not mc_questions
             and not combo_questions and not dragdrop_questions):
-        return _json_response({"error": "Gemini returned no questions"}, 502)
+        # See _handle_generate — an empty result is most likely a refusal.
+        return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+                               "limit": monthly_limit, "resetAt": reset_at}, 422)
 
     return _json_response(
         {"theory": theory, "gapQuestions": gap_questions, "mcQuestions": mc_questions,
@@ -655,6 +800,74 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
          "remaining": remaining, "limit": monthly_limit, "resetAt": reset_at},
         200,
     )
+
+
+REPORT_REASONS = {"sexual", "hateful", "violent", "profanity", "inaccurate", "other"}
+MAX_REPORT_CONTENT_LENGTH = 20000
+MAX_REPORT_COMMENT_LENGTH = 1000
+MAX_REPORTS_PER_DAY = 20
+
+
+def _handle_report(req: https_fn.Request) -> https_fn.Response:
+    """In-app flagging of AI-generated content — Google Play's AI-Generated
+    Content policy requires that users can report offensive output without
+    leaving the app. Stores the report (with the flagged content itself, so
+    it can be reviewed later even if the user deletes the set) in the
+    "reports" Firestore collection; review them in Firebase Console ->
+    Firestore -> reports. Takes the same Firebase Auth ID token as the
+    generate functions, plus {kind: "wordSet"|"ruleSet", theme, content
+    (the generated JSON as a string), reason (one of REPORT_REASONS),
+    comment}."""
+    if req.method != "POST":
+        return _json_response({"error": "Method not allowed"}, 405)
+
+    auth_header = req.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return _json_response({"error": "Missing bearer token"}, 401)
+    try:
+        decoded = auth.verify_id_token(auth_header[len("Bearer "):])
+    except Exception:
+        return _json_response({"error": "Invalid or expired token"}, 401)
+    uid = decoded["uid"]
+
+    body = req.get_json(silent=True) or {}
+    kind = str(body.get("kind", "")).strip()
+    reason = str(body.get("reason", "")).strip()
+    if kind not in ("wordSet", "ruleSet"):
+        return _json_response({"error": "Unknown content kind"}, 400)
+    if reason not in REPORT_REASONS:
+        return _json_response({"error": "Unknown report reason"}, 400)
+
+    db = firestore.client()
+    day_key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    counter_ref = db.collection("reportCounts").document(uid).collection("days").document(day_key)
+    transaction = db.transaction()
+
+    @firestore.transactional
+    def check_and_increment(tx: firestore.Transaction) -> bool:
+        snapshot = counter_ref.get(transaction=tx)
+        count = snapshot.get("count") if snapshot.exists else 0
+        if count >= MAX_REPORTS_PER_DAY:
+            return False
+        tx.set(counter_ref, {"count": count + 1}, merge=True)
+        return True
+
+    if not check_and_increment(transaction):
+        return _json_response({"error": "Too many reports today — please try again tomorrow."}, 429)
+
+    db.collection("reports").add({
+        "uid": uid,
+        "email": decoded.get("email"),
+        "kind": kind,
+        "reason": reason,
+        "theme": str(body.get("theme", ""))[:MAX_THEME_LENGTH],
+        "content": str(body.get("content", ""))[:MAX_REPORT_CONTENT_LENGTH],
+        "comment": str(body.get("comment", ""))[:MAX_REPORT_COMMENT_LENGTH],
+        "status": "open",
+        "createdAt": firestore.SERVER_TIMESTAMP,
+    })
+    print(f"AI content report filed: kind={kind} reason={reason}")
+    return _json_response({"ok": True}, 200)
 
 
 # Matches the "eur3" Firestore location (spans europe-west1 + europe-west4) —
@@ -682,3 +895,9 @@ def generate_rule_set_free(req: https_fn.Request) -> https_fn.Response:
 @https_fn.on_request(**_COMMON_OPTIONS)
 def generate_rule_set_pro(req: https_fn.Request) -> https_fn.Response:
     return _handle_generate_rules(req, RULE_PRO_MONTHLY_LIMIT)
+
+
+# No Gemini secret needed — this one never calls the model.
+@https_fn.on_request(memory=options.MemoryOption.MB_256, region="europe-west1")
+def report_ai_content(req: https_fn.Request) -> https_fn.Response:
+    return _handle_report(req)

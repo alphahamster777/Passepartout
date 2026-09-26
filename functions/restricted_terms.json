@@ -1,0 +1,47 @@
+{
+  "_comment": "Single source of truth for the sexual/profane-content blocklist. Read at runtime by functions/main.py (AI theme + AI output filtering) and embedded at build time into the app by CMake (ContentFilter: image auto-fetch + GeminiHelper). Every entry is normalized the same way as the text it's matched against (NFKD, combining marks stripped, casefolded, ss for sharp s, a few leetspeak digits/symbols mapped to letters), so accents/case don't matter here. 'words' (whole word) and 'phrases' (whole run of words) and 'stems' (anywhere — for compounds and for scripts written without spaces, e.g. CJK/Thai) apply everywhere. 'image_only_words' are too ambiguous to refuse an AI theme or drop an AI-generated word over (rooster, chicken breast, Spanish 'nudo' = knot, bra in a clothing set...) but still aren't worth the risk as an image search query. Avoid stems that are common substrings of innocent words in any supported language.",
+  "words": [
+    "sex", "sexy", "sexier", "sexiest", "sexed", "sexting", "sext", "nsfw", "nude", "nudes", "nudity", "nudist", "nudism", "naked", "topless", "undressed",
+    "nipple", "nipples", "boobs", "boobies", "titty", "titties", "areola", "areolas",
+    "pussy", "pussies", "vagina", "vaginas", "vaginal", "vulva", "labia", "clit", "clitoris", "penis", "penises", "phallus", "phallic", "dickhead",
+    "testicle", "testicles", "scrotum", "genital", "genitals", "genitalia", "anus", "anal", "buttocks",
+    "erection", "orgasm", "orgasms", "masturbate", "masturbating", "masturbation", "ejaculate", "ejaculation", "cum", "cumming", "horny", "foreplay", "intercourse", "coitus", "copulate", "copulation", "fornicate", "fornication", "sodomy",
+    "fellatio", "cunnilingus", "blowjob", "handjob", "rimjob", "dildo", "dildos", "vibrator", "buttplug", "bdsm", "bondage", "fetish", "fetishes", "kinky", "dominatrix", "threesome", "orgy", "orgies", "gangbang", "incest", "rape", "raped", "rapist", "molest", "molester", "pedophile", "paedophile", "pedophilia",
+    "porn", "porno", "pornography", "pornographic", "xxx", "erotic", "erotica", "hentai", "milf", "camgirl", "onlyfans", "playboy", "stripper", "strippers", "striptease", "stripclub", "lapdance", "brothel", "prostitute", "prostitutes", "prostitution", "whore", "whores", "slut", "sluts", "slutty", "skank", "thot", "kamasutra", "viagra",
+    "fuck", "fucks", "fucked", "fucker", "fuckers", "fucking", "shit", "shits", "shitty", "bullshit", "bitch", "bitches", "bastard", "bastards", "cunt", "cunts", "twat", "twats", "wank", "wanker", "wanking", "bollocks", "motherfucker", "goddamn", "douchebag", "jerkoff",
+    "profanity", "profanities", "obscene", "obscenity", "obscenities", "swearword", "swearwords", "cussword", "cusswords", "expletive", "expletives",
+    "nigger", "niggers", "nigga", "faggot", "faggots", "fag", "fags", "retard", "tranny", "spic", "chink", "kike", "wetback",
+    "sexo", "desnudo", "desnuda", "desnudos", "desnudas", "pezon", "pezones", "tetas", "verga", "culo", "puta", "putas", "puto", "mierda", "joder", "follar", "chingar", "pendejo", "cabron", "orgasmo", "erotico",
+    "sexe", "sexuel", "sexuelle", "sexuels", "sexuelles", "nichon", "nichons", "teton", "tetons", "putain", "merde", "salope", "pute", "enculer", "encule", "branler", "connard", "connasse",
+    "nackt", "nackte", "nackter", "nacktheit", "titten", "nippel", "brustwarze", "brustwarzen", "muschi", "fotze", "ficken", "fick", "scheisse", "arschloch", "hure", "nutte", "wichser", "schlampe", "geschlechtsverkehr", "sexuell",
+    "sesso", "capezzolo", "capezzoli", "tette", "cazzo", "figa", "pompino", "scopare", "puttana", "vaffanculo", "stronzo", "sessuale",
+    "sexual", "mamilo", "mamilos", "buceta", "caralho", "foder", "foda", "merda", "transar",
+    "seks", "naakt", "tepel", "tepels", "tieten", "neuken", "klootzak", "hoer",
+    "naken", "brostvarta", "brostvartor", "fitta", "knulla", "javla", "samlag",
+    "sutek", "sutki", "cycki", "kutas", "pizda", "chuj", "kurwa", "jebac", "pierdolic",
+    "amcik", "yarrak", "sikis",
+    "секс", "порно", "голый", "голая", "голые", "сиськи", "сосок", "соски", "хуй", "пизда", "ебать", "блядь", "бля", "жопа", "трахать", "эротика",
+    "порнографія", "голий", "цицьки",
+    "سكس", "اباحي", "إباحي", "عاري", "عارية",
+    "सेक्स", "नंगा", "नंगी", "चुदाई"
+  ],
+  "image_only_words": [
+    "sexes", "sexuality", "undress", "undressing", "bottomless", "breast", "breasts", "boob", "booby", "tit", "tits", "cleavage",
+    "cock", "cocks", "dick", "dicks", "prick", "pricks", "balls", "groin", "crotch", "ass", "asses", "arse", "butt", "butts", "buttock", "booty", "bum",
+    "erect", "climax", "semen", "sperm", "arousal", "aroused", "lust", "lustful", "seduce", "seduction", "seductive", "kink",
+    "hustler", "hooker", "hookers", "escort", "escorts", "lingerie", "thong", "thongs", "gstring", "bikini", "bikinis", "underwear", "panties", "bra", "bras", "swimsuit", "condom", "condoms", "aphrodisiac", "kiss", "kissing",
+    "damn", "crap", "piss", "pissed", "douche", "screw", "screwing", "profane", "vulgar", "vulgarity", "slur", "slurs", "dyke", "retarded", "body",
+    "teta", "polla", "pene", "coger", "zorra", "nudo", "nuda", "nudi", "fica", "nue", "nues", "seins", "mamelon", "mamelons", "chatte", "baiser", "foutre",
+    "bruste", "busen", "arsch", "peitos", "porra", "lul", "kut", "brost", "kuk", "hora", "nagi", "naga", "cycek", "sik", "сука"
+  ],
+  "phrases": [
+    "sexual intercourse", "sexual positions", "sex positions", "making love", "make love", "made love", "oral sex", "dirty talk", "dirty words", "curse words", "cuss words", "swear words", "bad words", "rude words", "four letter words", "adult content", "adult words", "adults only", "not safe for work", "g string", "strip club", "lap dance", "sex toy", "sex toys", "private parts", "intimate parts", "one night stand", "friends with benefits", "son of a bitch", "jerk off", "hand job", "blow job", "butt plug", "red light district"
+  ],
+  "stems": [
+    "porn", "fuck", "xxx", "hentai", "blowjob", "handjob", "masturbat", "orgasm", "ejaculat", "pussy", "dildo", "nympho", "erotic", "sexual", "motherf", "cunt", "bitch", "shit", "whore", "boob", "titties", "pedophil", "paedophil", "nigger", "faggot",
+    "色情", "性交", "性爱", "性愛", "做爱", "做愛", "裸体", "裸體", "裸照", "乳头", "乳頭", "阴茎", "陰莖", "阴道", "陰道", "自慰", "操你", "屄", "婊子", "妓女", "黄片", "成人片",
+    "セックス", "ポルノ", "乳首", "おっぱい", "ちんこ", "ちんぽ", "まんこ", "オナニー", "ヌード", "アダルト",
+    "섹스", "야동", "포르노", "젖꼭지", "씨발", "야한",
+    "เย็ด", "ควย", "เซ็กส์", "หนังโป๊"
+  ]
+}

@@ -26,6 +26,9 @@ constexpr auto kFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunc
 constexpr auto kRuleFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunctions.net/generate_rule_set_free";
 #endif
 
+// Reporting isn't quota-bound, so both tiers share one function.
+constexpr auto kReportFunctionUrl = "https://europe-west1-passepartout-ca98f.cloudfunctions.net/report_ai_content";
+
 constexpr auto kIdTokenSettingsKey = "Firebase/idToken";
 constexpr auto kRefreshTokenSettingsKey = "Firebase/refreshToken";
 constexpr auto kIdTokenExpirySettingsKey = "Firebase/idTokenExpiryEpochMs";
@@ -444,4 +447,49 @@ void FirebaseAiHelper::cancelRuleGeneration() {
     if (m_currentRuleReply)
         m_currentRuleReply->abort();
     setRuleGenerating(false);
+}
+
+void FirebaseAiHelper::reportContent(const QString& kind, const QString& theme, const QString& content,
+                                      const QString& reason, const QString& comment) {
+    if (m_reporting)
+        return;
+    m_reporting = true;
+    emit reportingChanged();
+
+    ensureSignedIn([this, kind, theme, content, reason, comment](bool ok, const QString& idTokenOrError) {
+        if (!ok) {
+            m_reporting = false;
+            emit reportingChanged();
+            emit reportFailed(idTokenOrError);
+            return;
+        }
+        const QJsonObject body{
+            {QStringLiteral("kind"), kind},
+            {QStringLiteral("theme"), theme},
+            {QStringLiteral("content"), content},
+            {QStringLiteral("reason"), reason},
+            {QStringLiteral("comment"), comment.trimmed()}
+        };
+        QNetworkRequest req{QUrl(QLatin1String(kReportFunctionUrl))};
+        req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+        req.setRawHeader("Authorization", "Bearer " + idTokenOrError.toUtf8());
+        req.setTransferTimeout(15000);
+
+        auto* reply = m_nam->post(req, QJsonDocument(body).toJson(QJsonDocument::Compact));
+        connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+            reply->deleteLater();
+            m_reporting = false;
+            emit reportingChanged();
+
+            const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            if (reply->error() != QNetworkReply::NoError || status != 200) {
+                QString message = QJsonDocument::fromJson(reply->readAll()).object()[QStringLiteral("error")].toString();
+                if (message.isEmpty())
+                    message = reply->errorString();
+                emit reportFailed(message);
+                return;
+            }
+            emit reportSent();
+        });
+    });
 }

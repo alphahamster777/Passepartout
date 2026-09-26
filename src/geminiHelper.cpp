@@ -1,6 +1,7 @@
 #include "geminiHelper.h"
 
 #include "aiWordSetShared.h"
+#include "contentFilter.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -54,6 +55,23 @@ void GeminiHelper::generateWordSet(const QString& theme, int fromLanguageId,
         emit generationFailed(tr("Enter a theme first."));
         return;
     }
+    // Same refusal the Cloud Function gives (functions/main.py's
+    // CONTENT_REFUSED_MESSAGE) — see its "Content safety" section.
+    if (ContentFilter::containsRestrictedTerm(theme)) {
+        emit generationFailed(tr("This theme can't be generated. Passepartout's AI only creates content "
+                                 "suitable for all ages — sexual, profane or offensive topics aren't "
+                                 "supported. Try a different theme."));
+        return;
+    }
+
+    QJsonArray safetySettings;
+    for (const auto* category : {"HARM_CATEGORY_SEXUALLY_EXPLICIT", "HARM_CATEGORY_HARASSMENT",
+                                 "HARM_CATEGORY_HATE_SPEECH", "HARM_CATEGORY_DANGEROUS_CONTENT"}) {
+        safetySettings.append(QJsonObject{
+            {QStringLiteral("category"), QLatin1String(category)},
+            {QStringLiteral("threshold"), QStringLiteral("BLOCK_LOW_AND_ABOVE")}
+        });
+    }
 
     const QJsonObject body{
         {QStringLiteral("contents"), QJsonArray{
@@ -64,6 +82,7 @@ void GeminiHelper::generateWordSet(const QString& theme, int fromLanguageId,
                 }}}
             }
         }},
+        {QStringLiteral("safetySettings"), safetySettings},
         {QStringLiteral("generationConfig"), QJsonObject{
             {QStringLiteral("responseMimeType"), QStringLiteral("application/json")},
             {QStringLiteral("responseSchema"), AiWordSetShared::buildResponseSchema()}
@@ -116,7 +135,13 @@ void GeminiHelper::generateWordSet(const QString& theme, int fromLanguageId,
             return;
         }
         const QString text = parts.first().toObject()[QStringLiteral("text")].toString();
-        const QVariantList result = AiWordSetShared::parseWords(text, fromLanguageId, toLanguageId);
+        QVariantList result = AiWordSetShared::parseWords(text, fromLanguageId, toLanguageId);
+        result.removeIf([](const QVariant& word) {
+            const auto map = word.toMap();
+            return ContentFilter::containsRestrictedTerm(map.value(QStringLiteral("expression")).toString()
+                                                         + QLatin1Char('\n') + map.value(QStringLiteral("hint")).toString()
+                                                         + QLatin1Char('\n') + map.value(QStringLiteral("exampleUsage")).toString());
+        });
         if (result.isEmpty()) {
             emit generationFailed(tr("Gemini returned no words."));
             return;

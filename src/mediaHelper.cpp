@@ -1,5 +1,7 @@
 #include "mediaHelper.h"
 
+#include "contentFilter.h"
+
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QJsonArray>
@@ -91,17 +93,34 @@ MediaHelper::MediaHelper(QObject* parent)
     });
 }
 
+// True if an Openverse result's own metadata (title + tags) contains a
+// restricted term — a second line of defense for when the search word itself
+// is innocent but the photo that matched it isn't.
+static bool openverseResultIsRestricted(const QJsonObject& result) {
+    QString metadata = result[QStringLiteral("title")].toString();
+    for (const auto& tag : result[QStringLiteral("tags")].toArray()) {
+        metadata += QLatin1Char(' ');
+        metadata += tag.toObject()[QStringLiteral("name")].toString();
+    }
+    return result[QStringLiteral("mature")].toBool()
+        || ContentFilter::containsRestrictedTerm(metadata, ContentFilter::Scope::ImageQuery);
+}
+
 void MediaHelper::fetchImageUrl(const QString& word, int cardIndex, int languageId) {
     Q_UNUSED(languageId); // kept for call-site compatibility — see header comment
+    // A restricted word never reaches the image search at all — see the
+    // header comment for why Openverse's own filter isn't enough by itself.
+    if (ContentFilter::containsRestrictedTerm(word, ContentFilter::Scope::ImageQuery))
+        return;
+
     // No API key required for this volume of traffic (a single lookup per
     // word). Every result is CC-licensed or public domain by construction,
-    // and "mature=false" applies Openverse's own safe-search filter — this
-    // used to be a fallback tried only after Wikipedia's raw, unfiltered
-    // page-summary thumbnail came up empty; that source is gone entirely
-    // now (see header comment) and this is the only one left.
+    // and "mature=false" applies Openverse's own safe-search filter. Asks for
+    // a page of candidates rather than just one so a result whose own
+    // title/tags are restricted can be skipped in favor of the next.
     QString encoded = QString::fromUtf8(QUrl::toPercentEncoding(word));
     QUrl url(QStringLiteral("https://api.openverse.org/v1/images/?q=") + encoded
-             + QStringLiteral("&page_size=1&mature=false"));
+             + QStringLiteral("&page_size=20&mature=false"));
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("Passepartout/1.0"));
 
@@ -110,16 +129,20 @@ void MediaHelper::fetchImageUrl(const QString& word, int cardIndex, int language
         reply->deleteLater();
         if (reply->error() != QNetworkReply::NoError)
             return;
-        auto results = QJsonDocument::fromJson(reply->readAll())
-                            .object()[QStringLiteral("results")].toArray();
-        if (results.isEmpty())
-            return;
-        auto first = results.first().toObject();
-        QString imgUrl = first[QStringLiteral("thumbnail")].toString();
-        if (imgUrl.isEmpty())
-            imgUrl = first[QStringLiteral("url")].toString();
-        if (!imgUrl.isEmpty())
-            fetchAndCacheImage(imgUrl, cardIndex);
+        const auto results = QJsonDocument::fromJson(reply->readAll())
+                                 .object()[QStringLiteral("results")].toArray();
+        for (const auto& value : results) {
+            const auto result = value.toObject();
+            if (openverseResultIsRestricted(result))
+                continue;
+            QString imgUrl = result[QStringLiteral("thumbnail")].toString();
+            if (imgUrl.isEmpty())
+                imgUrl = result[QStringLiteral("url")].toString();
+            if (!imgUrl.isEmpty()) {
+                fetchAndCacheImage(imgUrl, cardIndex);
+                return;
+            }
+        }
     });
 }
 

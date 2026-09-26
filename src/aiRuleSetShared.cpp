@@ -121,7 +121,11 @@ QString buildPrompt(const QString& theme, const TypeCounts& counts,
         "points at the correct tile.\n"
         "Every mcQuestions/comboQuestions/dragdropQuestions entry must include "
         "correctIndex. Keep sentences concise and strictly about \"%1\". Do not repeat "
-        "the same sentence.")
+        "the same sentence.\n"
+        "All content must be suitable for learners of all ages: never include sexual or "
+        "sexually suggestive content, nudity, profanity, slurs, insults, hate, harassment, "
+        "graphic violence or drugs. If the topic asks for any of that, return every array "
+        "empty instead.")
         .arg(clippedTheme, countLine(c.gap), countLine(c.mc), countLine(c.combobox), countLine(c.dragdrop))
         .arg(theoryLine, termLang);
 }

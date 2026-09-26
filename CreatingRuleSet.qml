@@ -22,6 +22,10 @@ Page {
     property string titleErrorMessage: ""
     property string previewPlayingPath: ""
     property string aiError: ""
+    // See CreatingRecSet.qml's matching properties — drives the "🚩 Report"
+    // banner for AI-generated content (a Google Play requirement).
+    property string aiGeneratedContent: ""
+    property string aiGeneratedTheme: ""
     readonly property QtObject aiBackend: FirebaseAiHelper
     readonly property bool aiGenerating: page.aiBackend.ruleGenerating
     // Briefly highlights an MC question card whose "Correct answer(s)" was
@@ -83,6 +87,8 @@ Page {
             // "Generate" fully populating the page.
             if (page.ruleSetName.trim() === "")
                 page.ruleSetName = aiThemeField.text.trim()
+            page.aiGeneratedTheme = aiThemeField.text.trim()
+            page.aiGeneratedContent = JSON.stringify(ruleSet)
             page.hydrateTheoryBlocks(theoryBlocksModel, ruleSet.theory || {})
             ruleSetModel.clear()
             var questions = ruleSet.questions || []
@@ -937,6 +943,14 @@ Page {
 
                     Label {
                         width: parent.width
+                        text: qsTr("AI can make mistakes. Only content suitable for all ages is generated — use 🚩 Report to flag anything inappropriate.")
+                        font.pixelSize: 11
+                        color: "#7f8c8d"
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Label {
+                        width: parent.width
                         text: qsTr("🎯 Rule/topic to explain")
                         font.pixelSize: 12; font.bold: true; color: "#2c3e50"
                     }
@@ -1230,6 +1244,13 @@ Page {
             font.pixelSize: 11
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
+        }
+
+        AiContentNotice {
+            Layout.fillWidth: true
+            kind: "ruleSet"
+            theme: page.aiGeneratedTheme
+            content: page.aiGeneratedContent
         }
 
         // ── Theory (single explanation for the whole set) ───────────────────

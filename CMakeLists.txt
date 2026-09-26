@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 2.3.25 LANGUAGES CXX)
+project(Passepartout VERSION 2.4.0 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # FREE vs PRO are separate Play Store listings built from this same source
@@ -239,6 +239,27 @@ target_include_directories(AppLifecycleBridge
 
 target_link_libraries(AppLifecycleBridge PRIVATE Qt6::Core)
 
+# Sexual/profane-content blocklist (see contentFilter.h). The term list is
+# functions/restricted_terms.json — the same file the Cloud Function reads —
+# embedded here as a generated header so there's only one list to maintain.
+# CMAKE_CONFIGURE_DEPENDS re-runs configure (and so regenerates the header)
+# whenever that JSON changes.
+set(RESTRICTED_TERMS_JSON_PATH ${CMAKE_SOURCE_DIR}/functions/restricted_terms.json)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${RESTRICTED_TERMS_JSON_PATH})
+file(READ ${RESTRICTED_TERMS_JSON_PATH} RESTRICTED_TERMS_JSON)
+configure_file(${CMAKE_SOURCE_DIR}/include/contentFilterTerms.h.in
+               ${CMAKE_BINARY_DIR}/generated/contentFilterTerms.h @ONLY)
+
+add_library(ContentFilter STATIC
+    ${CMAKE_SOURCE_DIR}/include/contentFilter.h
+    ${CMAKE_SOURCE_DIR}/src/contentFilter.cpp
+)
+target_include_directories(ContentFilter
+    PUBLIC ${CMAKE_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_BINARY_DIR}/generated
+)
+target_link_libraries(ContentFilter PRIVATE Qt6::Core)
+
 qt_add_qml_module(MediaHelper
     URI MediaHelper
     VERSION 1.0
@@ -254,7 +275,7 @@ target_include_directories(MediaHelper
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 
-target_link_libraries(MediaHelper PRIVATE Qt6::Core Qt6::Gui Qt6::Network Qt6::TextToSpeech)
+target_link_libraries(MediaHelper PRIVATE Qt6::Core Qt6::Gui Qt6::Network Qt6::TextToSpeech ContentFilter)
 
 # Prompt/schema/response-parsing shared by GeminiHelper (direct Gemini calls,
 # used for desktop/local testing) and FirebaseAiHelper (Firebase AI Logic,
@@ -292,7 +313,7 @@ target_include_directories(GeminiHelper
     PUBLIC ${CMAKE_SOURCE_DIR}/include
 )
 
-target_link_libraries(GeminiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared)
+target_link_libraries(GeminiHelper PRIVATE Qt6::Core Qt6::Network AiWordSetShared ContentFilter)
 
 qt_add_qml_module(FirebaseAiHelper
     URI FirebaseAiHelper
@@ -349,7 +370,7 @@ qt_add_executable(appPassepartout
 qt_add_qml_module(appPassepartout
     URI Passepartout
     VERSION 1.0
-    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml FlashCard.qml CreatingRuleSet.qml RuleSetPreview.qml RuleTest.qml
+    QML_FILES Main.qml Results.qml SetDirMenu.qml SpellingTest.qml SetPreviewMenu.qml CreatingRecSet.qml CameraCapture.qml AboutOpenSourcePage.qml LicenseTextPage.qml FlashCard.qml CreatingRuleSet.qml RuleSetPreview.qml RuleTest.qml AiContentNotice.qml
     IMPORTS LeitnerTestController SpellingTestController FlashCardController RuleTestController LanguageHelper
 )
 
@@ -482,7 +503,7 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "19"
+        QT_ANDROID_VERSION_CODE "20"
         # Human-readable app version
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 

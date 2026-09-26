@@ -38,6 +38,12 @@ Page {
     property bool titleError: false
     property string titleErrorMessage: ""
     property string aiError: ""
+    // What the AI generator produced this session (JSON) and for which theme
+    // — drives aiContentNotice's "🚩 Report" banner (a Google Play
+    // requirement for AI-generated content). Empty until something is
+    // generated; only the latest generation is kept.
+    property string aiGeneratedContent: ""
+    property string aiGeneratedTheme: ""
     readonly property QtObject aiBackend: FirebaseAiHelper
     readonly property bool aiGenerating: page.aiBackend.generating
 
@@ -166,6 +172,8 @@ Page {
             }
             for (var i = 0; i < words.length; i++)
                 recSetModel.append(words[i])
+            page.aiGeneratedTheme = aiThemeField.text.trim()
+            page.aiGeneratedContent = JSON.stringify(words)
             if (topTextField.text.trim() === "")
                 topTextField.text = aiThemeField.text.trim()
             if (page.autoMedia)
@@ -503,6 +511,14 @@ Page {
                               .arg(FirebaseAiHelper.remaining)
                               .arg(FirebaseAiHelper.monthlyLimit)
                               .arg(page.formatResetTime(FirebaseAiHelper.resetAt))
+                        font.pixelSize: 11
+                        color: "#7f8c8d"
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: qsTr("AI can make mistakes. Only content suitable for all ages is generated — use 🚩 Report to flag anything inappropriate.")
                         font.pixelSize: 11
                         color: "#7f8c8d"
                         wrapMode: Text.WordWrap
@@ -884,6 +900,14 @@ Page {
                     }
                 }
             }
+        }
+
+        AiContentNotice {
+            id: aiContentNotice
+            Layout.fillWidth: true
+            kind: "wordSet"
+            theme: page.aiGeneratedTheme
+            content: page.aiGeneratedContent
         }
 
         ScrollView {

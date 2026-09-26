@@ -25,6 +25,13 @@ public:
     // source and close that hole. This is what got the app rejected from
     // Google Play once already (Sexual Content policy, a nude painting
     // surfaced as a word's auto-fetched image) — do not reintroduce it.
+    // Openverse's "mature=false" turned out not to be enough on its own
+    // either (it only excludes results their uploaders flagged — the app
+    // got rejected a second time for explicit Flickr photos returned for
+    // "nipple" / "sexual intercourse"), so ContentFilter now also refuses
+    // restricted words outright and skips any result whose title/tags are
+    // restricted. Emits nothing (silent, same as any other miss) when a
+    // word is refused or every candidate was filtered out.
     // languageId is accepted for call-site compatibility (it selected which
     // Wikipedia language edition to query) but unused now; Openverse search
     // isn't language-scoped. Emits imageFetched(cardIndex, url) when done;

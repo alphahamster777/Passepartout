@@ -65,6 +65,9 @@ class FirebaseAiHelper : public QObject {
     Q_PROPERTY(int ruleMonthlyLimit READ ruleMonthlyLimit NOTIFY ruleQuotaChanged)
     Q_PROPERTY(QString ruleResetAt READ ruleResetAt NOTIFY ruleQuotaChanged)
 
+    // True while a reportContent() request is in flight.
+    Q_PROPERTY(bool reporting READ isReporting NOTIFY reportingChanged)
+
 public:
     explicit FirebaseAiHelper(QObject* parent = nullptr);
 
@@ -78,6 +81,7 @@ public:
     int ruleRemaining() const { return m_ruleRemaining; }
     int ruleMonthlyLimit() const { return m_ruleMonthlyLimit; }
     QString ruleResetAt() const { return m_ruleResetAt; }
+    bool isReporting() const { return m_reporting; }
 
     Q_INVOKABLE void generateWordSet(const QString& theme, int fromLanguageId,
                                       int toLanguageId, int wordCount);
@@ -111,6 +115,17 @@ public:
     Q_INVOKABLE void cancelRuleGeneration();
     Q_INVOKABLE void refreshRuleQuota();
 
+    // Flags AI-generated content as inappropriate/wrong — Google Play's
+    // AI-Generated Content policy requires an in-app way to do this. Sends
+    // it to the report_ai_content Cloud Function (functions/main.py's
+    // _handle_report), which stores it in Firestore for review. `kind` is
+    // "wordSet" or "ruleSet"; `content` is the generated JSON as a string;
+    // `reason` is one of that function's REPORT_REASONS ("sexual",
+    // "hateful", "violent", "profanity", "inaccurate", "other"). Emits
+    // reportSent or reportFailed.
+    Q_INVOKABLE void reportContent(const QString& kind, const QString& theme, const QString& content,
+                                    const QString& reason, const QString& comment);
+
     // Persists a session obtained elsewhere (GoogleSignInHelper's OAuth
     // flow) — wired via a QML Connections block to that class's
     // signInSucceeded signal, keeping the two singletons decoupled in C++.
@@ -139,6 +154,10 @@ signals:
     // {theory:{blocks:[...]}, questions:[...]} — see AiRuleSetShared::parseRuleSet.
     void ruleSetGenerated(const QVariantMap& ruleSet);
     void ruleGenerationFailed(const QString& error);
+
+    void reportingChanged();
+    void reportSent();
+    void reportFailed(const QString& error);
 
 private:
     void setGenerating(bool value);
@@ -180,6 +199,8 @@ private:
     QNetworkReply* m_currentRuleReply = nullptr;
     bool m_ruleCancelled = false;
     bool m_ruleGenerating = false;
+
+    bool m_reporting = false;
 
     int m_ruleRemaining = -1;
     int m_ruleMonthlyLimit = -1;

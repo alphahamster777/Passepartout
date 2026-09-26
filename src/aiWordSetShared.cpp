@@ -19,7 +19,11 @@ QString buildPrompt(const QString& theme, int fromLanguageId, int toLanguageId, 
         "\"expression\" must be a single word or short phrase in %3.\n"
         "\"hint\" must be its translation or definition in %4.\n"
         "\"exampleUsage\" must be one short example sentence in %3 that uses the expression.\n"
-        "Do not repeat words. Keep entries concise.")
+        "Do not repeat words. Keep entries concise.\n"
+        "All content must be suitable for learners of all ages: never include sexual or "
+        "sexually suggestive content, nudity, profanity, slurs, insults, hate, harassment, "
+        "graphic violence or drugs. If the theme asks for any of that, return an empty "
+        "\"words\" array instead.")
         .arg(count).arg(clippedTheme, fromLang, toLang);
 }
 
