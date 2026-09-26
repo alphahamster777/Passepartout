@@ -52,6 +52,36 @@ Page {
     // per-gap widget (typed field, tap-to-choose boxes, or a drop target).
     readonly property var segments: (question.text || "").split("___")
 
+    // The sentence broken into Flow items, one per word plus one per blank,
+    // so a blank sits inline mid-sentence and the sentence wraps around it
+    // word by word. (Each whole segment used to be a single wrapping Label,
+    // but Flow can only wrap *between* items — a long segment became a
+    // paragraph-shaped block with the blank parked beside it and the
+    // segment after it, e.g. a lone "?", dropped onto its own line.)
+    // Text touching a blank with no space in between — "?" in "station ___?",
+    // "un" in "un___able" — is glued onto that blank's item as its
+    // prefix/suffix so it can never be wrapped away from it.
+    // Word items: {text, gapIndex: -1}; blank items: {gapIndex, prefix, suffix}.
+    readonly property var sentenceTokens: {
+        var segs = root.segments
+        var tokens = []
+        for (var i = 0; i < segs.length; ++i) {
+            var seg = segs[i]
+            var words = seg.trim() === "" ? [] : seg.trim().split(/\s+/)
+            if (i > 0 && words.length > 0 && !/^\s/.test(seg))
+                tokens[tokens.length - 1].suffix += words.shift()
+            var hasGapAfter = i < segs.length - 1
+            var prefix = ""
+            if (hasGapAfter && words.length > 0 && !/\s$/.test(seg))
+                prefix = words.pop()
+            for (var w = 0; w < words.length; ++w)
+                tokens.push({ text: words[w], gapIndex: -1, prefix: "", suffix: "" })
+            if (hasGapAfter)
+                tokens.push({ text: "", gapIndex: i, prefix: prefix, suffix: "" })
+        }
+        return tokens
+    }
+
     property var dragdropShuffledOptions: []
     // Per blank: index into dragdropShuffledOptions placed there, or -1.
     property var dragdropPlacements: []
@@ -464,36 +494,37 @@ Page {
             Repeater {
                 id: gapRepeater
                 // No gaps to render for mc/combobox/dragdrop — kept at 0
-                // rather than root.segments.length so submitAnswers()'s
+                // rather than root.sentenceTokens so submitAnswers()'s
                 // gap-collecting loop has nothing spurious to iterate.
-                model: (question.type || "gap") === "gap" ? root.segments.length : 0
+                model: (question.type || "gap") === "gap" ? root.sentenceTokens : []
 
+                // One word, or one blank with its glued prefix/suffix — see
+                // root.sentenceTokens. Every item is the same height, with
+                // its content vertically centered, so words line up with
+                // the field on a shared line instead of hugging its top.
                 Row {
                     id: gapRow
-                    required property int index
-                    readonly property bool isGap: gapRow.index < root.segments.length - 1
+                    required property var modelData
+                    readonly property bool isGap: gapRow.modelData.gapIndex >= 0
+                    readonly property int gapIndex: gapRow.modelData.gapIndex
                     // Exposed so resetQuestion()/submitAnswers() can reach
                     // straight into whichever delegate the Repeater is
                     // currently showing at this slot, instead of tracking
                     // instances by hand (which breaks under delegate reuse).
                     readonly property string fieldText: gapField.text
                     function resetField() { gapField.text = "" }
-                    spacing: 6
+                    height: 40
+                    spacing: 2
 
                     Label {
-                        text: root.segments[gapRow.index]
+                        text: gapRow.isGap ? gapRow.modelData.prefix : gapRow.modelData.text
+                        visible: text !== ""
                         font.pixelSize: 17
                         color: "#2c3e50"
-                        wrapMode: Text.WordWrap
-                        // Flow can only wrap *between* whole Rows, never
-                        // inside one, so an unbounded-width Label here let a
-                        // long sentence push gapField off the right edge of
-                        // the screen, cropped. Capping it to the Flow's own
-                        // width (minus room for the field beside it) lets it
-                        // wrap onto its own lines instead, keeping the whole
-                        // Row within the visible width.
-                        width: Math.max(40, Math.min(implicitWidth,
-                            gapFlow.width - (gapRow.isGap ? 130 : 0)))
+                        // Only a single word longer than the whole line
+                        // ever needs this — break it rather than crop it.
+                        wrapMode: Text.WrapAnywhere
+                        width: Math.min(implicitWidth, gapFlow.width)
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
@@ -501,11 +532,16 @@ Page {
                         id: gapField
                         visible: gapRow.isGap
                         width: 110
+                        height: 40
+                        topPadding: 0
+                        bottomPadding: 0
+                        verticalAlignment: TextInput.AlignVCenter
+                        anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 16
                         enabled: !root.isAnswered
                         readonly property bool gapCorrect:
-                            root.isAnswered && ruleTestController.lastGapResults.length > gapRow.index
-                                ? ruleTestController.lastGapResults[gapRow.index] : true
+                            root.isAnswered && ruleTestController.lastGapResults.length > gapRow.gapIndex
+                                ? ruleTestController.lastGapResults[gapRow.gapIndex] : true
                         color: !root.isAnswered ? "#2c3e50" : (gapCorrect ? "#27ae60" : "#e74c3c")
                         background: Rectangle {
                             radius: 8
@@ -515,6 +551,14 @@ Page {
                             border.width: root.isAnswered ? 2 : 1
                         }
                         onAccepted: if (!root.isAnswered) root.submitAnswers()
+                    }
+
+                    Label {
+                        text: gapRow.modelData.suffix
+                        visible: gapRow.isGap && text !== ""
+                        font.pixelSize: 17
+                        color: "#2c3e50"
+                        anchors.verticalCenter: parent.verticalCenter
                     }
                 }
             }
@@ -536,39 +580,41 @@ Page {
                 spacing: 6
 
                 Repeater {
-                    model: question.type === "combobox" ? root.segments.length : 0
+                    model: question.type === "combobox" ? root.sentenceTokens : []
 
+                    // See the "gap" Flow's delegate above — same word-by-word layout.
                     delegate: Row {
                         id: comboRow
-                        required property int index
-                        readonly property bool isGap: comboRow.index < root.segments.length - 1
-                        spacing: 6
+                        required property var modelData
+                        readonly property bool isGap: comboRow.modelData.gapIndex >= 0
+                        readonly property int gapIndex: comboRow.modelData.gapIndex
+                        height: 36
+                        spacing: 2
 
                         Label {
-                            text: root.segments[comboRow.index]
+                            text: comboRow.isGap ? comboRow.modelData.prefix : comboRow.modelData.text
+                            visible: text !== ""
                             font.pixelSize: 17
                             color: "#2c3e50"
-                            wrapMode: Text.WordWrap
-                            // See the "gap" Flow's identical Label comment
-                            // above — same crop bug, same fix.
-                            width: Math.max(40, Math.min(implicitWidth,
-                                comboSegFlow.width - (comboRow.isGap ? comboBlank.width + 20 : 0)))
+                            wrapMode: Text.WrapAnywhere
+                            width: Math.min(implicitWidth, comboSegFlow.width)
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Rectangle {
                             id: comboBlank
                             visible: comboRow.isGap
+                            anchors.verticalCenter: parent.verticalCenter
                             // null (not yet spun) is kept distinct from ""
                             // (spun to a deliberately-blank option) so the
                             // preview can tell "not answered" from "answered
                             // with nothing" — see comboSelections above.
                             readonly property var picked:
-                                root.comboSelections.length > comboRow.index ? root.comboSelections[comboRow.index] : null
+                                root.comboSelections.length > comboRow.gapIndex ? root.comboSelections[comboRow.gapIndex] : null
                             readonly property bool hasPick: picked !== null && picked !== undefined
                             readonly property bool gapCorrect:
-                                root.isAnswered && ruleTestController.lastGapResults.length > comboRow.index
-                                    ? ruleTestController.lastGapResults[comboRow.index] : true
+                                root.isAnswered && ruleTestController.lastGapResults.length > comboRow.gapIndex
+                                    ? ruleTestController.lastGapResults[comboRow.gapIndex] : true
                             width: Math.max(70, comboBlankLabel.implicitWidth + 24)
                             height: 36
                             radius: 8
@@ -590,6 +636,14 @@ Page {
                                 font.pixelSize: 14
                                 color: comboBlank.hasPick ? "#2c3e50" : "#b0b8c1"
                             }
+                        }
+
+                        Label {
+                            text: comboRow.modelData.suffix
+                            visible: comboRow.isGap && text !== ""
+                            font.pixelSize: 17
+                            color: "#2c3e50"
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
                 }
@@ -797,23 +851,24 @@ Page {
 
                 Repeater {
                     id: ddBlankRepeater
-                    model: question.type === "dragdrop" ? root.segments.length : 0
+                    model: question.type === "dragdrop" ? root.sentenceTokens : []
 
+                    // See the "gap" Flow's delegate further up — same
+                    // word-by-word layout.
                     delegate: Row {
                         id: ddRow
-                        required property int index
-                        readonly property bool isBlank: ddRow.index < root.segments.length - 1
-                        spacing: 6
+                        required property var modelData
+                        readonly property bool isBlank: ddRow.modelData.gapIndex >= 0
+                        height: 36
+                        spacing: 2
 
                         Label {
-                            text: root.segments[ddRow.index]
+                            text: ddRow.isBlank ? ddRow.modelData.prefix : ddRow.modelData.text
+                            visible: text !== ""
                             font.pixelSize: 17
                             color: "#2c3e50"
-                            wrapMode: Text.WordWrap
-                            // See the "gap" Flow's identical Label comment
-                            // further up — same crop bug, same fix.
-                            width: Math.max(40, Math.min(implicitWidth,
-                                ddSegFlow.width - (ddRow.isBlank ? ddBlank.width + 20 : 0)))
+                            wrapMode: Text.WrapAnywhere
+                            width: Math.min(implicitWidth, ddSegFlow.width)
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -825,7 +880,8 @@ Page {
                         Rectangle {
                             id: ddBlank
                             visible: ddRow.isBlank
-                            readonly property int blankIndex: ddRow.index
+                            anchors.verticalCenter: parent.verticalCenter
+                            readonly property int blankIndex: ddRow.modelData.gapIndex
                             readonly property int placedTile:
                                 root.dragdropPlacements.length > ddBlank.blankIndex ? root.dragdropPlacements[ddBlank.blankIndex] : -1
                             readonly property bool gapCorrect:
@@ -947,6 +1003,14 @@ Page {
                                     onClicked: root.clearDragdropBlank(ddBlank.blankIndex)
                                 }
                             }
+                        }
+
+                        Label {
+                            text: ddRow.modelData.suffix
+                            visible: ddRow.isBlank && text !== ""
+                            font.pixelSize: 17
+                            color: "#2c3e50"
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
                 }
