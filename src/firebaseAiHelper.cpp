@@ -6,6 +6,7 @@
 #include "languageHelper.h"
 
 #include <QDateTime>
+#include <QDebug>
 #include <QJsonDocument>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -141,6 +142,39 @@ void FirebaseAiHelper::signOut() {
         emit signedInChanged();
 }
 
+QString FirebaseAiHelper::userMessageFor(QNetworkReply* reply, int status, const QJsonObject& payload) const {
+    // Shown to the user as-is, so always one of these translated strings —
+    // never the server's own English "error" text or Qt's raw network error.
+    // Codes are functions/main.py's (see the comment above its
+    // CONTENT_REFUSED_MESSAGE); status is the fallback for a server that
+    // predates them.
+    const QString code = payload[QStringLiteral("code")].toString();
+    if (code == QLatin1String("content_refused") || status == 422)
+        return tr("This topic can't be generated. The AI only creates content suitable for all ages — "
+                  "sexual, profane or offensive topics aren't supported. Please try a different topic.");
+    if (code == QLatin1String("limit_reached"))
+        return tr("You've used all your AI generations for this month. Try again next month.");
+    if (code == QLatin1String("report_limit_reached"))
+        return tr("Too many reports today — please try again tomorrow.");
+    if (code == QLatin1String("ai_busy") || status == 503)
+        return tr("The AI service is busy right now — please try again in a moment.");
+    if (code == QLatin1String("theme_required"))
+        return tr("Enter a theme first.");
+    if (code == QLatin1String("theme_too_long"))
+        return tr("The theme is too long (max %1 characters).").arg(AiWordSetShared::kMaxThemeLength);
+    if (code == QLatin1String("no_question_types"))
+        return tr("Set at least one question type above zero.");
+    if (code == QLatin1String("unauthorized") || status == 401)
+        return tr("Your session expired — please sign in again.");
+    if (status == 429)
+        return tr("You've used all your AI generations for this month. Try again next month.");
+    // No HTTP status at all means the request never reached the server.
+    if (status == 0 && reply && reply->error() != QNetworkReply::NoError
+            && reply->error() != QNetworkReply::OperationCanceledError)
+        return tr("Couldn't reach the server. Check your internet connection and try again.");
+    return tr("Something went wrong. Please try again.");
+}
+
 void FirebaseAiHelper::ensureSignedIn(std::function<void(bool, const QString&)> onReady) {
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (!m_idToken.isEmpty() && now < m_idTokenExpiryEpochMs - kExpiryMarginMs) {
@@ -182,7 +216,7 @@ void FirebaseAiHelper::refreshIdToken(std::function<void(bool, const QString&)> 
         const auto obj = QJsonDocument::fromJson(reply->readAll()).object();
         storeAuthResponse(obj, /*isRefreshResponse=*/true);
         if (m_idToken.isEmpty()) {
-            onReady(false, tr("Token refresh response had no token."));
+            onReady(false, tr("Something went wrong. Please try again."));
             return;
         }
         onReady(true, m_idToken);
@@ -267,26 +301,16 @@ void FirebaseAiHelper::postGenerate(const QString& idToken, const QString& theme
         applyQuota(payload); // present on both success and the 429/limit-reached error
 
         if (reply->error() != QNetworkReply::NoError || status != 200) {
-            QString message = payload[QStringLiteral("error")].toString();
-            if (message.isEmpty())
-                message = reply->errorString();
-            if (status == 429)
-                message = tr("Monthly limit reached — try again next month. (%1)").arg(message);
-            else if (status == 401)
-                message = tr("Not signed in — try again. (%1)").arg(message);
-            else if (status == 503)
-                // Gemini itself is rate-limited or transiently unavailable —
-                // distinct from the per-user cap above, affects every user,
-                // not just this one.
-                message = tr("⚠ DEBUG: shared AI service is temporarily unavailable (%1)").arg(message);
-            emit generationFailed(message);
+            if (!payload.isEmpty())
+                qWarning() << "Word-set generation failed:" << status << payload[QStringLiteral("error")].toString();
+            emit generationFailed(userMessageFor(reply, status, payload));
             return;
         }
 
         const QVariantList result = AiWordSetShared::parseWords(
             payload[QStringLiteral("words")].toArray(), fromLanguageId, toLanguageId);
         if (result.isEmpty()) {
-            emit generationFailed(tr("The backend returned no words."));
+            emit generationFailed(tr("Something went wrong. Please try again."));
             return;
         }
         emit wordSetGenerated(result);
@@ -419,23 +443,16 @@ void FirebaseAiHelper::postGenerateRule(const QString& idToken, const QString& t
         applyRuleQuota(payload); // present on both success and the 429/limit-reached error
 
         if (reply->error() != QNetworkReply::NoError || status != 200) {
-            QString message = payload[QStringLiteral("error")].toString();
-            if (message.isEmpty())
-                message = reply->errorString();
-            if (status == 429)
-                message = tr("Monthly limit reached — try again next month. (%1)").arg(message);
-            else if (status == 401)
-                message = tr("Not signed in — try again. (%1)").arg(message);
-            else if (status == 503)
-                message = tr("The shared AI service is temporarily busy — please try again in a moment. (%1)").arg(message);
-            emit ruleGenerationFailed(message);
+            if (!payload.isEmpty())
+                qWarning() << "Rule-set generation failed:" << status << payload[QStringLiteral("error")].toString();
+            emit ruleGenerationFailed(userMessageFor(reply, status, payload));
             return;
         }
 
         const AiRuleSetShared::TypeCounts counts{gapCount, mcCount, comboCount, dragdropCount};
         const QVariantMap result = AiRuleSetShared::parseRuleSet(payload, counts);
         if (result.value(QStringLiteral("questions")).toList().isEmpty()) {
-            emit ruleGenerationFailed(tr("The backend returned no usable questions."));
+            emit ruleGenerationFailed(tr("Something went wrong. Please try again."));
             return;
         }
         emit ruleSetGenerated(result);
@@ -483,10 +500,10 @@ void FirebaseAiHelper::reportContent(const QString& kind, const QString& theme, 
 
             const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
             if (reply->error() != QNetworkReply::NoError || status != 200) {
-                QString message = QJsonDocument::fromJson(reply->readAll()).object()[QStringLiteral("error")].toString();
-                if (message.isEmpty())
-                    message = reply->errorString();
-                emit reportFailed(message);
+                const auto payload = QJsonDocument::fromJson(reply->readAll()).object();
+                if (!payload.isEmpty())
+                    qWarning() << "AI content report failed:" << status << payload[QStringLiteral("error")].toString();
+                emit reportFailed(userMessageFor(reply, status, payload));
                 return;
             }
             emit reportSent();

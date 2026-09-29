@@ -77,7 +77,9 @@ Rectangle {
                 reportPopup.statusText = qsTr("Thank you — your report was sent and will be reviewed.")
             }
             function onReportFailed(error) {
-                reportPopup.statusText = qsTr("Couldn't send the report: %1").arg(error)
+                // Already a complete, translated sentence — see
+                // FirebaseAiHelper::userMessageFor.
+                reportPopup.statusText = error
             }
         }
 

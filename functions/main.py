@@ -80,6 +80,13 @@ CONTENT_RULES = (
     "graphic violence or drugs."
 )
 
+# Every error response carries a stable "code" (content_refused,
+# limit_reached, ai_busy, ai_failed, theme_required, theme_too_long,
+# no_question_types, report_limit_reached, unauthorized, bad_request) next to
+# its English "error" text. The app shows its own translated message per
+# code (FirebaseAiHelper::userMessageFor) — "error" is only for logs/curl,
+# so rewording it never needs an app update, but adding or renaming a code
+# does.
 CONTENT_REFUSED_MESSAGE = (
     "This theme can't be generated. Passepartout's AI only creates content suitable for all "
     "ages — sexual, profane or offensive topics aren't supported. Try a different theme."
@@ -526,15 +533,15 @@ def _reset_at_iso() -> str:
 
 def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Response:
     if req.method != "POST":
-        return _json_response({"error": "Method not allowed"}, 405)
+        return _json_response({"code": "bad_request", "error": "Method not allowed"}, 405)
 
     auth_header = req.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
-        return _json_response({"error": "Missing bearer token"}, 401)
+        return _json_response({"code": "unauthorized", "error": "Missing bearer token"}, 401)
     try:
         decoded = auth.verify_id_token(auth_header[len("Bearer "):])
     except Exception:
-        return _json_response({"error": "Invalid or expired token"}, 401)
+        return _json_response({"code": "unauthorized", "error": "Invalid or expired token"}, 401)
     uid = decoded["uid"]
     unlimited = _is_unlimited(decoded)
     monthly_limit = _apply_pro_override(decoded, monthly_limit, PRO_MONTHLY_LIMIT)
@@ -564,11 +571,11 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
     except (TypeError, ValueError):
         word_count = 10
     if not theme:
-        return _json_response({"error": "Theme is required"}, 400)
+        return _json_response({"code": "theme_required", "error": "Theme is required"}, 400)
     if len(theme) > MAX_THEME_LENGTH:
-        return _json_response({"error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
+        return _json_response({"code": "theme_too_long", "error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
     if _contains_restricted(theme):
-        return _json_response({"error": CONTENT_REFUSED_MESSAGE}, 422)
+        return _json_response({"code": "content_refused", "error": CONTENT_REFUSED_MESSAGE}, 422)
 
     if unlimited:
         remaining = -1
@@ -587,7 +594,7 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
         remaining = check_and_increment(transaction)
         if remaining is None:
             return _json_response(
-                {"error": f"Monthly limit of {monthly_limit} reached", "remaining": 0,
+                {"code": "limit_reached", "error": f"Monthly limit of {monthly_limit} reached", "remaining": 0,
                  "limit": monthly_limit, "resetAt": reset_at},
                 429,
             )
@@ -610,22 +617,22 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
             # from the per-user Firestore cap above, since it affects every
             # user at once, not just this one.
             return _json_response(
-                {"error": "The shared AI service is temporarily busy — please try again in a moment."},
+                {"code": "ai_busy", "error": "The shared AI service is temporarily busy — please try again in a moment."},
                 503,
             )
-        return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
+        return _json_response({"code": "ai_failed", "error": f"Gemini call failed (HTTP {status})."}, 502)
     except ContentBlockedError:
-        return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+        return _json_response({"code": "content_refused", "error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
                                "limit": monthly_limit, "resetAt": reset_at}, 422)
     except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
         print(f"Gemini call failed unexpectedly: {_redact(exc)}")
-        return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
+        return _json_response({"code": "ai_failed", "error": "Gemini call failed unexpectedly."}, 502)
 
     # CONTENT_RULES asks Gemini to return an empty list for a restricted
     # theme, so an empty result is most likely a refusal, not a malfunction.
     words = _drop_restricted(words)
     if not words:
-        return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+        return _json_response({"code": "content_refused", "error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
                                "limit": monthly_limit, "resetAt": reset_at}, 422)
 
     return _json_response(
@@ -635,15 +642,15 @@ def _handle_generate(req: https_fn.Request, monthly_limit: int) -> https_fn.Resp
 
 def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_fn.Response:
     if req.method != "POST":
-        return _json_response({"error": "Method not allowed"}, 405)
+        return _json_response({"code": "bad_request", "error": "Method not allowed"}, 405)
 
     auth_header = req.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
-        return _json_response({"error": "Missing bearer token"}, 401)
+        return _json_response({"code": "unauthorized", "error": "Missing bearer token"}, 401)
     try:
         decoded = auth.verify_id_token(auth_header[len("Bearer "):])
     except Exception:
-        return _json_response({"error": "Invalid or expired token"}, 401)
+        return _json_response({"code": "unauthorized", "error": "Invalid or expired token"}, 401)
     uid = decoded["uid"]
     unlimited = _is_unlimited(decoded)
     monthly_limit = _apply_pro_override(decoded, monthly_limit, RULE_PRO_MONTHLY_LIMIT)
@@ -681,13 +688,13 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
     combo_target = _int_field("comboCount", 0)
     dragdrop_target = _int_field("dragdropCount", 0)
     if not theme:
-        return _json_response({"error": "Theme is required"}, 400)
+        return _json_response({"code": "theme_required", "error": "Theme is required"}, 400)
     if len(theme) > MAX_THEME_LENGTH:
-        return _json_response({"error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
+        return _json_response({"code": "theme_too_long", "error": f"Theme is too long (max {MAX_THEME_LENGTH} characters)"}, 400)
     if gap_target == 0 and mc_target == 0 and combo_target == 0 and dragdrop_target == 0:
-        return _json_response({"error": "Set at least one question type above zero"}, 400)
+        return _json_response({"code": "no_question_types", "error": "Set at least one question type above zero"}, 400)
     if _contains_restricted(theme):
-        return _json_response({"error": CONTENT_REFUSED_MESSAGE}, 422)
+        return _json_response({"code": "content_refused", "error": CONTENT_REFUSED_MESSAGE}, 422)
 
     if unlimited:
         remaining = -1
@@ -706,7 +713,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
         remaining = check_and_increment(transaction)
         if remaining is None:
             return _json_response(
-                {"error": f"Monthly limit of {monthly_limit} reached", "remaining": 0,
+                {"code": "limit_reached", "error": f"Monthly limit of {monthly_limit} reached", "remaining": 0,
                  "limit": monthly_limit, "resetAt": reset_at},
                 429,
             )
@@ -743,14 +750,14 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
                 break  # keep whatever the first attempt produced
             if status in (429, 503):
                 return _json_response(
-                    {"error": "The shared AI service is temporarily busy — please try again in a moment."},
+                    {"code": "ai_busy", "error": "The shared AI service is temporarily busy — please try again in a moment."},
                     503,
                 )
-            return _json_response({"error": f"Gemini call failed (HTTP {status})."}, 502)
+            return _json_response({"code": "ai_failed", "error": f"Gemini call failed (HTTP {status})."}, 502)
         except ContentBlockedError:
             # A deliberate refusal, not a transient failure — retrying the
             # same prompt would only get refused again.
-            return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+            return _json_response({"code": "content_refused", "error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
                                    "limit": monthly_limit, "resetAt": reset_at}, 422)
         except Exception as exc:  # noqa: BLE001 — logged, not surfaced to the client
             print(f"Gemini call failed unexpectedly: {_redact(exc)}")
@@ -758,7 +765,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
                 continue
             if attempts:
                 break
-            return _json_response({"error": "Gemini call failed unexpectedly."}, 502)
+            return _json_response({"code": "ai_failed", "error": "Gemini call failed unexpectedly."}, 502)
         else:
             attempts.append(candidate)
             gap_n = _valid_gap_count(candidate.get("gapQuestions") or [])
@@ -776,7 +783,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
                 if raw:
                     print(f"  raw {key} sample: {_redact(json.dumps(raw[:2], ensure_ascii=False))[:400]}")
     if not attempts:
-        return _json_response({"error": "Gemini returned no usable content."}, 502)
+        return _json_response({"code": "ai_failed", "error": "Gemini returned no usable content."}, 502)
 
     theory = _drop_restricted(next((a.get("theory") for a in attempts if a.get("theory")), []) or [])
     gap_questions = _drop_restricted(_merge_question_lists([a.get("gapQuestions") or [] for a in attempts]))
@@ -791,7 +798,7 @@ def _handle_generate_rules(req: https_fn.Request, monthly_limit: int) -> https_f
     if (not theory and not gap_questions and not mc_questions
             and not combo_questions and not dragdrop_questions):
         # See _handle_generate — an empty result is most likely a refusal.
-        return _json_response({"error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
+        return _json_response({"code": "content_refused", "error": CONTENT_REFUSED_MESSAGE, "remaining": remaining,
                                "limit": monthly_limit, "resetAt": reset_at}, 422)
 
     return _json_response(
@@ -819,24 +826,24 @@ def _handle_report(req: https_fn.Request) -> https_fn.Response:
     (the generated JSON as a string), reason (one of REPORT_REASONS),
     comment}."""
     if req.method != "POST":
-        return _json_response({"error": "Method not allowed"}, 405)
+        return _json_response({"code": "bad_request", "error": "Method not allowed"}, 405)
 
     auth_header = req.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
-        return _json_response({"error": "Missing bearer token"}, 401)
+        return _json_response({"code": "unauthorized", "error": "Missing bearer token"}, 401)
     try:
         decoded = auth.verify_id_token(auth_header[len("Bearer "):])
     except Exception:
-        return _json_response({"error": "Invalid or expired token"}, 401)
+        return _json_response({"code": "unauthorized", "error": "Invalid or expired token"}, 401)
     uid = decoded["uid"]
 
     body = req.get_json(silent=True) or {}
     kind = str(body.get("kind", "")).strip()
     reason = str(body.get("reason", "")).strip()
     if kind not in ("wordSet", "ruleSet"):
-        return _json_response({"error": "Unknown content kind"}, 400)
+        return _json_response({"code": "bad_request", "error": "Unknown content kind"}, 400)
     if reason not in REPORT_REASONS:
-        return _json_response({"error": "Unknown report reason"}, 400)
+        return _json_response({"code": "bad_request", "error": "Unknown report reason"}, 400)
 
     db = firestore.client()
     day_key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -853,7 +860,7 @@ def _handle_report(req: https_fn.Request) -> https_fn.Response:
         return True
 
     if not check_and_increment(transaction):
-        return _json_response({"error": "Too many reports today — please try again tomorrow."}, 429)
+        return _json_response({"code": "report_limit_reached", "error": "Too many reports today — please try again tomorrow."}, 429)
 
     db.collection("reports").add({
         "uid": uid,

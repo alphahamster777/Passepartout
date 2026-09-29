@@ -2,6 +2,7 @@
 
 #include <QJsonObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QObject>
 #include <QVariantList>
 #include <QVariantMap>
@@ -170,6 +171,10 @@ private:
     void refreshIdToken(std::function<void(bool ok, const QString& idTokenOrError)> onReady);
     void storeAuthResponse(const QJsonObject& obj, bool isRefreshResponse);
     void applyQuota(const QJsonObject& payload);
+    // The translated, user-facing message for a failed Cloud Function call
+    // — maps the server's "code" (or failing that, the HTTP status) to one
+    // of a small set of tr() strings. See the .cpp for the mapping.
+    QString userMessageFor(QNetworkReply* reply, int status, const QJsonObject& payload) const;
 
     void postGenerate(const QString& idToken, const QString& theme,
                        int fromLanguageId, int toLanguageId, int wordCount);
