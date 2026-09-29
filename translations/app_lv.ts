@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Atcelt</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Bibliotēka vai kopa ar šādu nosaukumu šeit jau pastāv.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Vārdu kopa ar šādu nosaukumu šeit jau pastāv.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Rezultāti</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Lieliski</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>padarīts</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>no %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Lielisks darbs! Turpini tā!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Zinu</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+26"/>
+        <source>Practice again</source>
+        <translation>Vingrināties vēlreiz</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Atrast citu kopu</translation>
+    </message>
+    <message>
         <source>Practice Again</source>
-        <translation>Praktizēties vēlreiz</translation>
+        <translation type="vanished">Praktizēties vēlreiz</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Notiek: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Atiestatīt</translation>
+        <translation type="vanished">← Atiestatīt</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Atiestatīt, lai vingrinātos vēlreiz</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Atiestatīt</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Sākt testu</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Tests ir pabeigts</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Jauna bibliotēka</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Bibliotēkas nosaukums:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Bibliotēka ar šādu nosaukumu šeit jau pastāv.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Izveidot</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Pārdēvēt bibliotēku</translation>
     </message>
@@ -1396,7 +1414,8 @@ Pieskarieties + Izveidot, lai pievienotu vārdu kopu vai bibliotēku.</translati
         <translation>Saskarnes valoda</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Atcelt</translation>
     </message>
@@ -1479,17 +1498,28 @@ Pieskarieties + Izveidot, lai pievienotu vārdu kopu vai bibliotēku.</translati
         <translation>Vispirms izvēle no variantiem, tad rakstīšana, lai apgūtu visas norādes</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Gatavs</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Atiestatīt</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Pabeigts — pavelciet pa kreisi, lai atiestatītu</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>Atlikuši: %1</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Pareizrakstības stingrība</translation>
     </message>

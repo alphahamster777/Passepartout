@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Hætta við</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Safn eða sett með þessu nafni er þegar til hér.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Orðasett með þessu nafni er þegar til hér.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Niðurstöður</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Vel</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>gert</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>af %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Frábært starf! Haltu áfram!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Kann</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Practice Again</source>
+        <location line="+26"/>
+        <source>Practice again</source>
         <translation>Æfa aftur</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Finna annað sett</translation>
+    </message>
+    <message>
+        <source>Practice Again</source>
+        <translation type="vanished">Æfa aftur</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Í vinnslu: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Endurstilla</translation>
+        <translation type="vanished">← Endurstilla</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Endurstilla til að æfa aftur</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Endurstilla</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Hefja próf</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Prófinu er lokið</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Nýtt safn</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Nafn safns:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Safn með þessu nafni er þegar til hér.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Búa til</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Endurnefna safn</translation>
     </message>
@@ -1396,7 +1414,8 @@ Tap + Create to add a word set or library.</source>
         <translation>Tungumál viðmóts</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Hætta við</translation>
     </message>
@@ -1479,17 +1498,28 @@ Tap + Create to add a word set or library.</source>
         <translation>Fjölval til að læra, síðan skrifun til að ná tökum á öllum vísbendingum</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Lokið</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Endurstilla</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Lokið — strjúktu til vinstri til að endurstilla</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>%1 eftir</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Stafsetningarstrangleiki</translation>
     </message>

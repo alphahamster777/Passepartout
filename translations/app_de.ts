@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Eine Bibliothek oder ein Set mit diesem Namen existiert hier bereits.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Ein Wortset mit diesem Namen existiert hier bereits.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Ergebnisse</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Gut</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>gemacht</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>von %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Ausgezeichnete Arbeit! Weiter so!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Weiß ich</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Practice Again</source>
+        <location line="+26"/>
+        <source>Practice again</source>
         <translation>Erneut üben</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Anderes Set suchen</translation>
+    </message>
+    <message>
+        <source>Practice Again</source>
+        <translation type="vanished">Erneut üben</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">In Bearbeitung: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Zurücksetzen</translation>
+        <translation type="vanished">← Zurücksetzen</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Zurücksetzen und erneut üben</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Test starten</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Test ist abgeschlossen</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Neue Bibliothek</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Bibliotheksname:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Eine Bibliothek mit diesem Namen existiert hier bereits.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Erstellen</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Bibliothek umbenennen</translation>
     </message>
@@ -1396,7 +1414,8 @@ Tippe auf + Erstellen, um ein Wortset oder eine Bibliothek hinzuzufügen.</trans
         <translation>Sprache der Oberfläche</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -1479,17 +1498,28 @@ Tippe auf + Erstellen, um ein Wortset oder eine Bibliothek hinzuzufügen.</trans
         <translation>Erst Multiple-Choice zum Lernen, dann Schreiben, um alle Hinweise zu meistern</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Fertig</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Zurücksetzen</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Abgeschlossen — zum Zurücksetzen nach links wischen</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>Noch %1</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Rechtschreibstrenge</translation>
     </message>

@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Άκυρο</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Υπάρχει ήδη εδώ μια βιβλιοθήκη ή σύνολο με αυτό το όνομα.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Υπάρχει ήδη εδώ ένα σύνολο λέξεων με αυτό το όνομα.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Αποτελέσματα</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Μπράβο</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>σωστά</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>από %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Εξαιρετική δουλειά! Συνέχισε έτσι!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Ξέρω</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Practice Again</source>
+        <location line="+26"/>
+        <source>Practice again</source>
         <translation>Εξάσκηση ξανά</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Βρείτε άλλο σετ</translation>
+    </message>
+    <message>
+        <source>Practice Again</source>
+        <translation type="vanished">Εξάσκηση ξανά</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Σε εξέλιξη: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Επαναφορά</translation>
+        <translation type="vanished">← Επαναφορά</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Επαναφορά για νέα εξάσκηση</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Επαναφορά</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Έναρξη τεστ</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Το τεστ ολοκληρώθηκε</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Νέα βιβλιοθήκη</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Όνομα βιβλιοθήκης:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Υπάρχει ήδη εδώ μια βιβλιοθήκη με αυτό το όνομα.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Δημιουργία</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Μετονομασία βιβλιοθήκης</translation>
     </message>
@@ -1396,7 +1414,8 @@ Tap + Create to add a word set or library.</source>
         <translation>Γλώσσα διεπαφής</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Άκυρο</translation>
     </message>
@@ -1479,17 +1498,28 @@ Tap + Create to add a word set or library.</source>
         <translation>Πολλαπλή επιλογή για εκμάθηση, μετά γραφή για εμπέδωση όλων των υποδείξεων</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Ολοκληρώθηκε</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Επαναφορά</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Ολοκληρώθηκε — σύρετε αριστερά για επαναφορά</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>Απομένουν %1</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Αυστηρότητα ορθογραφίας</translation>
     </message>

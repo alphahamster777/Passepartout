@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">இந்தப் பெயருடன் ஒரு நூலகம் அல்லது தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>இந்தப் பெயருடன் ஒரு சொல் தொகுப்பு ஏற்கனவே இங்கு உள்ளது.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>முடிவுகள்</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>அருமை</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>வேலை</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>%1 இல்</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>சிறப்பான வேலை! இப்படியே தொடருங்கள்!</translation>
@@ -1043,9 +1043,18 @@
         <translation>தெரியும்</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Practice Again</source>
+        <location line="+26"/>
+        <source>Practice again</source>
         <translation>மீண்டும் பயிற்சி செய்</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>வேறு தொகுப்பைக் கண்டறி</translation>
+    </message>
+    <message>
+        <source>Practice Again</source>
+        <translation type="vanished">மீண்டும் பயிற்சி செய்</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">நடைபெறுகிறது: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← மீட்டமை</translation>
+        <translation type="vanished">← மீட்டமை</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>மீண்டும் பயிற்சி செய்ய மீட்டமை</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>மீட்டமை</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>சோதனையைத் தொடங்கு</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>தேர்வு முடிந்தது</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>புதிய நூலகம்</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>நூலகத்தின் பெயர்:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>இந்தப் பெயருடன் ஒரு நூலகம் ஏற்கனவே இங்கு உள்ளது.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>உருவாக்கு</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>நூலகத்தை மறுபெயரிடு</translation>
     </message>
@@ -1396,7 +1414,8 @@ Tap + Create to add a word set or library.</source>
         <translation>இடைமுக மொழி</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
     </message>
@@ -1479,17 +1498,28 @@ Tap + Create to add a word set or library.</source>
         <translation>கற்க முதலில் பல்தேர்வு, பின்னர் அனைத்து குறிப்புகளிலும் தேர்ச்சி பெற எழுதுதல்</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ முடிந்தது</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← மீட்டமை</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>முடிந்தது — மீட்டமைக்க இடதுபுறம் ஸ்வைப் செய்யவும்</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>%1 மீதம்</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ எழுத்துப்பிழை கடுமை</translation>
     </message>

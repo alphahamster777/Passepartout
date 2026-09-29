@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>বাতিল করুন</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">এই নামের একটি লাইব্রেরি বা সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>এই নামের একটি শব্দ সেট এখানে ইতিমধ্যে বিদ্যমান।</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>ফলাফল</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>চমৎকার</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>কাজ</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>%1 এর মধ্যে</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>চমৎকার কাজ! এভাবেই চালিয়ে যান!</translation>
@@ -1043,9 +1043,18 @@
         <translation>জানি</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Practice Again</source>
+        <location line="+26"/>
+        <source>Practice again</source>
         <translation>আবার অনুশীলন করুন</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>অন্য সেট খুঁজুন</translation>
+    </message>
+    <message>
+        <source>Practice Again</source>
+        <translation type="vanished">আবার অনুশীলন করুন</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">চলমান: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← রিসেট</translation>
+        <translation type="vanished">← রিসেট</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>আবার অনুশীলনের জন্য রিসেট করুন</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>রিসেট করুন</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>পরীক্ষা শুরু করুন</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>পরীক্ষা সম্পন্ন হয়েছে</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>নতুন লাইব্রেরি</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>লাইব্রেরির নাম:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>এই নামের একটি লাইব্রেরি এখানে ইতিমধ্যে বিদ্যমান।</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>তৈরি করুন</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>লাইব্রেরির নাম পরিবর্তন করুন</translation>
     </message>
@@ -1396,7 +1414,8 @@ Tap + Create to add a word set or library.</source>
         <translation>ইন্টারফেস ভাষা</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>বাতিল করুন</translation>
     </message>
@@ -1479,17 +1498,28 @@ Tap + Create to add a word set or library.</source>
         <translation>শেখার জন্য প্রথমে বহুনির্বাচনী, তারপর সব ইঙ্গিতে দক্ষতা অর্জনের জন্য লেখা</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ সম্পন্ন</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← রিসেট করুন</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>সম্পন্ন — রিসেট করতে বাঁয়ে সোয়াইপ করুন</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>%1টি বাকি</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ বানান কঠোরতা</translation>
     </message>

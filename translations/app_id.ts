@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Batal</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Pustaka atau set dengan nama ini sudah ada di sini.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Set kata dengan nama ini sudah ada di sini.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Hasil</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Kerja</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>bagus</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>dari %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Kerja luar biasa! Pertahankan!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Tahu</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+26"/>
+        <source>Practice again</source>
+        <translation>Latihan lagi</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Cari set lain</translation>
+    </message>
+    <message>
         <source>Practice Again</source>
-        <translation>Berlatih Lagi</translation>
+        <translation type="vanished">Berlatih Lagi</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Sedang berlangsung: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Reset</translation>
+        <translation type="vanished">← Reset</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Atur ulang untuk berlatih lagi</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Atur Ulang</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Mulai Tes</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Tes telah selesai</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Pustaka Baru</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Nama pustaka:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Pustaka dengan nama ini sudah ada di sini.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Buat</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Ganti Nama Pustaka</translation>
     </message>
@@ -1396,7 +1414,8 @@ Ketuk + Buat untuk menambahkan set kata atau pustaka.</translation>
         <translation>Bahasa Antarmuka</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Batal</translation>
     </message>
@@ -1479,17 +1498,28 @@ Ketuk + Buat untuk menambahkan set kata atau pustaka.</translation>
         <translation>Pilihan ganda untuk belajar, lalu menulis untuk menguasai semua petunjuk</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Selesai</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Atur Ulang</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Selesai — geser ke kiri untuk mengatur ulang</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>%1 tersisa</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Ketegasan ejaan</translation>
     </message>

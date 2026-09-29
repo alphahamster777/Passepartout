@@ -5,7 +5,8 @@ import SpellingTestController
 
 Page {
     id: page
-    signal resultsNextPressed()
+    signal practiceSetAgain()
+    signal findAnotherSet()
 
     property var spellingTestController: rootScope.spellingTestController
     readonly property bool isE_LeitnerType:
@@ -62,17 +63,27 @@ Page {
             ColumnLayout {
                 anchors.centerIn: parent
                 spacing: 2
+                // Both labels shrink to fit the circle — translations of
+                // "Well"/"done" (e.g. "Отлично") are much wider than English.
+                // (Sized from the measured width rather than fontSizeMode,
+                // which shrinks the glyphs but keeps the full line height and
+                // leaves a gap between the two lines.)
                 Label {
+                    id: scoreTopLabel
                     Layout.alignment: Qt.AlignHCenter
                     text: page.isE_LeitnerType? qsTr("Well"): page.displayCorrect
-                    font.pixelSize: 52
+                    TextMetrics { id: scoreTopMetrics; font.bold: true; font.pixelSize: 52; text: scoreTopLabel.text }
+                    font.pixelSize: Math.max(16, Math.min(52, Math.floor(52 * 128 / Math.max(1, scoreTopMetrics.advanceWidth))))
                     font.bold: true
                     color: "white"
                 }
                 Label {
+                    id: scoreBottomLabel
                     Layout.alignment: Qt.AlignHCenter
+                    readonly property int baseSize: page.isE_LeitnerType ? 30 : 14
                     text: page.isE_LeitnerType? qsTr("done"): qsTr("out of %1").arg(page.displayTotal)
-                    font.pixelSize: page.isE_LeitnerType? 30 : 14
+                    TextMetrics { id: scoreBottomMetrics; font.pixelSize: scoreBottomLabel.baseSize; text: scoreBottomLabel.text }
+                    font.pixelSize: Math.max(10, Math.min(baseSize, Math.floor(baseSize * 136 / Math.max(1, scoreBottomMetrics.advanceWidth))))
                     color: "white"
                     opacity: 0.85
                 }
@@ -158,28 +169,61 @@ Page {
         height: 64 + SafeArea.margins.bottom
         color: "#2c3e50"
 
-        Button {
-            id: practiceAgainBtn
+        RowLayout {
             anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: parent.top; topMargin: (64 - height) / 2
+                left: parent.left; right: parent.right; top: parent.top
+                leftMargin: 16; rightMargin: 16; topMargin: 10
             }
-            width: parent.width * 0.7
             height: 44
-            text: qsTr("Practice Again")
-            background: Rectangle {
-                radius: 22
-                color: practiceAgainBtn.pressed ? "#2980b9" : "#3498db"
+            spacing: 12
+
+            Button {
+                id: practiceAgainBtn
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                text: qsTr("Practice again")
+                background: Rectangle {
+                    radius: 22
+                    color: practiceAgainBtn.pressed ? "#2980b9" : "#3498db"
+                }
+                contentItem: Text {
+                    text: practiceAgainBtn.text
+                    color: "white"
+                    font.pixelSize: 15
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    fontSizeMode: Text.HorizontalFit
+                    minimumPixelSize: 11
+                }
+                onClicked: page.practiceSetAgain()
             }
-            contentItem: Text {
-                text: practiceAgainBtn.text
-                color: "white"
-                font.pixelSize: 17
-                font.bold: true
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+
+            Button {
+                id: findAnotherSetBtn
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                text: qsTr("Find another set")
+                background: Rectangle {
+                    radius: 22
+                    color: findAnotherSetBtn.pressed ? "#3d566e" : "transparent"
+                    border.color: "#3498db"
+                    border.width: 2
+                }
+                contentItem: Text {
+                    text: findAnotherSetBtn.text
+                    color: "white"
+                    font.pixelSize: 15
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    fontSizeMode: Text.HorizontalFit
+                    minimumPixelSize: 11
+                }
+                onClicked: page.findAnotherSet()
             }
-            onClicked: page.resultsNextPressed()
         }
     }
 }

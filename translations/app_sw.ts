@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Ghairi</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Maktaba au seti yenye jina hili tayari ipo hapa.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Seti ya maneno yenye jina hili tayari ipo hapa.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Matokeo</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Kazi</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>nzuri</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>kati ya %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Kazi nzuri sana! Endelea hivyo!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Ninajua</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+26"/>
+        <source>Practice again</source>
+        <translation>Fanya mazoezi tena</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Tafuta seti nyingine</translation>
+    </message>
+    <message>
         <source>Practice Again</source>
-        <translation>Fanya Mazoezi Tena</translation>
+        <translation type="vanished">Fanya Mazoezi Tena</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Inaendelea: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Weka upya</translation>
+        <translation type="vanished">← Weka upya</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Weka upya ili kufanya mazoezi tena</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Weka Upya</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Anza Mtihani</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Mtihani umekamilika</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Maktaba Mpya</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Jina la maktaba:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Maktaba yenye jina hili tayari ipo hapa.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Unda</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Badilisha Jina la Maktaba</translation>
     </message>
@@ -1396,7 +1414,8 @@ Gusa + Unda ili kuongeza seti ya maneno au maktaba.</translation>
         <translation>Lugha ya Kiolesura</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Ghairi</translation>
     </message>
@@ -1479,17 +1498,28 @@ Gusa + Unda ili kuongeza seti ya maneno au maktaba.</translation>
         <translation>Chaguo nyingi kwanza kujifunza, kisha kuandika kubobea dokezo zote</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Imekamilika</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Weka Upya</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Imekamilika — telezesha kushoto ili kuweka upya</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>Zimebaki %1</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Ukali wa tahajia</translation>
     </message>

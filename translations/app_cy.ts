@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Canslo</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Mae llyfrgell neu set gyda&apos;r enw hwn eisoes yn bodoli yma.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Mae set eiriau gyda&apos;r enw hwn eisoes yn bodoli yma.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Canlyniadau</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Gwaith</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>ardderchog</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>allan o %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Gwaith gwych! Daliwch ati!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Gwn</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+26"/>
+        <source>Practice again</source>
+        <translation>Ymarfer eto</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Dod o hyd i set arall</translation>
+    </message>
+    <message>
         <source>Practice Again</source>
-        <translation>Ymarfer Eto</translation>
+        <translation type="vanished">Ymarfer Eto</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Ar y gweill: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Ailosod</translation>
+        <translation type="vanished">← Ailosod</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Ailosod i ymarfer eto</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Ailosod</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Dechrau&apos;r Prawf</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Mae&apos;r prawf wedi&apos;i gwblhau</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Llyfrgell Newydd</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Enw&apos;r llyfrgell:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Mae llyfrgell gyda&apos;r enw hwn eisoes yn bodoli yma.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Creu</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Ailenwi&apos;r Llyfrgell</translation>
     </message>
@@ -1396,7 +1414,8 @@ Tapiwch + Creu i ychwanegu set eiriau neu lyfrgell.</translation>
         <translation>Iaith y Rhyngwyneb</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Canslo</translation>
     </message>
@@ -1479,17 +1498,28 @@ Tapiwch + Creu i ychwanegu set eiriau neu lyfrgell.</translation>
         <translation>Aml-ddewis i ddysgu, yna ysgrifennu i feistroli&apos;r holl awgrymiadau</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Wedi Gorffen</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Ailosod</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Wedi&apos;i gwblhau — llithrwch i&apos;r chwith i ailosod</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>%1 ar ôl</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Trylwyredd sillafu</translation>
     </message>

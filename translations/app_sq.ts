@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Anulo</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Këtu ekziston tashmë një bibliotekë ose grup me këtë emër.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Këtu ekziston tashmë një grup fjalësh me këtë emër.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Rezultatet</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Punë</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>e shkëlqyer</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>nga %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Punë e shkëlqyer! Vazhdo kështu!</translation>
@@ -1043,9 +1043,18 @@
         <translation>E di</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>Practice Again</source>
+        <location line="+26"/>
+        <source>Practice again</source>
         <translation>Praktiko përsëri</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Gjej një grup tjetër</translation>
+    </message>
+    <message>
+        <source>Practice Again</source>
+        <translation type="vanished">Praktiko përsëri</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Në vazhdim: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Rivendos</translation>
+        <translation type="vanished">← Rivendos</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Rivendos për të praktikuar përsëri</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Rivendos</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Fillo testin</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Testi ka përfunduar</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Bibliotekë e re</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Emri i bibliotekës:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Këtu ekziston tashmë një bibliotekë me këtë emër.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Krijo</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Riemërto bibliotekën</translation>
     </message>
@@ -1396,7 +1414,8 @@ Trokit + Krijo për të shtuar një grup fjalësh ose bibliotekë.</translation>
         <translation>Gjuha e ndërfaqes</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Anulo</translation>
     </message>
@@ -1479,17 +1498,28 @@ Trokit + Krijo për të shtuar një grup fjalësh ose bibliotekë.</translation>
         <translation>Zgjedhje e shumëfishtë për të mësuar, pastaj shkrim për të zotëruar të gjitha ndihmat</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ U krye</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Rivendos</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Përfunduar — rrëshqit majtas për ta rivendosur</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>Kanë mbetur %1</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Ashpërsia e drejtshkrimit</translation>
     </message>

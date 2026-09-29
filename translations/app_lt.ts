@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>Atšaukti</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Biblioteka ar rinkinys tokiu pavadinimu jau yra čia.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Žodžių rinkinys tokiu pavadinimu jau yra čia.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Rezultatai</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Puikiai</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>atlikta</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>iš %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Puikus darbas! Taip toliau!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Žinau</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+26"/>
+        <source>Practice again</source>
+        <translation>Praktikuotis dar kartą</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Rasti kitą rinkinį</translation>
+    </message>
+    <message>
         <source>Practice Again</source>
-        <translation>Treniruotis dar kartą</translation>
+        <translation type="vanished">Treniruotis dar kartą</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Vykdoma: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Atkurti</translation>
+        <translation type="vanished">← Atkurti</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Atstatyti ir praktikuotis dar kartą</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Atstatyti</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Pradėti testą</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Testas baigtas</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Nauja biblioteka</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Bibliotekos pavadinimas:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Biblioteka tokiu pavadinimu jau yra čia.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Kurti</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Pervadinti biblioteką</translation>
     </message>
@@ -1396,7 +1414,8 @@ Bakstelėkite + Kurti, kad pridėtumėte žodžių rinkinį ar biblioteką.</tra
         <translation>Sąsajos kalba</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>Atšaukti</translation>
     </message>
@@ -1479,17 +1498,28 @@ Bakstelėkite + Kurti, kad pridėtumėte žodžių rinkinį ar biblioteką.</tra
         <translation>Iš pradžių renkatės iš variantų, tada rašote, kad įsisavintumėte visas užuominas</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Atlikta</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Atstatyti</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Baigta — perbraukite kairėn, kad atstatytumėte</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>Liko: %1</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Rašybos griežtumas</translation>
     </message>

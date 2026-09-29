@@ -211,7 +211,7 @@
     </message>
     <message>
         <location line="+124"/>
-        <location line="+326"/>
+        <location line="+339"/>
         <location line="+835"/>
         <source>Cancel</source>
         <translation>İptal</translation>
@@ -977,7 +977,7 @@
         <translation type="vanished">Bu ada sahip bir kütüphane veya set burada zaten mevcut.</translation>
     </message>
     <message>
-        <location line="+309"/>
+        <location line="+317"/>
         <location line="+7"/>
         <source>A word set with this name already exists here.</source>
         <translation>Bu ada sahip bir kelime seti burada zaten mevcut.</translation>
@@ -992,17 +992,17 @@
 <context>
     <name>Results</name>
     <message>
-        <location filename="../Results.qml" line="+37"/>
+        <location filename="../Results.qml" line="+38"/>
         <source>Results</source>
         <translation>Sonuçlar</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+36"/>
         <source>Well</source>
         <translation>Aferin</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+10"/>
         <source>done</source>
         <translation>tamamlandı</translation>
     </message>
@@ -1012,7 +1012,7 @@
         <translation>%1 üzerinden</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Excellent work! Keep it up!</source>
         <translation>Harika iş! Böyle devam et!</translation>
@@ -1043,9 +1043,18 @@
         <translation>Biliyorum</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+26"/>
+        <source>Practice again</source>
+        <translation>Tekrar çalış</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Find another set</source>
+        <translation>Başka bir set bul</translation>
+    </message>
+    <message>
         <source>Practice Again</source>
-        <translation>Tekrar pratik yap</translation>
+        <translation type="vanished">Tekrar pratik yap</translation>
     </message>
 </context>
 <context>
@@ -1073,9 +1082,18 @@
         <translation type="vanished">Devam ediyor: %1 / %2</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>← Reset</source>
-        <translation>← Sıfırla</translation>
+        <translation type="vanished">← Sıfırla</translation>
+    </message>
+    <message>
+        <location line="+185"/>
+        <source>Reset to practise again</source>
+        <translation>Tekrar çalışmak için sıfırla</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reset</source>
+        <translation>Sıfırla</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1118,7 +1136,7 @@
         <translation>Testi Başlat</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-316"/>
         <source>Test is completed</source>
         <translation>Test tamamlandı</translation>
     </message>
@@ -1268,7 +1286,7 @@
         <translation>Yeni Kütüphane</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+31"/>
         <source>Library name:</source>
         <translation>Kütüphane adı:</translation>
     </message>
@@ -1283,17 +1301,17 @@
     </message>
     <message>
         <location line="+12"/>
-        <location line="+74"/>
+        <location line="+99"/>
         <source>A library with this name already exists here.</source>
         <translation>Bu ada sahip bir kütüphane burada zaten mevcut.</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-62"/>
         <source>Create</source>
         <translation>Oluştur</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
         <source>Rename Library</source>
         <translation>Kütüphaneyi Yeniden Adlandır</translation>
     </message>
@@ -1396,7 +1414,8 @@ Kelime seti veya kütüphane eklemek için + Oluştur&apos;a dokunun.</translati
         <translation>Arayüz Dili</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="-710"/>
+        <location line="+796"/>
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
@@ -1479,17 +1498,28 @@ Kelime seti veya kütüphane eklemek için + Oluştur&apos;a dokunun.</translati
         <translation>Öğrenmek için önce çoktan seçmeli, sonra tüm ipuçlarında ustalaşmak için yazma</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+36"/>
+        <location line="+82"/>
         <source>✓ Done</source>
         <translation>✓ Bitti</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-82"/>
         <source>← Reset</source>
         <translation>← Sıfırla</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+56"/>
+        <source>Completed — swipe left to reset</source>
+        <translation>Tamamlandı — sıfırlamak için sola kaydırın</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 left</source>
+        <translation>%1 kaldı</translation>
+    </message>
+    <message>
+        <location line="+51"/>
         <source>✍️ Spelling strictness</source>
         <translation>✍️ Yazım katılığı</translation>
     </message>

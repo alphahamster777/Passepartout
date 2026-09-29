@@ -121,12 +121,25 @@ Page {
                         SwipeDelegate {
                             id: swipeRow
                             width: typeCol.width
-                            height: 64
+                            // Grows when a long title/description wraps onto a second line.
+                            height: Math.max(64, typeRowLayout.implicitHeight + 16)
                             enabled: swipeView.count > 0
                             clip: true
 
                             required property var modelData
                             property bool swipeResetDone: false
+
+                            property int remaining: {
+                                page.popupRefresh                         // re-evaluate when popup opens / after reset
+                                spellingTestController.progressVersion    // re-evaluate during an active test session
+                                return spellingTestController.getUnfinishedCount(
+                                    AppController.recSetManager,
+                                    setPreviewController.currentSetIndex,
+                                    swipeRow.modelData.type)
+                            }
+                            // Nothing left to practise in this test type — it can't be
+                            // started again until it's reset (swipe left).
+                            readonly property bool completed: swipeView.count > 0 && remaining === 0
 
                             // Full-width background — red normally, green after a successful reset
                             swipe.right: Rectangle {
@@ -160,7 +173,8 @@ Page {
                             swipe.onClosed: swipeRow.swipeResetDone = false
 
                             background: Rectangle {
-                                color: swipeRow.pressed ? "#f0f4f8" : "white"
+                                color: swipeRow.completed ? "#eafaf1"
+                                     : swipeRow.pressed   ? "#f0f4f8" : "white"
                                 Rectangle {
                                     anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                                     height: 1; color: "#ececec"
@@ -170,39 +184,59 @@ Page {
                             // Wrap in Item so the RowLayout's anchors don't land on contentItem itself
                             contentItem: Item {
                                 RowLayout {
+                                    id: typeRowLayout
                                     anchors { fill: parent; leftMargin: 14; rightMargin: 10 }
                                     spacing: 10
 
-                                    Label { text: swipeRow.modelData.icon; font.pixelSize: 22 }
+                                    Label {
+                                        text: swipeRow.modelData.icon; font.pixelSize: 22
+                                        opacity: swipeRow.completed ? 0.45 : 1.0
+                                    }
 
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 1
                                         Label {
                                             text: swipeRow.modelData.title
-                                            font.pixelSize: 13; font.bold: true; color: "#2c3e50"
+                                            // Wrap long (translated) titles instead of pushing
+                                            // the status badge off the row's right edge.
+                                            wrapMode: Text.WordWrap
+                                            Layout.fillWidth: true
+                                            font.pixelSize: 13; font.bold: true
+                                            color: swipeRow.completed ? "#7f8c8d" : "#2c3e50"
                                         }
                                         Label {
-                                            text: swipeRow.modelData.desc
-                                            font.pixelSize: 11; color: "#7f8c8d"
+                                            text: swipeRow.completed
+                                                  ? qsTr("Completed — swipe left to reset")
+                                                  : swipeRow.modelData.desc
+                                            font.pixelSize: 11
+                                            font.italic: swipeRow.completed
+                                            color: swipeRow.completed ? "#27ae60" : "#7f8c8d"
                                             wrapMode: Text.WordWrap
                                             Layout.fillWidth: true
                                         }
                                     }
 
                                     Label {
-                                        id: remainingLabel
-                                        property int remaining: {
-                                            page.popupRefresh                         // re-evaluate when popup opens / after reset
-                                            spellingTestController.progressVersion    // re-evaluate during an active test session
-                                            return spellingTestController.getUnfinishedCount(
-                                                AppController.recSetManager,
-                                                setPreviewController.currentSetIndex,
-                                                swipeRow.modelData.type)
-                                        }
-                                        text:  remaining > 0 ? remaining + " left" : "✓"
-                                        color: remaining > 0 ? "#3498db" : "#27ae60"
+                                        visible: !swipeRow.completed
+                                        text: qsTr("%1 left").arg(swipeRow.remaining)
+                                        color: "#3498db"
                                         font.pixelSize: 11
+                                    }
+                                    // Completed badge
+                                    Rectangle {
+                                        visible: swipeRow.completed
+                                        implicitWidth: doneLabel.implicitWidth + 16
+                                        implicitHeight: 22
+                                        radius: 11
+                                        color: "#27ae60"
+                                        Label {
+                                            id: doneLabel
+                                            anchors.centerIn: parent
+                                            text: qsTr("✓ Done")
+                                            color: "white"
+                                            font.pixelSize: 11; font.bold: true
+                                        }
                                     }
                                 }
                             }
@@ -212,6 +246,8 @@ Page {
                                     swipeRow.swipe.close()
                                     return
                                 }
+                                if (swipeRow.completed)
+                                    return
                                 testTypePopup.close()
                                 page.navigateToTest(swipeRow.modelData.type)
                             }

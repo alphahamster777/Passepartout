@@ -129,16 +129,134 @@ Page {
 
                     Rectangle { Layout.fillWidth: true; height: 1; color: "#ececec" }
 
+                    // Always a pill with the same drawn reset icon. While the
+                    // test is in progress it's a quiet coral outline; once it's
+                    // completed (resetting is then the only way to practise
+                    // this set again) it fills with a glowing gradient, pulses
+                    // and spins its icon to draw the eye.
                     ItemDelegate {
+                        id: resetRow
+                        readonly property bool completed: ruleTestController.testComplete
+                        readonly property color accent: "#ff5f6d"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 50
-                        background: Rectangle { color: parent.pressed ? "#f0f4f8" : "white" }
-                        contentItem: Text {
-                            text: qsTr("← Reset")
-                            color: "#e74c3c"
-                            font.pixelSize: 15; font.bold: true
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                        Layout.preferredHeight: completed ? 72 : 62
+                        Behavior on Layout.preferredHeight { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+                        background: Item {
+                            Item {
+                                id: resetPill
+                                anchors { fill: parent; leftMargin: 14; rightMargin: 14; topMargin: 10; bottomMargin: 10 }
+                                scale: resetRow.pressed ? 0.96 : 1.0
+                                Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+
+                                // Soft pulsing halo behind the pill (completed only).
+                                Rectangle {
+                                    id: resetHalo
+                                    anchors.centerIn: parent
+                                    width: parent.width; height: parent.height
+                                    radius: height / 2
+                                    color: "#ff6a88"
+                                    opacity: 0
+                                    visible: resetRow.completed
+                                    SequentialAnimation {
+                                        running: resetRow.completed
+                                        loops: Animation.Infinite
+                                        ParallelAnimation {
+                                            NumberAnimation { target: resetHalo; property: "opacity"; from: 0.45; to: 0; duration: 1400; easing.type: Easing.OutCubic }
+                                            NumberAnimation { target: resetHalo; property: "width"; from: resetPill.width; to: resetPill.width + 16; duration: 1400; easing.type: Easing.OutCubic }
+                                            NumberAnimation { target: resetHalo; property: "height"; from: resetPill.height; to: resetPill.height + 16; duration: 1400; easing.type: Easing.OutCubic }
+                                        }
+                                        PauseAnimation { duration: 600 }
+                                    }
+                                }
+
+                                // In progress: light tinted fill with a coral outline.
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: height / 2
+                                    visible: !resetRow.completed
+                                    color: resetRow.pressed ? "#ffe3e6" : "#fff4f5"
+                                    border.color: resetRow.accent
+                                    border.width: 1.5
+                                }
+
+                                // Completed: warm coral → pink gradient with a glossy top.
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: height / 2
+                                    visible: resetRow.completed
+                                    gradient: Gradient {
+                                        orientation: Gradient.Horizontal
+                                        GradientStop { position: 0.0; color: resetRow.pressed ? "#e8603c" : "#ff8a5c" }
+                                        GradientStop { position: 1.0; color: resetRow.pressed ? "#d63a6a" : "#ff4f81" }
+                                    }
+                                    Rectangle {
+                                        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 2 }
+                                        height: parent.height / 2 - 2
+                                        radius: height / 2
+                                        color: "white"
+                                        opacity: 0.18
+                                    }
+                                }
+                            }
+                        }
+
+                        contentItem: Item {
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 8
+                                scale: resetPill.scale
+                                // Drawn rather than a "↻" glyph, which some Android
+                                // fonts don't have (it showed up as a missing-glyph box).
+                                Canvas {
+                                    id: resetIcon
+                                    readonly property color strokeColor: resetRow.completed ? "white" : resetRow.accent
+                                    onStrokeColorChanged: requestPaint()
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 20; height: 20
+                                    onPaint: {
+                                        var ctx = getContext("2d")
+                                        ctx.reset()
+                                        var cx = width / 2, cy = height / 2, r = 7
+                                        ctx.strokeStyle = strokeColor
+                                        ctx.fillStyle = strokeColor
+                                        ctx.lineWidth = 2.4
+                                        ctx.lineCap = "round"
+                                        // Clockwise open circle with a small gap at the top.
+                                        var from = -40 * Math.PI / 180
+                                        var to   = 250 * Math.PI / 180
+                                        ctx.beginPath()
+                                        ctx.arc(cx, cy, r, from, to, false)
+                                        ctx.stroke()
+                                        // Arrowhead at the arc's end, pointing along the
+                                        // clockwise direction (tangent d, normal n).
+                                        var px = cx + r * Math.cos(to), py = cy + r * Math.sin(to)
+                                        var dx = -Math.sin(to), dy = Math.cos(to)
+                                        var nx = Math.cos(to),  ny = Math.sin(to)
+                                        ctx.beginPath()
+                                        ctx.moveTo(px + dx * 5, py + dy * 5)
+                                        ctx.lineTo(px - dx * 1 + nx * 4, py - dy * 1 + ny * 4)
+                                        ctx.lineTo(px - dx * 1 - nx * 4, py - dy * 1 - ny * 4)
+                                        ctx.closePath()
+                                        ctx.fill()
+                                    }
+                                    // A slow full turn now and then, hinting "start over"
+                                    // (completed only; snaps back upright otherwise).
+                                    SequentialAnimation on rotation {
+                                        running: resetRow.completed
+                                        loops: Animation.Infinite
+                                        PauseAnimation { duration: 1600 }
+                                        NumberAnimation { from: 0; to: 360; duration: 700; easing.type: Easing.InOutCubic }
+                                        onRunningChanged: if (!running) resetIcon.rotation = 0
+                                    }
+                                }
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: resetRow.completed ? qsTr("Reset to practise again") : qsTr("Reset")
+                                    color: resetRow.completed ? "white" : resetRow.accent
+                                    font.pixelSize: 15; font.bold: true
+                                }
+                            }
                         }
                         onClicked: resetConfirmDialog.open()
                     }
@@ -311,7 +429,8 @@ Page {
             width: parent.width * 0.7
             height: 44
             text: qsTr("Start Test")
-            enabled: page.questionCount > 0
+            // A completed test can't be restarted — it has to be reset first.
+            enabled: page.questionCount > 0 && !ruleTestController.testComplete
             background: Rectangle {
                 radius: 22
                 color: !parent.enabled ? "#4a6070" : (parent.pressed ? "#2980b9" : "#3498db")

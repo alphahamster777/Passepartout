@@ -563,7 +563,7 @@ ApplicationWindow {
 
         Loader {
             id: resultsConnectionLoader
-            active: stackView.currentItem && typeof stackView.currentItem.resultsNextPressed === "function"
+            active: stackView.currentItem && typeof stackView.currentItem.practiceSetAgain === "function"
             sourceComponent: resultsConnectionComponent
         }
 
@@ -611,9 +611,17 @@ ApplicationWindow {
             id: resultsConnectionComponent
             Connections {
                 target: stackView.currentItem
-                function onResultsNextPressed() {
-                    // Pop back to SetPreview (Results → SpellingTest → SetPreview).
-                    // Stack: [..., SetDirMenu, SetPreview, SpellingTest, Results]
+                // The test page itself was already replaced by Results (see
+                // onGetResults), so the stack here is
+                // [..., SetDirMenu, SetPreviewMenu | RuleSetPreview, Results].
+                function onPracticeSetAgain() {
+                    // Word sets land back on their Choose Test Type popup
+                    // (backToTestTypeMenu is a no-op on RuleSetPreview, which
+                    // has no such popup — it is itself the rule set's preview).
+                    rootScope.backToTestTypeMenu()
+                }
+                function onFindAnotherSet() {
+                    // Back to the library the set lives in.
                     stackView.pop(stackView.get(stackView.depth - 3))
                 }
             }
