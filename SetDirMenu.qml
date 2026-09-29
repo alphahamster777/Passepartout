@@ -723,7 +723,6 @@ Page {
                                         page.refreshModel()
                                     }
                                 }
-                                MenuSeparator { visible: model.type === "folder"; height: visible ? implicitHeight : 0 }
 
                                 // Set items
                                 MenuItem {
