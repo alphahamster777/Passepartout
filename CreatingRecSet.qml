@@ -438,9 +438,22 @@ Page {
         height: Math.min(implicitHeight, visibleAreaHeight)
         padding: 0
         modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        // Closing while a request is in flight (Cancel, tap outside, Escape,
-        // the Android back gesture) must abort it — otherwise the dialog just
+        // No automatic close (same as CreatingRuleSet.qml's AI generator): a
+        // stray tap outside mustn't throw away what the creator typed. Only
+        // Cancel closes it; Escape/Back first just dismisses the keyboard.
+        closePolicy: Popup.NoAutoClose
+        focus: true
+        function handleBackOrEscape(event) {
+            event.accepted = true
+            if (keyboardUp)
+                Qt.inputMethod.hide()
+            else
+                aiGeneratorPopup.close()
+        }
+        Keys.onEscapePressed: (event) => handleBackOrEscape(event)
+        Keys.onBackPressed: (event) => handleBackOrEscape(event)
+        // Closing while a request is in flight (Cancel, Escape, the Android
+        // back gesture) must abort it — otherwise the dialog just
         // disappears while Gemini keeps "generating" forever in the background,
         // and reopening it shows a stuck, unresponsive Generate button.
         onClosed: if (page.aiGenerating) page.aiBackend.cancelGeneration()

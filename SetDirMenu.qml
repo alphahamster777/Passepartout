@@ -236,7 +236,19 @@ Page {
         anchors.centerIn: parent
         width: Math.min(parent.width - 32, 320)
         modal: true
-        standardButtons: Dialog.Cancel
+        // Same behavior as the AI generators: a tap outside doesn't dismiss it
+        // (only Cancel does), and Escape/Back first just hides the keyboard.
+        closePolicy: Popup.NoAutoClose
+        focus: true
+        function handleBackOrEscape(event) {
+            event.accepted = true
+            if (Qt.inputMethod.visible)
+                Qt.inputMethod.hide()
+            else
+                newFolderDialog.reject()
+        }
+        Keys.onEscapePressed: (event) => handleBackOrEscape(event)
+        Keys.onBackPressed: (event) => handleBackOrEscape(event)
 
         readonly property string trimmedName: folderNameField.text.trim()
         readonly property bool nameTaken: trimmedName !== "" &&
@@ -273,19 +285,44 @@ Page {
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Button {
-                text: qsTr("Create")
-                Layout.fillWidth: true
-                enabled: newFolderDialog.nameValid
-                background: Rectangle {
-                    radius: 8
-                    color: parent.enabled ? (parent.pressed ? "#2980b9" : "#3498db") : "#bbb"
+        }
+
+        // Cancel / Create side by side, laid out like the AI generator's footer.
+        footer: Column {
+            Rectangle { width: parent.width; height: 1; color: "#ececec" }
+            Row {
+                width: parent.width
+                ItemDelegate {
+                    width: parent.width / 2
+                    height: 52
+                    background: Rectangle { color: parent.pressed ? "#f0f4f8" : "transparent"; radius: 12 }
+                    contentItem: Text {
+                        text: qsTr("Cancel")
+                        color: "#e74c3c"
+                        font.pixelSize: 15; font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: newFolderDialog.reject()
                 }
-                contentItem: Text {
-                    text: parent.text; color: "white"; font: parent.font
-                    horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                ItemDelegate {
+                    id: createFolderButton
+                    width: parent.width / 2
+                    height: 52
+                    enabled: newFolderDialog.nameValid
+                    background: Rectangle {
+                        radius: 12
+                        color: createFolderButton.enabled
+                               ? (createFolderButton.pressed ? "#2980b9" : "#3498db") : "#bbb"
+                    }
+                    contentItem: Text {
+                        text: qsTr("Create"); color: "white"
+                        font.pixelSize: 15; font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: newFolderDialog.tryAccept()
                 }
-                onClicked: newFolderDialog.tryAccept()
             }
         }
 
