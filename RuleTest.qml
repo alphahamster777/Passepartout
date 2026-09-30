@@ -184,6 +184,12 @@ Page {
     // { blocks: [ {kind:"text",value} | {kind:"image",value,imgHeight} |
     //             {kind:"audio",value}, ... ] } — rendered in that order.
     readonly property var theoryBlocks: ruleTestController.theory.blocks || []
+    // False when the set has no explanation at all — no blocks, or only
+    // blocks left empty (e.g. a text block with just whitespace) — so the
+    // "View rule" link isn't offered for a popup with nothing in it.
+    readonly property bool hasTheory: theoryBlocks.some(function(b) {
+        return b && typeof b.value === "string" && b.value.trim() !== ""
+    })
 
     Connections {
         target: ruleTestController
@@ -478,7 +484,7 @@ Page {
         // Reveal link — invisible until the learner has made a mistake.
         Button {
             Layout.alignment: Qt.AlignRight
-            visible: ruleTestController.theoryUnlocked
+            visible: ruleTestController.theoryUnlocked && root.hasTheory
             flat: true
             text: qsTr("💡 View rule")
             onClicked: theoryPopup.open()
