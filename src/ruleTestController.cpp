@@ -252,9 +252,14 @@ void RuleTestController::showQuestion(int position) {
     m_isAnswered = false;
     m_lastAnswerCorrect = false;
     m_lastGapResults = {};
-    emit currentQuestionChanged();
+    // isAnsweredChanged must go out before currentQuestionChanged: the new
+    // question's combo wheels are created (and register their starting
+    // null pick) synchronously on currentQuestionChanged, and RuleTest.qml
+    // ignores picks while isAnswered still reads true — which left the
+    // previous question's pick showing in the new blank.
     emit isAnsweredChanged();
     emit lastAnswerCorrectChanged();
+    emit currentQuestionChanged();
     emit currentPositionChanged();
 }
 
