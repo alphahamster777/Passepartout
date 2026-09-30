@@ -226,8 +226,12 @@ ApplicationWindow {
                         // answer, and resuming lets that same word be answered
                         // (and counted) again, eventually pushing correctAnswers
                         // past totalQuestions.
-                        if (typeof stackView.currentItem.answerSubmitted !== "undefined" &&
-                            stackView.currentItem.answerSubmitted) {
+                        // (answerSubmitted is SpellingTest's flag, isAnswered
+                        // RuleTest's — same situation for both.)
+                        if ((typeof stackView.currentItem.answerSubmitted !== "undefined" &&
+                             stackView.currentItem.answerSubmitted) ||
+                            (typeof stackView.currentItem.isAnswered !== "undefined" &&
+                             stackView.currentItem.isAnswered)) {
                             spellingTestController.nextQuestion()
                         } else {
                             spellingTestController.saveProgress()
