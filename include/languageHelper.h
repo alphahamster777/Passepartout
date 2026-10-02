@@ -489,22 +489,32 @@ public:
         return mapping.value(lang, QStringLiteral("🏳️"));
     }
 
-    // A bundled bitmap for languages whose flagEmoji() result doesn't render
-    // reliably as live text — currently just Welsh. Its flag is a 7-codepoint
-    // Unicode subdivision-flag tag sequence rather than an ordinary
-    // 2-codepoint regional-indicator flag, and Android's Noto Color Emoji has
-    // a documented history of positioning that artwork inconsistently within
-    // its own glyph box (confirmed here across three separate on-device
-    // attempts to compensate for it in QML: too small, then mostly cropped
-    // off, then overflowing). Rendering wales.png (extracted from a
-    // desktop-browser render of the same sequence, where it's correct) via
-    // an Image instead of a Text glyph sidesteps the on-device font entirely.
-    // Empty for every language that renders fine as plain text — callers
-    // fall back to flagEmoji() in that case.
+    // A bundled bitmap of every language's flag (images/flags/, Noto Color
+    // Emoji's own "waved" flag artwork from googlefonts/noto-emoji's
+    // third_party/region-flags, public domain), which every flag in the UI
+    // renders through instead of flagEmoji()'s text glyph. Android's emoji
+    // font can't be trusted to position flag glyphs within their own box:
+    // first just Welsh's 7-codepoint subdivision flag (too small, then
+    // cropped, then overflowing), later on some devices every flag — drawn
+    // ~150px below where its Text item actually is, so the header flag
+    // floated over the page (and taps on it missed the real button) and
+    // picker rows' flags hid under the next row. An Image sidesteps the
+    // on-device font entirely. Derived from flagEmoji() so the two can't
+    // drift apart; empty only where there's no flag to show.
     Q_INVOKABLE static QString flagImageSource(Language lang) {
         if (lang == Welsh)
             return QStringLiteral("qrc:/images/flags/wales.png");
-        return QString();
+        // A regular flag is two regional-indicator symbols (U+1F1E6..1F1FF,
+        // "A".."Z"), each a surrogate pair in the QString.
+        const QString emoji = flagEmoji(lang);
+        if (emoji.size() != 4) return QString();
+        QString code;
+        for (int i = 0; i < 4; i += 2) {
+            const char32_t cp = QChar::surrogateToUcs4(emoji.at(i), emoji.at(i + 1));
+            if (cp < 0x1F1E6 || cp > 0x1F1FF) return QString();
+            code += QChar(u'a' + char16_t(cp - 0x1F1E6));
+        }
+        return QStringLiteral("qrc:/images/flags/%1.png").arg(code);
     }
 
     // Best-effort match from the system/UI locale to one of our supported

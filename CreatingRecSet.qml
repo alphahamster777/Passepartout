@@ -317,11 +317,10 @@ Page {
                             contentItem: RowLayout {
                                 anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
                                 spacing: 10
-                                // A bundled image for languages whose flag
-                                // doesn't render reliably as live emoji text
-                                // (currently just Welsh — see LanguageHelper::
-                                // flagImageSource's comment); the plain-text
-                                // glyph every other language uses otherwise.
+                                // The bundled flag image (see LanguageHelper::
+                                // flagImageSource's comment for why not emoji
+                                // text); the emoji glyph only as a fallback
+                                // where there's no image.
                                 Item {
                                     implicitWidth: 24; implicitHeight: 20
                                     Image {

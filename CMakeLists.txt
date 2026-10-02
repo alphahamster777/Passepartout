@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(Passepartout VERSION 2.4.9 LANGUAGES CXX)
+project(Passepartout VERSION 2.4.10 LANGUAGES CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # FREE vs PRO are separate Play Store listings built from this same source
@@ -406,13 +406,63 @@ qt_add_resources(appPassepartout "license_resources"
         licenses/qt_notice.txt
 )
 
-# Wales' flag as a bundled bitmap rather than its live Unicode emoji glyph —
-# see LanguageHelper::flagImageSource()'s comment for why (Android's Noto
-# Color Emoji doesn't render that specific sequence reliably on-device).
+# Every language's flag as a bundled bitmap rather than its live Unicode
+# emoji glyph — see LanguageHelper::flagImageSource()'s comment for why
+# (Android's emoji font doesn't position flag glyphs reliably on-device).
 qt_add_resources(appPassepartout "flag_resources"
     PREFIX "/"
     FILES
+        images/flags/al.png
+        images/flags/am.png
+        images/flags/az.png
+        images/flags/bd.png
+        images/flags/bg.png
+        images/flags/by.png
+        images/flags/cn.png
+        images/flags/cz.png
+        images/flags/de.png
+        images/flags/dk.png
+        images/flags/ee.png
+        images/flags/es.png
+        images/flags/fi.png
+        images/flags/fr.png
+        images/flags/gb.png
+        images/flags/ge.png
+        images/flags/gr.png
+        images/flags/hr.png
+        images/flags/hu.png
+        images/flags/id.png
+        images/flags/il.png
+        images/flags/in.png
+        images/flags/ir.png
+        images/flags/is.png
+        images/flags/it.png
+        images/flags/jp.png
+        images/flags/kr.png
+        images/flags/kz.png
+        images/flags/lt.png
+        images/flags/lv.png
+        images/flags/my.png
+        images/flags/nl.png
+        images/flags/no.png
+        images/flags/ph.png
+        images/flags/pk.png
+        images/flags/pl.png
+        images/flags/pt.png
+        images/flags/ro.png
+        images/flags/rs.png
+        images/flags/ru.png
+        images/flags/sa.png
+        images/flags/se.png
+        images/flags/si.png
+        images/flags/sk.png
+        images/flags/th.png
+        images/flags/tr.png
+        images/flags/tz.png
+        images/flags/ua.png
+        images/flags/vn.png
         images/flags/wales.png
+        images/flags/za.png
 )
 
 # One .ts per LanguageHelper language except English (the qsTr() source
@@ -503,7 +553,7 @@ elseif(ANDROID)
         QT_ANDROID_APP_NAME "Passepartout"
         # Google Play use the number to decide whether one build is newer than another.
         # Every public release must use a higher value than the previous one.
-        QT_ANDROID_VERSION_CODE "25"
+        QT_ANDROID_VERSION_CODE "26"
         # Human-readable app version
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
 

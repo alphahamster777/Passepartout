@@ -34,7 +34,8 @@ QVariantList LanguageHelper::sortedLanguageEntries()
         {"name", tr("Not selected")},
         {"id",   static_cast<int>(NotSelected)},
         {"code", QStringLiteral("")},
-        {"flag", QStringLiteral("")}
+        {"flag", QStringLiteral("")},
+        {"flagImage", QStringLiteral("")}
     });
 
     return entries;

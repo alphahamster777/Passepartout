@@ -446,11 +446,10 @@ Page {
 
                 ToolButton {
                     id: interfaceFlagButton
-                    // A bundled image for languages whose flag doesn't
-                    // render reliably as live emoji text (currently just
-                    // Welsh — see LanguageHelper::flagImageSource's own
-                    // comment); the plain-text glyph every other language
-                    // uses otherwise.
+                    // The bundled flag image (see LanguageHelper::
+                    // flagImageSource's comment for why not emoji text);
+                    // the emoji glyph only as a fallback where there's no
+                    // image.
                     readonly property string flagImage:
                         LanguageHelper.flagImageSource(AppController.interfaceLanguage)
                     contentItem: Item {
